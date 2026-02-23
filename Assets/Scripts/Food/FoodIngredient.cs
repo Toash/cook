@@ -5,11 +5,17 @@ using UnityEngine;
 
 public enum FoodIngredientType
 {
-    BUN,
+    BURGER_BUN,
     PATTY,
-
+    HOTDOG,
+    HOTDOG_BUN,
+    LETTUCE,
+    TOMATO
 }
 
+/// <summary>
+/// Represenets an actual ingredient in the world
+/// </summary>
 [RequireComponent(typeof(FoodSnapper))]
 public class FoodIngredient : MonoBehaviour
 {
@@ -26,6 +32,7 @@ public class FoodIngredient : MonoBehaviour
     {
         snapper = GetComponent<FoodSnapper>();
     }
+
 
     void OnEnable()
     {
@@ -78,6 +85,11 @@ public class FoodIngredient : MonoBehaviour
             other.FoodRoot.RemoveIngredient(this);
         }
 
+    }
+
+    public FoodRoot GetFoodRoot()
+    {
+        return this.FoodRoot;
     }
 
 

@@ -5,13 +5,14 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// determines what the food actually "is" to npc
+/// source of truth for a "food" that an npc would receive.
 /// </summary>
 public class FoodQuality
 {
-
+    // determine based on placements of each individual ingredient
 }
 
+// [RequireComponent(typeof(Rigidbody))]
 public class FoodRoot : MonoBehaviour
 {
     public List<FoodIngredient> ingredients = new List<FoodIngredient>();
@@ -26,6 +27,16 @@ public class FoodRoot : MonoBehaviour
         GameObject rootObj = new GameObject("Food root");
         rootObj.transform.position = ingredient.transform.position;
         FoodRoot foodRoot = rootObj.AddComponent<FoodRoot>();
+
+        // Rigidbody rb = rootObj.GetComponent<Rigidbody>();
+        // rb.useGravity = false;
+        // rb.isKinematic = true;
+        // rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        // Collider col = rootObj.AddComponent<SphereCollider>();
+        // col.isTrigger = true;
+
+
 
         foodRoot.ingredients.Add(ingredient);
         ingredient.transform.SetParent(rootObj.transform);

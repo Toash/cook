@@ -27,7 +27,6 @@ public class SnapConnection
 /// Detached can happen both manually from the player, and by physics (from joint breaking)
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(FoodIngredient))]
 public class FoodSnapper : MonoBehaviour
 {
 
@@ -51,7 +50,6 @@ public class FoodSnapper : MonoBehaviour
     public event Action<FoodIngredient> OnSnapEvent;
     public event Action<FoodIngredient> OnDetachedEvent;
 
-    private FoodIngredient ingredient;
 
     private float snapDelay = .3f;
     private float snapTimer;
@@ -65,7 +63,6 @@ public class FoodSnapper : MonoBehaviour
 
     void Awake()
     {
-        ingredient = GetComponent<FoodIngredient>();
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         // ingredient = GetComponent<FoodIngredient>();
@@ -148,12 +145,15 @@ public class FoodSnapper : MonoBehaviour
         Debug.Log("Snap");
         AudioManager.I.PlayOneShot(SnapSound, transform.position);
 
-        OnSnapEvent.Invoke(other.ingredient);
+        // OnSnapEvent.Invoke(other.ingredient);
+        // smelly
+        OnSnapEvent.Invoke(other.GetComponent<FoodIngredient>());
     }
 
     void OnDetached(FoodSnapper other)
     {
-        OnDetachedEvent.Invoke(other.ingredient);
+        // OnDetachedEvent.Invoke(other.ingredient);
+        OnDetachedEvent.Invoke(other.GetComponent<FoodIngredient>());
 
     }
 
