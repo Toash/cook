@@ -527,6 +527,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &502202682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 502202684}
+  - component: {fileID: 502202683}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &502202683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502202682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4be584aea954144abc83946c250b5b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+--- !u!4 &502202684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502202682}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.12763, y: 0.51111, z: -0.23032}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &781476109
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,6 +739,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944b15392521cab4d906b33495de27ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodSnapper
+  SnapSound: {fileID: 0}
   Grabbable: {fileID: 781476110}
   JointPriority: 1
 --- !u!114 &781476117
@@ -1378,8 +1423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6492f1aade3c20245847921447f579f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImpactAudio
-  volume: 0.6
-  impactSound: {fileID: 6418180475301049370, guid: 18e64f504bf908245a54396f6ad6d337, type: 2}
+  AudioDef: {fileID: 11400000, guid: 18a3678dddca3744b8904c3a57e4ae95, type: 2}
 --- !u!33 &318775072333680939
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1518,6 +1562,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944b15392521cab4d906b33495de27ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodSnapper
+  SnapSound: {fileID: 11400000, guid: e33ae71e176e2584e84366f520aef36c, type: 2}
   Grabbable: {fileID: 1794658886341618890}
   JointPriority: 0
 --- !u!4 &5872385389859730096
@@ -1650,3 +1695,4 @@ SceneRoots:
   - {fileID: 5872385389859730096}
   - {fileID: 414645059}
   - {fileID: 781476115}
+  - {fileID: 502202684}

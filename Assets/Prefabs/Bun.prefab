@@ -183,8 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6492f1aade3c20245847921447f579f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ImpactAudio
-  volume: 0.6
-  impactSound: {fileID: 6418180475301049370, guid: 5f14d5c6150b3ea46b6726314b9961e6, type: 2}
+  AudioDef: {fileID: 11400000, guid: 3540c14f9169c594ebf5f326bd169f52, type: 2}
 --- !u!114 &5092177489839818430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210,5 +209,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944b15392521cab4d906b33495de27ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodSnapper
+  SnapSound: {fileID: 11400000, guid: e33ae71e176e2584e84366f520aef36c, type: 2}
   Grabbable: {fileID: 2719425010079322672}
   JointPriority: 0

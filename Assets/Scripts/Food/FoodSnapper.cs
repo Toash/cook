@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Audio;
 
 
 public enum JointPriority
@@ -25,7 +26,12 @@ public class SnapConnection
 public class FoodSnapper : MonoBehaviour
 {
 
+    [Tooltip("Auto set if not set.")]
+    public FoodSnapSettings SnapSettings;
+    [Header("Audio")]
+    public AudioDefinition SnapSound;
 
+    [Header("References")]
     public Grabbable Grabbable;
     [Tooltip("Determines the snapping priority. Goes from lowest priority to highest priority")]
     public JointPriority JointPriority;
@@ -54,11 +60,28 @@ public class FoodSnapper : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         ingredient = GetComponent<FoodIngredient>();
 
+        // init snap connections for each priority.
         foreach (JointPriority p in Enum.GetValues(typeof(JointPriority)))
         {
             SnapConnections[p] = new List<SnapConnection>();
         }
 
+        if (SnapSound == null)
+        {
+            SnapSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/Snap");
+        }
+
+        if (SnapSettings == null)
+        {
+            SnapSettings = Resources.Load<FoodSnapSettings>("ScriptableObjects/FoodSnapSettings/Default");
+
+        }
+
+    }
+
+    void FixedUpdate()
+    {
+        CleanupBrokenConnections();
     }
 
     void OnEnable()
@@ -100,6 +123,22 @@ public class FoodSnapper : MonoBehaviour
         }
 
     }
+
+    void OnJointBreak(float breakForce)
+    {
+        Debug.Log("Joint has been broken with force " + breakForce);
+
+        // ensure snap connections are updated.
+        CleanupBrokenConnections();
+    }
+
+
+    void OnSnap()
+    {
+        AudioManager.I.PlayOneShot(SnapSound, transform.position);
+
+    }
+
     void OnPrimaryInteract(InteractionContext context)
     {
         snapTimer = 0;
@@ -125,7 +164,7 @@ public class FoodSnapper : MonoBehaviour
         }
     }
     /// <summary>
-    /// Destroys the joints where the other connections point to this FoodSnapper.
+    /// Destroys the joints where the other connections point to this FoodSnapper for a given type.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -134,7 +173,8 @@ public class FoodSnapper : MonoBehaviour
         if (SnapConnections.TryGetValue(type, out List<SnapConnection> connections))
         {
             // get snap connections that reference this snapper.
-            List<SnapConnection> allOtherConnections = GetOthersConnectionsThatConnectToThis(type);
+            List<SnapConnection> allOtherConnections = GetOtherConnectionsThatConnectToThisSnapper(type);
+
             if (allOtherConnections.Count == 0) return false;
 
 
@@ -145,14 +185,17 @@ public class FoodSnapper : MonoBehaviour
                 List<SnapConnection> otherConnections = otherConnection.This.SnapConnections[type];
                 List<SnapConnection> thisConnections = SnapConnections[type];
 
+                // TODO is remove all not needed?
+                // we could just remove both connections for the otherConnection.
                 otherConnections.RemoveAll(c => c.Other == this);
                 thisConnections.RemoveAll(c => c.Other == otherConnection.This);
+
 
                 // destroy the joint.
                 Debug.Log("Destroy joint");
                 Destroy(otherConnection.Joint);
 
-                // reset timer
+                // reset timer for the other snappers. 
                 otherConnection.This.snapTimer = 0;
 
                 // remove food root on other connections if it exists
@@ -179,7 +222,7 @@ public class FoodSnapper : MonoBehaviour
     }
 
 
-    public List<SnapConnection> GetOthersConnectionsThatConnectToThis(JointPriority p)
+    public List<SnapConnection> GetOtherConnectionsThatConnectToThisSnapper(JointPriority p)
     {
         var result = new List<SnapConnection>();
 
@@ -201,7 +244,7 @@ public class FoodSnapper : MonoBehaviour
 
     void SnapByHighestPriority(FoodSnapper other)
     {
-        // only make one joint.
+        // only make one joint. So this only gets called once between two joints.
         if (GetInstanceID() > other.GetInstanceID()) return;
 
         JointPriority highestPriority = (JointPriority)Math.Max((int)JointPriority, (int)other.JointPriority);
@@ -211,12 +254,17 @@ public class FoodSnapper : MonoBehaviour
             return;
         }
 
-
-
         // create joint
         Rigidbody otherRb = other.rb;
         FixedJoint joint = gameObject.AddComponent<FixedJoint>();
+
+        joint.breakForce = SnapSettings.BreakForce;
+        joint.breakTorque = SnapSettings.BreakTorque;
+
         joint.connectedBody = otherRb;
+
+        OnSnap();
+
 
         List<SnapConnection> snapConnections = SnapConnections[highestPriority];
         snapConnections.Add(new SnapConnection
@@ -235,7 +283,7 @@ public class FoodSnapper : MonoBehaviour
             IsOwner = false
         });
 
-
+        // create food roots
         if (ingredient.FoodRoot != null)
         {
             // add to existing food root
@@ -256,6 +304,44 @@ public class FoodSnapper : MonoBehaviour
         }
     }
 
+
+
+
+    /// <summary>
+    /// 
+    /// Loops through snap connections without a valid joint and removes them.
+    /// </summary>
+    void CleanupBrokenConnections()
+    {
+        foreach (var key in SnapConnections)
+        {
+            CleanupBrokenConnectionsByPriority(key.Key);
+        }
+    }
+    void CleanupBrokenConnectionsByPriority(JointPriority priority)
+    {
+        if (!SnapConnections.TryGetValue(priority, out var list))
+            return;
+
+        // loop backwards beacuse we are removing items whilst iterating this
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            var connection = list[i];
+
+            if (connection.Joint == null)
+            {
+                // Remove from this side
+                list.RemoveAt(i);
+
+                // Remove from other side
+                if (connection.Other != null &&
+                    connection.Other.SnapConnections.TryGetValue(priority, out var otherList))
+                {
+                    otherList.RemoveAll(c => c.Joint == null || c.Other == this);
+                }
+            }
+        }
+    }
 
 
 

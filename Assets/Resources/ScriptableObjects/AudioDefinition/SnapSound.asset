@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e9344ecea4280544844371e44711c0d, type: 3}
+  m_Name: SnapSound
+  m_EditorClassIdentifier: Assembly-CSharp::AudioDefinition
+  Resource: {fileID: 6418180475301049370, guid: e580d3dd507a033498d661c24d9f5655, type: 2}
+  Settings: {fileID: 11400000, guid: 858574de2db6cc146bfa5bfd5093d5d1, type: 2}
