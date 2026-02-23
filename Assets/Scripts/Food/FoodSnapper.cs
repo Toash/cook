@@ -21,8 +21,13 @@ public class SnapConnection
     public bool IsOwner;
 }
 
+/// <summary>
+/// Handles snapping food together to make a FoodRoot.
+/// 
+/// Detached can happen both manually from the player, and by physics (from joint breaking)
+/// </summary>
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(FoodIngredient))] // ?
+[RequireComponent(typeof(FoodIngredient))]
 public class FoodSnapper : MonoBehaviour
 {
 
@@ -42,6 +47,10 @@ public class FoodSnapper : MonoBehaviour
     // public Dictionary<JointPriority, SnapConnection> SnapConnections = new Dictionary<JointPriority, SnapConnection>();
     public Dictionary<JointPriority, List<SnapConnection>> SnapConnections = new Dictionary<JointPriority, List<SnapConnection>>();
 
+
+    public event Action<FoodIngredient> OnSnapEvent;
+    public event Action<FoodIngredient> OnDetachedEvent;
+
     private FoodIngredient ingredient;
 
     private float snapDelay = .3f;
@@ -56,9 +65,10 @@ public class FoodSnapper : MonoBehaviour
 
     void Awake()
     {
+        ingredient = GetComponent<FoodIngredient>();
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-        ingredient = GetComponent<FoodIngredient>();
+        // ingredient = GetComponent<FoodIngredient>();
 
         // init snap connections for each priority.
         foreach (JointPriority p in Enum.GetValues(typeof(JointPriority)))
@@ -133,11 +143,20 @@ public class FoodSnapper : MonoBehaviour
     }
 
 
-    void OnSnap()
+    void OnSnap(FoodSnapper other)
     {
+        Debug.Log("Snap");
         AudioManager.I.PlayOneShot(SnapSound, transform.position);
 
+        OnSnapEvent.Invoke(other.ingredient);
     }
+
+    void OnDetached(FoodSnapper other)
+    {
+        OnDetachedEvent.Invoke(other.ingredient);
+
+    }
+
 
     void OnPrimaryInteract(InteractionContext context)
     {
@@ -150,6 +169,49 @@ public class FoodSnapper : MonoBehaviour
 
 
 
+
+    void SnapByHighestPriority(FoodSnapper other)
+    {
+        // only make one joint. So this only gets called once between two joints.
+        if (GetInstanceID() > other.GetInstanceID()) return;
+
+        JointPriority highestPriority = (JointPriority)Math.Max((int)JointPriority, (int)other.JointPriority);
+        // Check for existing connection on other
+        if (SnapConnections.TryGetValue(highestPriority, out var list) && list.Any(c => c.Other == other))
+        {
+            return;
+        }
+
+        // create joint
+        Rigidbody otherRb = other.rb;
+        FixedJoint joint = gameObject.AddComponent<FixedJoint>();
+
+        joint.breakForce = SnapSettings.BreakForce;
+        joint.breakTorque = SnapSettings.BreakTorque;
+
+        joint.connectedBody = otherRb;
+
+
+
+        List<SnapConnection> snapConnections = SnapConnections[highestPriority];
+        snapConnections.Add(new SnapConnection
+        {
+            Joint = joint,
+            This = this,
+            Other = other,
+            IsOwner = true
+        });
+        List<SnapConnection> otherSnapConnections = other.SnapConnections[highestPriority];
+        otherSnapConnections.Add(new SnapConnection
+        {
+            Joint = joint,
+            This = other,
+            Other = this,
+            IsOwner = false
+        });
+
+        OnSnap(other);
+    }
 
     public void DetachJointsByHighestPriority()
     {
@@ -185,8 +247,6 @@ public class FoodSnapper : MonoBehaviour
                 List<SnapConnection> otherConnections = otherConnection.This.SnapConnections[type];
                 List<SnapConnection> thisConnections = SnapConnections[type];
 
-                // TODO is remove all not needed?
-                // we could just remove both connections for the otherConnection.
                 otherConnections.RemoveAll(c => c.Other == this);
                 thisConnections.RemoveAll(c => c.Other == otherConnection.This);
 
@@ -198,20 +258,12 @@ public class FoodSnapper : MonoBehaviour
                 // reset timer for the other snappers. 
                 otherConnection.This.snapTimer = 0;
 
-                // remove food root on other connections if it exists
-                if (otherConnection.This.ingredient.FoodRoot != null)
-                {
-                    otherConnection.This.ingredient.FoodRoot.RemoveIngredient(otherConnection.Other.ingredient);
-                }
+                OnDetached(otherConnection.This);
+
 
             }
 
 
-            // remove food root if it exists
-            if (ingredient.FoodRoot != null)
-            {
-                ingredient.FoodRoot.RemoveIngredient(ingredient);
-            }
 
             snapTimer = 0;
 
@@ -222,6 +274,11 @@ public class FoodSnapper : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Gets all of the Snap Connections on this snapper, that point back to this snapper.
+    /// </summary>
+    /// <param name="p"></param>
+    /// <returns></returns>
     public List<SnapConnection> GetOtherConnectionsThatConnectToThisSnapper(JointPriority p)
     {
         var result = new List<SnapConnection>();
@@ -242,67 +299,6 @@ public class FoodSnapper : MonoBehaviour
     }
 
 
-    void SnapByHighestPriority(FoodSnapper other)
-    {
-        // only make one joint. So this only gets called once between two joints.
-        if (GetInstanceID() > other.GetInstanceID()) return;
-
-        JointPriority highestPriority = (JointPriority)Math.Max((int)JointPriority, (int)other.JointPriority);
-        // Check for existing connection on other
-        if (SnapConnections.TryGetValue(highestPriority, out var list) && list.Any(c => c.Other == other))
-        {
-            return;
-        }
-
-        // create joint
-        Rigidbody otherRb = other.rb;
-        FixedJoint joint = gameObject.AddComponent<FixedJoint>();
-
-        joint.breakForce = SnapSettings.BreakForce;
-        joint.breakTorque = SnapSettings.BreakTorque;
-
-        joint.connectedBody = otherRb;
-
-        OnSnap();
-
-
-        List<SnapConnection> snapConnections = SnapConnections[highestPriority];
-        snapConnections.Add(new SnapConnection
-        {
-            Joint = joint,
-            This = this,
-            Other = other,
-            IsOwner = true
-        });
-        List<SnapConnection> otherSnapConnections = other.SnapConnections[highestPriority];
-        otherSnapConnections.Add(new SnapConnection
-        {
-            Joint = joint,
-            This = other,
-            Other = this,
-            IsOwner = false
-        });
-
-        // create food roots
-        if (ingredient.FoodRoot != null)
-        {
-            // add to existing food root
-            ingredient.FoodRoot.AddIngredient(other.ingredient);
-        }
-        else if (other.ingredient.FoodRoot != null)
-        {
-            // add to existing food root
-            other.ingredient.FoodRoot.AddIngredient(ingredient);
-        }
-        else
-        {
-            // create food root
-            FoodRoot foodRoot = FoodRoot.CreateRootFromIngredient(ingredient);
-            foodRoot.AddIngredient(ingredient);
-            foodRoot.AddIngredient(other.ingredient);
-
-        }
-    }
 
 
 
@@ -323,6 +319,7 @@ public class FoodSnapper : MonoBehaviour
         if (!SnapConnections.TryGetValue(priority, out var list))
             return;
 
+        // loop through the connections that we have and remove any that have a null Joint. do this on both sides.
         // loop backwards beacuse we are removing items whilst iterating this
         for (int i = list.Count - 1; i >= 0; i--)
         {
@@ -333,11 +330,17 @@ public class FoodSnapper : MonoBehaviour
                 // Remove from this side
                 list.RemoveAt(i);
 
+
                 // Remove from other side
                 if (connection.Other != null &&
                     connection.Other.SnapConnections.TryGetValue(priority, out var otherList))
                 {
-                    otherList.RemoveAll(c => c.Joint == null || c.Other == this);
+
+                    // remove the other connection.
+                    var otherConnection = otherList.FirstOrDefault(c => c.Other == this);
+                    otherList.Remove(otherConnection);
+
+                    OnDetached(connection.Other);
                 }
             }
         }

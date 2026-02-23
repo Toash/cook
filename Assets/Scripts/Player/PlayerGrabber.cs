@@ -121,7 +121,7 @@ public class PlayerGrabber : MonoBehaviour
         if (Handle != null)
         {
 
-            Gizmos.DrawSphere(Handle.position, .2f);
+            Gizmos.DrawWireSphere(Handle.position, .2f);
             Handles.Label(Handle.position, "Handle\nDistance from camera: " + handleDistanceFromCamera);
         }
 
