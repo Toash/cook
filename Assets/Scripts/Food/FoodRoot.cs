@@ -1,62 +1,34 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using GamingIsLove.Footsteps;
 using UnityEditor;
+using UnityEditor.Rendering;
 using UnityEngine;
+
 
 /// <summary>
 /// source of truth for a "food" that an npc would receive.
 /// </summary>
-public class FoodQuality
-{
-    // determine based on placements of each individual ingredient
-}
-
-// [RequireComponent(typeof(Rigidbody))]
 public class FoodRoot : MonoBehaviour
 {
     public List<FoodIngredient> ingredients = new List<FoodIngredient>();
 
 
-    public FoodQuality GetFoodQuality()
+
+
+    public bool MatchesRecipe(Recipe recipe)
     {
-        return null;
-    }
-    public static FoodRoot CreateRootFromIngredient(FoodIngredient ingredient)
-    {
-        GameObject rootObj = new GameObject("Food root");
-        rootObj.transform.position = ingredient.transform.position;
-        FoodRoot foodRoot = rootObj.AddComponent<FoodRoot>();
-
-        // Rigidbody rb = rootObj.GetComponent<Rigidbody>();
-        // rb.useGravity = false;
-        // rb.isKinematic = true;
-        // rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-
-        // Collider col = rootObj.AddComponent<SphereCollider>();
-        // col.isTrigger = true;
-
-
-
-        foodRoot.ingredients.Add(ingredient);
-        ingredient.transform.SetParent(rootObj.transform);
-
-
-        return foodRoot;
-    }
-    public int IngredientCount()
-    {
-        return ingredients.Count;
-    }
-    public static FoodRoot GetGreater(FoodRoot a, FoodRoot b)
-    {
-        if (b.IngredientCount() > a.IngredientCount())
+        foreach (IngredientRequirement requirement in recipe.requirements)
         {
-            return b;
-        }
-        return a;
+            // how many we have of the requirement
+            int requirementCount = ingredients.Count(x => x.Type == requirement.Type);
+            if (requirementCount != requirement.Count) return false;
 
+        }
+        return true;
     }
+
 
     /// <summary>
     /// Adds ingredient to food root and deletes from existing food root if it already exists.
@@ -92,6 +64,32 @@ public class FoodRoot : MonoBehaviour
         }
 
     }
+    public static FoodRoot CreateRootFromIngredient(FoodIngredient ingredient)
+    {
+        GameObject rootObj = new GameObject("Food root");
+        rootObj.transform.position = ingredient.transform.position;
+        FoodRoot foodRoot = rootObj.AddComponent<FoodRoot>();
+
+        foodRoot.ingredients.Add(ingredient);
+        ingredient.transform.SetParent(rootObj.transform);
+
+
+        return foodRoot;
+    }
+    public int IngredientCount()
+    {
+        return ingredients.Count;
+    }
+    public static FoodRoot GetGreater(FoodRoot a, FoodRoot b)
+    {
+        if (b.IngredientCount() > a.IngredientCount())
+        {
+            return b;
+        }
+        return a;
+
+    }
+
 
 
 

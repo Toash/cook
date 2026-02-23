@@ -12,8 +12,11 @@
 /[Uu]ser[Ss]ettings/
 *.log
 
+# paid asset store stuff and just large files in general.
 Audio/
 Footstepper/
+EasyRoads3D/
+EasyRoads3D scenes/
 
 
 # By default unity supports Blender asset imports, *.blend1 blender files do not need to be commited to version control.

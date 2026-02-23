@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b701565f2a4934429dda07d30c24cc0, type: 3}
   m_Name: DefaultGrab
   m_EditorClassIdentifier: Assembly-CSharp::GrabSettings
-  PositionSpring: 800
-  PositionDamper: 60
+  PositionSpring: 400
+  PositionDamper: 50
+  Limit: 1
+  BreakForce: 300
+  BreakTorque: 300
   SpeedMultiplier: 1

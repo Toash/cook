@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9b17c4cf48a187439e03b7026365dc8, type: 3}
-  m_Name: Default
-  m_EditorClassIdentifier: Assembly-CSharp::FoodSnapSettings
-  BreakForce: 200
-  BreakTorque: 200
+  m_Script: {fileID: 11500000, guid: 43e5e3cf4ee366f4f90c18fc21559653, type: 3}
+  m_Name: Burger
+  m_EditorClassIdentifier: Assembly-CSharp::Recipe
+  requirements:
+  - Type: 0
+    Count: 2
+  - Type: 1
+    Count: 1

@@ -8,14 +8,31 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class FoodSubmission : MonoBehaviour
 {
+    // todo: explicit submit method?
+    public Recipe matchingRecipe;
     List<FoodRoot> submittedFoodRoots = new List<FoodRoot>();
 
     private Collider col;
+
+
 
     void Awake()
     {
         col = GetComponent<Collider>();
         col.isTrigger = true;
+    }
+
+
+    void OnFoodRootAdded(FoodRoot root)
+    {
+        if (root.MatchesRecipe(matchingRecipe))
+        {
+            Debug.Log("Matches recipe!");
+        }
+    }
+    void OnFoodRootRemoved(FoodRoot root)
+    {
+
     }
 
     void OnTriggerEnter(Collider other)
@@ -28,6 +45,7 @@ public class FoodSubmission : MonoBehaviour
             {
                 if (submittedFoodRoots.Contains(root)) return;
                 submittedFoodRoots.Add(root);
+                OnFoodRootAdded(root);
             }
         }
     }
@@ -43,6 +61,7 @@ public class FoodSubmission : MonoBehaviour
                 if (submittedFoodRoots.Contains(root))
                 {
                     submittedFoodRoots.Remove(root);
+                    OnFoodRootRemoved(root);
                 }
             }
         }
@@ -54,7 +73,7 @@ public class FoodSubmission : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.red;
         GUIStyle style = new GUIStyle();
         style.normal.textColor = Color.orange;
 
@@ -72,6 +91,9 @@ public class FoodSubmission : MonoBehaviour
             Handles.Label(transform.position, message);
 
         }
+
+
+
 
     }
 

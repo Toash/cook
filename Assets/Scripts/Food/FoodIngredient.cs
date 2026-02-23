@@ -3,15 +3,6 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-public enum FoodIngredientType
-{
-    BURGER_BUN,
-    PATTY,
-    HOTDOG,
-    HOTDOG_BUN,
-    LETTUCE,
-    TOMATO
-}
 
 /// <summary>
 /// Represenets an actual ingredient in the world
