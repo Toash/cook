@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class AudioManager : MonoBehaviour
@@ -30,6 +32,30 @@ public class AudioManager : MonoBehaviour
         player.Play();
 
         StartCoroutine(DestroyWhenFinished(player.GetAudioSource()));
+    }
+
+    /// <summary>
+    /// plays a looping audio source, returns AudioSource so its gameobject can be destroyed as needed.
+    /// </summary>
+    /// <param name="audio"></param>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public AudioSource PlayLooping(AudioDefinition def, Vector3 pos)
+    {
+        GameObject audioObject = new GameObject("Looping audio");
+        AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+
+        audioSource.volume = def.Settings.Volume;
+        audioSource.spatialBlend = def.Settings.SpatialBlend;
+        audioSource.playOnAwake = false;
+
+        audioSource.loop = true;
+        audioSource.resource = def.Resource;
+
+        audioObject.transform.position = pos;
+        audioSource.Play();
+
+        return audioSource;
     }
 
     IEnumerator DestroyWhenFinished(AudioSource source)

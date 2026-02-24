@@ -6,7 +6,7 @@ AudioRandomContainer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SnapSound
+  m_Name: Detach
   m_Volume: 0
   m_Pitch: 0
   m_AutomaticTriggerTime: 0
@@ -16,23 +16,23 @@ AudioRandomContainer:
   m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
   m_LoopCountRandomizationRange: {x: 0, y: 0}
   m_Elements:
-  - {fileID: 7213583579746426480}
+  - {fileID: 7579103884130249127}
   m_AvoidRepeatingLast: 0
-  m_PlaybackMode: 2
-  m_TriggerMode: 0
+  m_PlaybackMode: 0
+  m_TriggerMode: 1
   m_AutomaticTriggerMode: 1
   m_LoopMode: 2
   m_VolumeRandomizationEnabled: 0
   m_PitchRandomizationEnabled: 0
   m_AutomaticTriggerTimeRandomizationEnabled: 0
   m_LoopCountRandomizationEnabled: 0
---- !u!1233149941 &7213583579746426480
+--- !u!1233149941 &7579103884130249127
 AudioContainerElement:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BUTTON_Clean_Tap_mono_{7213583579746426480}
-  m_AudioClip: {fileID: 8300000, guid: bf59b2a161f0d6d4f94ec3570d62072d, type: 3}
+  m_Name: POP_Mouth_Darker_mono_{7579103884130249127}
+  m_AudioClip: {fileID: 8300000, guid: 8e5f5a200c7656a4e8cb4819c3553324, type: 3}
   m_Volume: 0
   m_Enabled: 1

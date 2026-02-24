@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using Mono.Cecil;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -34,6 +36,7 @@ public class FoodSnapper : MonoBehaviour
     public FoodSnapSettings SnapSettings;
     [Header("Audio")]
     public AudioDefinition SnapSound;
+    public AudioDefinition DetachSound;
 
     [Header("References")]
     public Grabbable Grabbable;
@@ -51,13 +54,15 @@ public class FoodSnapper : MonoBehaviour
     public event Action<FoodIngredient> OnDetachedEvent;
 
 
-    private float snapDelay = .3f;
+    private float snapDelay = 0f;
+    private float detachSnapDelay = .5f;
     private float snapTimer;
+    private float detachTimer;
     private bool canSnap
     {
         get
         {
-            return snapTimer >= snapDelay;
+            return (snapTimer >= snapDelay) && (detachTimer >= detachSnapDelay);
         }
     }
 
@@ -77,6 +82,10 @@ public class FoodSnapper : MonoBehaviour
         {
             SnapSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/Snap");
         }
+        if (DetachSound == null)
+        {
+            DetachSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/Detach");
+        }
 
         if (SnapSettings == null)
         {
@@ -84,6 +93,11 @@ public class FoodSnapper : MonoBehaviour
 
         }
 
+    }
+
+    void Update()
+    {
+        detachTimer += Time.deltaTime;
     }
 
     void FixedUpdate()
@@ -153,8 +167,11 @@ public class FoodSnapper : MonoBehaviour
     void OnDetached(FoodSnapper other)
     {
         // OnDetachedEvent.Invoke(other.ingredient);
+        AudioManager.I.PlayOneShot(DetachSound, transform.position);
         OnDetachedEvent.Invoke(other.GetComponent<FoodIngredient>());
 
+        detachTimer = 0;
+        other.detachTimer = 0;
     }
 
 
@@ -352,7 +369,7 @@ public class FoodSnapper : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        string message = "Snap timer: " + snapTimer + "\n Can snap: " + canSnap;
+        string message = "Can snap: " + canSnap;
         // message += "\nCurrent snap types: \n";
         // foreach (JointPriority priority in Enum.GetValues(typeof(JointPriority)))
         // {

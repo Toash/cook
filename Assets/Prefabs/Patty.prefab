@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 4166611388341100134}
   - component: {fileID: 235703878213247498}
   - component: {fileID: 171079942983400014}
+  - component: {fileID: 1535279557526883662}
   m_Layer: 6
   m_Name: Patty
   m_TagString: Untagged
@@ -211,5 +212,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FoodSnapper
   SnapSettings: {fileID: 0}
   SnapSound: {fileID: 11400000, guid: e33ae71e176e2584e84366f520aef36c, type: 2}
+  DetachSound: {fileID: 0}
   Grabbable: {fileID: 540168866430414835}
   JointPriority: 0
+--- !u!114 &1535279557526883662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8939089222002549302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7466ec096aa23d1498d14160f1f1a69e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Cookable
+  CookedThreshold: 50
+  BurntThreshold: 80
+  CookRate: 4
+  CookedMaterial: {fileID: 0}
+  BurntMaterial: {fileID: 0}
+  SizzlingEffect: {fileID: 0}

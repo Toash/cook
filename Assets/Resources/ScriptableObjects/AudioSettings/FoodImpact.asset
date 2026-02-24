@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62cbeb5d498966f4c9f06a1677422c6a, type: 3}
   m_Name: FoodImpact
   m_EditorClassIdentifier: Assembly-CSharp::AudioSourceSettings
-  Volume: 0.5
+  Volume: 0.37
+  SpatialBlend: 1

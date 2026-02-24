@@ -10,6 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62cbeb5d498966f4c9f06a1677422c6a, type: 3}
-  m_Name: Snap
+  m_Name: 3DFullVolume
   m_EditorClassIdentifier: Assembly-CSharp::AudioSourceSettings
-  Volume: 0.2
+  Volume: 1
+  SpatialBlend: 1
