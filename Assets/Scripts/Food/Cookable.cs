@@ -21,7 +21,6 @@ public class Cookable : MonoBehaviour
     [Header("Visuals")]
     public Material CookedMaterial;
     public Material BurntMaterial;
-    public ParticleSystem SizzlingEffect;
 
 
     float cookLevel = 0;
@@ -41,16 +40,6 @@ public class Cookable : MonoBehaviour
         if (BurntMaterial == null)
         {
             BurntMaterial = Resources.Load<Material>("Materials/DefaultBurnt");
-        }
-        if (SizzlingEffect == null)
-        {
-            ParticleSystem prefab = Resources.Load<ParticleSystem>("ParticleSystem/DefaultSizzle");
-            if (prefab != null)
-            {
-                SizzlingEffect = Instantiate(prefab, transform);
-                SizzlingEffect.transform.localPosition = Vector3.zero;
-                SizzlingEffect.transform.localRotation = Quaternion.identity;
-            }
         }
     }
 

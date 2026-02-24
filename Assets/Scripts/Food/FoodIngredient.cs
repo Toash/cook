@@ -17,7 +17,7 @@ public class FoodIngredient : MonoBehaviour
 
 
     // what food this ingredient belongs to, if any.
-    public FoodRoot FoodRoot { get; private set; }
+    public PreparedItem PreparedItem { get; private set; }
 
     void Awake()
     {
@@ -40,25 +40,25 @@ public class FoodIngredient : MonoBehaviour
     void OnSnapEvent(FoodIngredient other)
     {
 
-        if (FoodRoot != null && other.FoodRoot != null)
+        if (PreparedItem != null && other.PreparedItem != null)
         {
             // add to greater food root
-            FoodRoot toAdd = FoodRoot.GetGreater(FoodRoot, other.FoodRoot);
+            PreparedItem toAdd = PreparedItem.GetGreater(PreparedItem, other.PreparedItem);
             toAdd.AddIngredient(this);
             toAdd.AddIngredient(other);
         }
-        else if (FoodRoot != null)
+        else if (PreparedItem != null)
         {
-            FoodRoot.AddIngredient(other);
+            PreparedItem.AddIngredient(other);
         }
-        else if (other.FoodRoot != null)
+        else if (other.PreparedItem != null)
         {
-            other.FoodRoot.AddIngredient(this);
+            other.PreparedItem.AddIngredient(this);
         }
         else
         {
             // create new food root
-            FoodRoot foodRoot = FoodRoot.CreateRootFromIngredient(this);
+            PreparedItem foodRoot = PreparedItem.CreateItemFromIngredient(this);
             foodRoot.AddIngredient(other);
         }
 
@@ -66,28 +66,24 @@ public class FoodIngredient : MonoBehaviour
     void OnDetachedEvent(FoodIngredient other)
     {
         // remove food root if it exists
-        if (FoodRoot != null)
+        if (PreparedItem != null)
         {
-            FoodRoot.RemoveIngredient(this);
+            PreparedItem.RemoveIngredient(this);
         }
 
-        if (other.FoodRoot != null)
+        if (other.PreparedItem != null)
         {
-            other.FoodRoot.RemoveIngredient(this);
+            other.PreparedItem.RemoveIngredient(this);
         }
 
     }
 
-    public FoodRoot GetFoodRoot()
+
+
+
+    public void SetFoodRoot(PreparedItem root)
     {
-        return this.FoodRoot;
-    }
-
-
-
-    public void SetFoodRoot(FoodRoot root)
-    {
-        this.FoodRoot = root;
+        this.PreparedItem = root;
     }
 
     public void RemoveFoodRoot()
@@ -101,7 +97,7 @@ public class FoodIngredient : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        Handles.Label(transform.position + Vector3.up * .3f, "Foot root: " + FoodRoot);
+        Handles.Label(transform.position + Vector3.up * .3f, "Foot root: " + PreparedItem);
 
     }
 #endif

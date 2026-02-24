@@ -12,27 +12,45 @@ public class CookRegion : MonoBehaviour
 
     [Tooltip("The type that this region cooks.")]
     public CookType CookType;
+
+    [Tooltip("Should be looping, set to a default value if not set.")]
+    public ParticleSystem SizzlingEffectPrefab;
     Collider col;
 
+    // keeps track of manager instances to destroy when needed.
     private Dictionary<Cookable, AudioSource> sizzleSounds = new Dictionary<Cookable, AudioSource>();
+    private Dictionary<Cookable, ParticleSystem> sizzleEffects = new Dictionary<Cookable, ParticleSystem>();
 
 
-    void Awake()
+    void OnValidate()
     {
-        col = GetComponent<Collider>();
         if (SizzleAudio == null)
         {
             SizzleAudio = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/DefaultSizzle");
         }
-        col.isTrigger = true;
+        if (SizzlingEffectPrefab == null)
+        {
+            SizzlingEffectPrefab = Resources.Load<ParticleSystem>("ParticleSystem/DefaultSizzle");
+        }
+
     }
+    void Awake()
+    {
+        col = GetComponent<Collider>();
+        col.isTrigger = true;
+
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent<Cookable>(out var cookable))
         {
             AudioSource audioSource = AudioManager.I.PlayLooping(SizzleAudio, cookable.transform.position);
             sizzleSounds.Add(cookable, audioSource);
-            cookable.SizzlingEffect.Play();
+
+            ParticleSystem sizzleEffect = ParticleManager.I.InstantiateAndPlay(SizzlingEffectPrefab, cookable.transform.position, Quaternion.LookRotation(Vector3.up, Vector3.up));
+            sizzleEffects.Add(cookable, sizzleEffect);
+
         }
     }
     void OnTriggerStay(Collider other)
@@ -49,7 +67,9 @@ public class CookRegion : MonoBehaviour
         {
             Destroy(sizzleSounds[cookable].gameObject);
             sizzleSounds.Remove(cookable);
-            cookable.SizzlingEffect.Stop();
+
+            Destroy(sizzleEffects[cookable].gameObject);
+            sizzleEffects.Remove(cookable);
 
         }
     }

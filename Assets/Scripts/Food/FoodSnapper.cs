@@ -2,11 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
-using Mono.Cecil;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Audio;
 
 
 public enum JointPriority
@@ -26,9 +23,14 @@ public class SnapConnection
 /// <summary>
 /// Handles snapping food together to make a FoodRoot.
 /// 
+/// Can be grabbed, detached ( if attached to another snapper ), or dropped.
+/// 
+/// Snapping should only occur when the player is actually holding the item. 
+/// 
 /// Detached can happen both manually from the player, and by physics (from joint breaking)
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Grabbable))]
 public class FoodSnapper : MonoBehaviour
 {
 
@@ -39,7 +41,7 @@ public class FoodSnapper : MonoBehaviour
     public AudioDefinition DetachSound;
 
     [Header("References")]
-    public Grabbable Grabbable;
+    private Grabbable grabbable;
     [Tooltip("Determines the snapping priority. Goes from lowest priority to highest priority")]
     public JointPriority JointPriority;
 
@@ -54,15 +56,56 @@ public class FoodSnapper : MonoBehaviour
     public event Action<FoodIngredient> OnDetachedEvent;
 
 
-    private float snapDelay = 0f;
-    private float detachSnapDelay = .5f;
+
+    private float timeSinceGrabbedDelay = .3f;
+
+    private float initialSnapDelay = 0f; // delay before it actual is snapped.
+    private float detachDelay = .5f;
+
+    // timers
+    private float timeSinceGrabbed;
     private float snapTimer;
     private float detachTimer;
     private bool canSnap
     {
+        // get
+        // {
+        //     return passedDropDelayTimer || (grabbable.IsBeingHeld() && passedDetachDelayTimer && passedGrabDelayTimer);
+
+        // }
         get
         {
-            return (snapTimer >= snapDelay) && (detachTimer >= detachSnapDelay);
+            return passedDetachAndDropDelayTimer || (grabbable.IsBeingHeld() && passedDetachAndDropDelayTimer && passedGrabDelayTimer);
+
+        }
+    }
+
+
+    private bool passedDetachAndDropDelayTimer// ensures that objects dont keep snapping after being detached.
+    {
+        get
+        {
+            return detachTimer >= detachDelay;
+        }
+
+    }
+
+    private bool passedGrabDelayTimer// ensures the objects dont immediately snap together when grabbing.
+    {
+        get
+        {
+            return timeSinceGrabbed >= timeSinceGrabbedDelay;
+        }
+    }
+
+    // period of time after detaching in which the food can attach. (for dropping food onto another.)
+    // private bool
+
+    void OnValidate()
+    {
+        if (grabbable == null)
+        {
+            grabbable = GetComponent<Grabbable>();
         }
     }
 
@@ -71,6 +114,7 @@ public class FoodSnapper : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         // ingredient = GetComponent<FoodIngredient>();
+
 
         // init snap connections for each priority.
         foreach (JointPriority p in Enum.GetValues(typeof(JointPriority)))
@@ -98,6 +142,7 @@ public class FoodSnapper : MonoBehaviour
     void Update()
     {
         detachTimer += Time.deltaTime;
+        timeSinceGrabbed += Time.deltaTime;
     }
 
     void FixedUpdate()
@@ -108,17 +153,20 @@ public class FoodSnapper : MonoBehaviour
     void OnEnable()
     {
 
-        Grabbable.OnPrimaryInteract += OnPrimaryInteract;
-        Grabbable.OnSecondaryInteract += OnSecondaryInteract;
+        grabbable.OnGrab += OnGrabbableGrab;
+        grabbable.OnSecondaryInteract += OnGrabbableSecondaryInteract;
+        grabbable.OnDrop += OnGrabbableDrop;
     }
     void OnDisable()
     {
-        Grabbable.OnPrimaryInteract -= OnPrimaryInteract;
-        Grabbable.OnSecondaryInteract -= OnSecondaryInteract;
+        grabbable.OnGrab -= OnGrabbableGrab;
+        grabbable.OnSecondaryInteract -= OnGrabbableSecondaryInteract;
+        grabbable.OnDrop -= OnGrabbableDrop;
 
     }
     void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Collision enter");
         if (collision.rigidbody != null)
         {
             if (collision.rigidbody.TryGetComponent<FoodSnapper>(out FoodSnapper snapper))
@@ -172,16 +220,22 @@ public class FoodSnapper : MonoBehaviour
 
         detachTimer = 0;
         other.detachTimer = 0;
+
     }
 
 
-    void OnPrimaryInteract(InteractionContext context)
+    void OnGrabbableGrab(InteractionContext context)
     {
         snapTimer = 0;
+        timeSinceGrabbed = 0;
     }
-    void OnSecondaryInteract(InteractionContext context)
+    void OnGrabbableSecondaryInteract(InteractionContext context)
     {
         DetachJointsByHighestPriority();
+    }
+    void OnGrabbableDrop(InteractionContext context)
+    {
+
     }
 
 
@@ -190,7 +244,7 @@ public class FoodSnapper : MonoBehaviour
     void SnapByHighestPriority(FoodSnapper other)
     {
         // only make one joint. So this only gets called once between two joints.
-        if (GetInstanceID() > other.GetInstanceID()) return;
+        // if (GetInstanceID() > other.GetInstanceID()) return;
 
         JointPriority highestPriority = (JointPriority)Math.Max((int)JointPriority, (int)other.JointPriority);
         // Check for existing connection on other
@@ -272,8 +326,6 @@ public class FoodSnapper : MonoBehaviour
                 Debug.Log("Destroy joint");
                 Destroy(otherConnection.Joint);
 
-                // reset timer for the other snappers. 
-                otherConnection.This.snapTimer = 0;
 
                 OnDetached(otherConnection.This);
 
@@ -281,8 +333,6 @@ public class FoodSnapper : MonoBehaviour
             }
 
 
-
-            snapTimer = 0;
 
             return true;
         }
@@ -369,18 +419,42 @@ public class FoodSnapper : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.orange;
+
         string message = "Can snap: " + canSnap;
-        // message += "\nCurrent snap types: \n";
-        // foreach (JointPriority priority in Enum.GetValues(typeof(JointPriority)))
-        // {
-        //     if (SnapConnections.ContainsKey(priority))
-        //     {
-        //         message += priority.ToString() + "\n";
-        //     }
-        // }
         message += "\nSnap Connections: " + SnapConnections.Values.Sum(list => list.Count) + " \n";
 
         Handles.Label(transform.position, message);
+
+        if (canSnap)
+        {
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(transform.position, Vector3.one * (grabbable.GizmoSize + .1f));
+        }
+
+        Gizmos.color = Color.blue;
+
+        // visualize snap connections
+        foreach (JointPriority key in SnapConnections.Keys)
+        {
+            foreach (SnapConnection connection in SnapConnections[key])
+            {
+                // Gizmos.DrawLine(connection.This.transform.position, connection.Other.transform.position);
+                Vector3 a = connection.This.transform.position;
+                Vector3 b = connection.Other.transform.position;
+                Vector3 dir = a - b;
+                Vector3 otherDir = b - a;
+
+                float length = (dir).magnitude;
+
+                Vector3 center = a + (otherDir / 2);
+
+                Gizmos.DrawSphere(center, length);
+
+            }
+        }
     }
 #endif
 

@@ -1,18 +1,21 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
-/// place FootRoot here to give to npcs.
+/// 
 /// </summary>
 [RequireComponent(typeof(Collider))]
-public class FoodSubmission : MonoBehaviour
+public class OrderSubmissionArea : MonoBehaviour
 {
-    // todo: explicit submit method?
-    public Recipe matchingRecipe;
-    List<FoodRoot> submittedFoodRoots = new List<FoodRoot>();
+    public Order order;
+    public UnityEvent OnOrderSuccessful;
+    public UnityEvent OnOrderFailed;
+    List<PreparedItem> submittedItems = new List<PreparedItem>();
 
     private Collider col;
+
 
 
 
@@ -23,14 +26,26 @@ public class FoodSubmission : MonoBehaviour
     }
 
 
-    void OnFoodRootAdded(FoodRoot root)
+    public void Submit()
     {
-        if (root.MatchesRecipe(matchingRecipe))
-        {
-            Debug.Log("Matches recipe!");
-        }
+        // evaluate order
+
+        List<PreparedItemSnapshot> submittedItemSnapshots = PreparedItemSnapshot.From(submittedItems);
+
+        OrderEvaluator.Evaluate(order, submittedItemSnapshots);
+
+        // fire off appropriate event.
     }
-    void OnFoodRootRemoved(FoodRoot root)
+    void OnMenuItemAdded(PreparedItem item)
+    {
+        // 
+
+        // if (item.MatchesMenuItem())
+        // {
+        //     Debug.Log("Matches recipe!");
+        // }
+    }
+    void OnMenuItemRemoved(PreparedItem root)
     {
 
     }
@@ -40,12 +55,12 @@ public class FoodSubmission : MonoBehaviour
         if (other.TryGetComponent<FoodIngredient>(out var ingredient))
         {
             // check for food root
-            FoodRoot root = ingredient.GetFoodRoot();
+            PreparedItem root = ingredient.PreparedItem;
             if (root != null)
             {
-                if (submittedFoodRoots.Contains(root)) return;
-                submittedFoodRoots.Add(root);
-                OnFoodRootAdded(root);
+                if (submittedItems.Contains(root)) return;
+                submittedItems.Add(root);
+                OnMenuItemAdded(root);
             }
         }
     }
@@ -55,13 +70,13 @@ public class FoodSubmission : MonoBehaviour
         if (other.TryGetComponent<FoodIngredient>(out var ingredient))
         {
             // check for food root
-            FoodRoot root = ingredient.GetFoodRoot();
+            PreparedItem root = ingredient.PreparedItem;
             if (root != null)
             {
-                if (submittedFoodRoots.Contains(root))
+                if (submittedItems.Contains(root))
                 {
-                    submittedFoodRoots.Remove(root);
-                    OnFoodRootRemoved(root);
+                    submittedItems.Remove(root);
+                    OnMenuItemRemoved(root);
                 }
             }
         }
@@ -78,10 +93,10 @@ public class FoodSubmission : MonoBehaviour
         style.normal.textColor = Color.orange;
 
         string message = "";
-        if (submittedFoodRoots.Count > 0)
+        if (submittedItems.Count > 0)
         {
             message += "Food submitted\n";
-            message += "Count: " + submittedFoodRoots.Count + "\n";
+            message += "Count: " + submittedItems.Count + "\n";
             Handles.Label(transform.position, message);
             Gizmos.DrawWireCube(transform.position, Vector3.one);
         }

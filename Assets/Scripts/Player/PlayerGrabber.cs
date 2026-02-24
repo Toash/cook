@@ -70,7 +70,7 @@ public class PlayerGrabber : MonoBehaviour
     {
         if (context.Type == InteractType.Primary)
         {
-            Drop();
+            Drop(context);
         }
         else if (context.Type == InteractType.Secondary)
         {
@@ -145,10 +145,11 @@ public class PlayerGrabber : MonoBehaviour
         held = null;
         playerController.SetSpeedMultiplier(1);
     }
-    public void Drop()
+    public void Drop(InteractionContext context)
     {
         // held.Drop();
         Destroy(handleJoint);
+        held.Drop(context);
         held = null;
 
         playerController.SetSpeedMultiplier(1);
