@@ -1,4 +1,4 @@
-using Unity.Multiplayer.Center.Common.Analytics;
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,17 +7,21 @@ public class PlayerInteraction : MonoBehaviour
 {
     public float InteractRange = 3;
 
+    public PlayerController Controller;
     public PlayerGrabber Grabber;
     public Transform CamRoot;
     public InputActionReference PrimaryInteract;
     public InputActionReference SecondaryInteract;
     public LayerMask InteractionMask;
 
-    private IInteractable hoveredInteractable;
+    public event Action<InteractableBase> OnInteractableChanged;
+
+    private InteractableBase hoveredInteractable;
 
 #if UNITY_EDITOR
     private Vector3 hitPoint;
 #endif
+
 
 
 
@@ -26,10 +30,16 @@ public class PlayerInteraction : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(CamRoot.position, CamRoot.forward, out hit, InteractRange, InteractionMask))
         {
-            if (hit.collider.TryGetComponent<IInteractable>(out var interactable))
+            if (hit.collider.TryGetComponent<InteractableBase>(out var currentInteractable))
             {
                 TryHighlightHoverInteractable(false);
-                hoveredInteractable = interactable;
+                if (currentInteractable != hoveredInteractable)
+                {
+
+                    InteractableChanged(hoveredInteractable, currentInteractable);
+
+                }
+                hoveredInteractable = currentInteractable;
                 TryHighlightHoverInteractable(true);
 
 #if UNITY_EDITOR
@@ -40,8 +50,13 @@ public class PlayerInteraction : MonoBehaviour
         }
         else
         {
+            // aiming away from an interactable
             TryHighlightHoverInteractable(false);
-            hoveredInteractable = null;
+            if (hoveredInteractable != null)
+            {
+                InteractableChanged(hoveredInteractable, null);
+                hoveredInteractable = null;
+            }
         }
 
         if (PrimaryInteract.action.WasPressedThisFrame())
@@ -55,14 +70,30 @@ public class PlayerInteraction : MonoBehaviour
 
     }
 
+    void InteractableChanged(InteractableBase oldInteractable, InteractableBase newInteractable)
+    {
+        oldInteractable?.OnHoverExit();
+        newInteractable?.OnHoverEnter();
+
+        OnInteractableChanged.Invoke(newInteractable);
+
+    }
+
     void HandleInteraction(InteractType type)
     {
-        InteractionContext context = new InteractionContext(type, this, Grabber);
+        InteractionContext context = new InteractionContext(type, Controller, this, Grabber);
+        if (Controller.IsConstrained == true)
+        {
+            Controller.UnConstrain();
+            return;
+        }
+
         if (Grabber.isHolding)
         {
             Grabber.OnInteractAndHolding(context);
             return;
         }
+
         if (hoveredInteractable != null)
         {
             hoveredInteractable.Interact(context);
@@ -74,7 +105,7 @@ public class PlayerInteraction : MonoBehaviour
     void TryHighlightHoverInteractable(bool highlight)
     {
         if (hoveredInteractable == null) return;
-        if (hoveredInteractable.GetTransform().TryGetComponent<Highlightable>(out Highlightable highlightable))
+        if (hoveredInteractable.transform.TryGetComponent<Highlightable>(out Highlightable highlightable))
         {
             highlightable.SetHighlight(highlight);
         }
@@ -93,7 +124,7 @@ public class PlayerInteraction : MonoBehaviour
             Handles.Label(hitPoint, "Interactable hit point");
             Gizmos.DrawWireSphere(hitPoint, .2f);
 
-            Handles.Label(transform.position, "Current interactable: " + hoveredInteractable.GetTransform().name);
+            Handles.Label(transform.position, "Current interactable: " + hoveredInteractable.transform.name);
         }
 
     }

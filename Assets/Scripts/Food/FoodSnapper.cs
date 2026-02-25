@@ -52,8 +52,8 @@ public class FoodSnapper : MonoBehaviour
     public Dictionary<JointPriority, List<SnapConnection>> SnapConnections = new Dictionary<JointPriority, List<SnapConnection>>();
 
 
-    public event Action<FoodIngredient> OnSnapEvent;
-    public event Action<FoodIngredient> OnDetachedEvent;
+    public event Action<Ingredient> OnSnapEvent;
+    public event Action<Ingredient> OnDetachedEvent;
 
 
 
@@ -208,15 +208,15 @@ public class FoodSnapper : MonoBehaviour
         AudioManager.I.PlayOneShot(SnapSound, transform.position);
 
         // OnSnapEvent.Invoke(other.ingredient);
-        // smelly
-        OnSnapEvent.Invoke(other.GetComponent<FoodIngredient>());
+        // REMOVE ME ASAP!@!@!@!@!@!@ 
+        OnSnapEvent.Invoke(other.GetComponent<Ingredient>());
     }
 
     void OnDetached(FoodSnapper other)
     {
         // OnDetachedEvent.Invoke(other.ingredient);
         AudioManager.I.PlayOneShot(DetachSound, transform.position);
-        OnDetachedEvent.Invoke(other.GetComponent<FoodIngredient>());
+        OnDetachedEvent.Invoke(other.GetComponent<Ingredient>());
 
         detachTimer = 0;
         other.detachTimer = 0;
@@ -257,8 +257,16 @@ public class FoodSnapper : MonoBehaviour
         Rigidbody otherRb = other.rb;
         FixedJoint joint = gameObject.AddComponent<FixedJoint>();
 
-        joint.breakForce = SnapSettings.BreakForce;
-        joint.breakTorque = SnapSettings.BreakTorque;
+        if (SnapSettings.Infinity)
+        {
+            joint.breakForce = Single.PositiveInfinity;
+            joint.breakTorque = Single.PositiveInfinity;
+        }
+        else
+        {
+            joint.breakForce = SnapSettings.BreakForce;
+            joint.breakTorque = SnapSettings.BreakTorque;
+        }
 
         joint.connectedBody = otherRb;
 
@@ -422,10 +430,11 @@ public class FoodSnapper : MonoBehaviour
         GUIStyle style = new GUIStyle();
         style.normal.textColor = Color.orange;
 
-        string message = "Can snap: " + canSnap;
-        message += "\nSnap Connections: " + SnapConnections.Values.Sum(list => list.Count) + " \n";
+        // string message = "";
+        // message += "Can snap: " + canSnap;
+        // message += "\nSnap Connections: " + SnapConnections.Values.Sum(list => list.Count) + " \n";
 
-        Handles.Label(transform.position, message);
+        // Handles.Label(transform.position, message);
 
         if (canSnap)
         {

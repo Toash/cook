@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,6 +15,8 @@ public class PlayerController : MonoBehaviour
     public float Gravity = 25;
     public float JumpForce = 6;
     public float GroundCheckDistance = 1.5f;
+
+    public float ConstrainSpeed = 10;
 
     [Header("References")]
     public CharacterController CharController;
@@ -34,6 +38,18 @@ public class PlayerController : MonoBehaviour
     float yaw = 0;
     float pitch = 0;
 
+
+    Vector3 initialLocalCameraPos;
+    Vector3 constrainedCameraPos;
+    Quaternion constrainedCameraRot;
+
+
+    public bool IsConstrained { get; private set; } = false;
+
+    void Awake()
+    {
+        initialLocalCameraPos = CamRoot.localPosition;
+    }
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -41,16 +57,77 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        HandleCameraConstraint();
+
+        if (!IsConstrained)
+        {
+            HandleJumping();
+            HandleWishVelocity();
+            HandleAcceleratingVelocity();
+            HandleLooking();
+        }
         HandleGravity();
-        HandleJumping();
-        HandleWishVelocity();
-        HandleAcceleratingVelocity();
-        HandleLooking();
+
 
 
         Vector3 totalVelocity = moveVelocity + gravityVelocity;
         CharController.Move(totalVelocity * Time.deltaTime);
 
+    }
+
+    void HandleCameraConstraint()
+    {
+
+        if (IsConstrained)
+        {
+            CamRoot.position = Vector3.Lerp(CamRoot.position, constrainedCameraPos, Time.deltaTime * ConstrainSpeed);
+            CamRoot.rotation = Quaternion.Slerp(CamRoot.rotation, constrainedCameraRot, Time.deltaTime * ConstrainSpeed);
+        }
+        else
+        {
+            CamRoot.localPosition = Vector3.Lerp(CamRoot.localPosition, initialLocalCameraPos, Time.deltaTime * ConstrainSpeed);
+            // CamRoot.rotation = Quaternion.Slerp(CamRoot.rotation, constrainedCameraRot, Time.deltaTime * ConstrainSpeed);
+
+        }
+
+
+    }
+
+    public void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+    }
+    public void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    public void ConstrainCamera(Vector3 pos, Quaternion rot)
+    {
+        IsConstrained = true;
+        // CamRoot.position = pos;
+        // CamRoot.rotation = rot;
+        constrainedCameraPos = pos;
+        constrainedCameraRot = rot;
+
+    }
+
+    public void UnConstrain()
+    {
+        Debug.Log("unconstrained");
+        IsConstrained = false;
+
+
+        // sync the yaw and pitch back.
+        yaw = transform.localEulerAngles.y;
+        float rawPitch = CamRoot.localEulerAngles.x;
+        if (rawPitch > 180f)
+            rawPitch -= 360f;
+
+        pitch = rawPitch;
+
+        // REMOVE ME ASAP!@@!@@!@!!@@!
+        LockCursor();
     }
 
     void HandleGravity()

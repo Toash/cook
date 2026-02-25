@@ -1,6 +1,8 @@
 
 
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine.InputSystem.Android;
 
 /// <summary>
 /// Represents an order
@@ -19,6 +21,21 @@ public class Order
     public List<MenuItem> MenuItems;
 
     public int Payout;
+
+    // long order time bad.
+    public float TimeSinceOrdered;
+
+
+    // orders should be created through order manager.
+    public Order(List<MenuItem> items, int Payout)
+    {
+        OrderNumber = Counter;
+        Counter++;
+
+        this.MenuItems = items;
+        this.Payout = Payout;
+
+    }
 
 
 

@@ -9,11 +9,11 @@ using UnityEngine;
 
 
 /// <summary>
-/// source of truth for a "food" that an npc would receive.
+/// A submittable food item, that exists in the world
 /// </summary>
 public class PreparedItem : MonoBehaviour
 {
-    public List<FoodIngredient> Ingredients = new List<FoodIngredient>();
+    public List<Ingredient> Ingredients = new List<Ingredient>();
 
 
 
@@ -24,7 +24,7 @@ public class PreparedItem : MonoBehaviour
     /// Adds ingredient to food root and deletes from existing food root if it already exists.
     /// </summary>
     /// <param name="ingredient"></param>
-    public void AddIngredient(FoodIngredient ingredient)
+    public void AddIngredient(Ingredient ingredient)
     {
         if (Ingredients.Contains(ingredient)) return;
         // remove from existing food root.
@@ -38,7 +38,7 @@ public class PreparedItem : MonoBehaviour
         ingredient.SetFoodRoot(this);
     }
 
-    public void RemoveIngredient(FoodIngredient ingredient)
+    public void RemoveIngredient(Ingredient ingredient)
     {
         Ingredients.Remove(ingredient);
         ingredient.RemoveFoodRoot();
@@ -46,7 +46,7 @@ public class PreparedItem : MonoBehaviour
         if (Ingredients.Count <= 1)
         {
             // remove the foodroot from the ingredient, and delete the food root
-            FoodIngredient first = Ingredients[0];
+            Ingredient first = Ingredients[0];
             first.RemoveFoodRoot();
 
             Ingredients.Clear();
@@ -54,7 +54,7 @@ public class PreparedItem : MonoBehaviour
         }
 
     }
-    public static PreparedItem CreateItemFromIngredient(FoodIngredient ingredient)
+    public static PreparedItem CreateItemFromIngredient(Ingredient ingredient)
     {
         GameObject rootObj = new GameObject("Prepared Item");
         rootObj.transform.position = ingredient.transform.position;
@@ -83,21 +83,21 @@ public class PreparedItem : MonoBehaviour
 
 
 
-#if UNITY_EDITOR
-    void OnDrawGizmos()
-    {
-        if (Ingredients.Count > 0)
-        {
-            GUIStyle style = new GUIStyle();
-            // style.fontSize = 24;
-            style.normal.textColor = Color.green;
-            // Handles.Label(transform.position + Vector3.up * .6f, "Food root", style);
-            string message = "Food root";
-            message += "\nIngredient count: " + IngredientCount();
-            Handles.Label(Ingredients.First<FoodIngredient>().transform.position + Vector3.up * .6f, message, style);
-        }
-    }
-#endif
+    // #if UNITY_EDITOR
+    //     void OnDrawGizmos()
+    //     {
+    //         if (Ingredients.Count > 0)
+    //         {
+    //             GUIStyle style = new GUIStyle();
+    //             // style.fontSize = 24;
+    //             style.normal.textColor = Color.green;
+    //             // Handles.Label(transform.position + Vector3.up * .6f, "Food root", style);
+    //             string message = "Food root";
+    //             message += "\nIngredient count: " + IngredientCount();
+    //             Handles.Label(Ingredients.First<Ingredient>().transform.position + Vector3.up * .6f, message, style);
+    //         }
+    //     }
+    // #endif
 
 
 

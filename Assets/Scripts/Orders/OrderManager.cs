@@ -1,0 +1,68 @@
+using System.Collections.Generic;
+using UnityEngine;
+/// <summary>
+/// Stores orders that are created
+/// 
+/// 
+/// </summary>
+public class OrderManager : MonoBehaviour
+{
+    public static OrderManager I;
+
+
+    void Awake()
+    {
+        if (I != null && I != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        else if (I == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            I = this;
+        }
+    }
+
+    public List<Order> Orders = new List<Order>();
+
+
+    public void Update()
+    {
+        foreach (var order in Orders)
+        {
+            order.TimeSinceOrdered += Time.deltaTime;
+        }
+    }
+
+    /// <summary>
+    /// Gets a random order
+    /// 
+    /// TODO dynamically calculate the order based on stuff 
+    /// </summary>
+    /// <returns></returns>
+    public Order GetRandomOrder()
+    {
+        List<MenuItem> menuItems = new List<MenuItem>();
+
+
+        // probably get this based on some difficulty thing
+        int menuItemCount = 1;
+
+        for (int i = 0; i < menuItemCount; i++)
+        {
+            MenuItem item = MenuItem.GetRandomMenuItem();
+            menuItems.Add(item);
+        }
+
+        // calculate payout based on difficulty 
+        Order order = new Order(menuItems, 100);
+        Orders.Add(order);
+        return order;
+    }
+
+
+
+
+
+}

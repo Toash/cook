@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Grabbable : MonoBehaviour, IInteractable
+public class Grabbable : InteractableBase
 {
 
     public GrabSettings GrabSettings;
@@ -28,7 +28,7 @@ public class Grabbable : MonoBehaviour, IInteractable
     {
         Rb = GetComponent<Rigidbody>();
     }
-    public void Interact(InteractionContext context)
+    public override void Interact(InteractionContext context)
     {
         OnGrab.Invoke(context);
         context.Grabber.TryGrab(this);
@@ -68,6 +68,7 @@ public class Grabbable : MonoBehaviour, IInteractable
         Gizmos.DrawWireCube(transform.position, Vector3.one * GizmoSize);
 
     }
+
 #endif
 
 }

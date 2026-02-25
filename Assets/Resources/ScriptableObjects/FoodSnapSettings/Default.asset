@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9b17c4cf48a187439e03b7026365dc8, type: 3}
   m_Name: Default
   m_EditorClassIdentifier: Assembly-CSharp::FoodSnapSettings
+  Infinity: 1
   BreakForce: 200
   BreakTorque: 200
