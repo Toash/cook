@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: LettuceBurger
   m_EditorClassIdentifier: Assembly-CSharp::Recipe
   Name: Hamburger with Lettuce
-  requirements:
-  - Type: 0
+  Requirements:
+  - Data: {fileID: 11400000, guid: 741da3d437771584ca16a0d8652b63ba, type: 2}
     Count: 1
-  - Type: 4
+  - Data: {fileID: 11400000, guid: 5706b029712bdca46b9070d1a4c69e18, type: 2}
     Count: 1
-  - Type: 1
+  - Data: {fileID: 11400000, guid: 0fd90f4aa75e00844845c8eff566dc64, type: 2}
     Count: 1
-  - Type: 0
+  - Data: {fileID: 11400000, guid: 741da3d437771584ca16a0d8652b63ba, type: 2}
     Count: 1

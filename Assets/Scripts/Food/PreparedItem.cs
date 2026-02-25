@@ -16,10 +16,6 @@ public class PreparedItem : MonoBehaviour
     public List<Ingredient> Ingredients = new List<Ingredient>();
 
 
-
-
-
-
     /// <summary>
     /// Adds ingredient to food root and deletes from existing food root if it already exists.
     /// </summary>

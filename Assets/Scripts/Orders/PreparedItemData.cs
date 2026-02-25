@@ -7,25 +7,26 @@ using UnityEditor.Search;
 /// </summary>
 public class PreparedItemData
 {
-    public Dictionary<IngredientType, int> Counts = new();
+    public Dictionary<IngredientData, int> Counts = new();
 
 
+    // returns data from a prepared item
     public static PreparedItemData From(PreparedItem item)
     {
-        var snap = new PreparedItemData();
+        var data = new PreparedItemData();
         foreach (var ing in item.Ingredients)
         {
-            if (snap.Counts.TryGetValue(ing.Type, out var count))
+            if (data.Counts.TryGetValue(ing.Data, out var count))
             {
-                snap.Counts[ing.Type] = count + 1;
+                data.Counts[ing.Data] = count + 1;
             }
             else
             {
-                snap.Counts[ing.Type] = 1;
+                data.Counts[ing.Data] = 1;
             }
 
         }
-        return snap;
+        return data;
     }
 
     public static List<PreparedItemData> From(List<PreparedItem> items)

@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviour
     public InputActionReference Jump;
     public InputActionReference RightClick;
 
+    // events
+    public event System.Action Constrained;
+    public event System.Action UnConstrained;
+
 
     Vector3 moveVelocity = Vector3.zero;
     Vector3 wishVelocity = Vector3.zero;
@@ -59,6 +63,7 @@ public class PlayerController : MonoBehaviour
     {
         HandleCameraConstraint();
 
+        HandleGravity();
         if (!IsConstrained)
         {
             HandleJumping();
@@ -66,7 +71,6 @@ public class PlayerController : MonoBehaviour
             HandleAcceleratingVelocity();
             HandleLooking();
         }
-        HandleGravity();
 
 
 
@@ -104,17 +108,20 @@ public class PlayerController : MonoBehaviour
 
     public void ConstrainCamera(Vector3 pos, Quaternion rot)
     {
+        Debug.Log("Constrained");
         IsConstrained = true;
+        moveVelocity = Vector3.zero;
         // CamRoot.position = pos;
         // CamRoot.rotation = rot;
         constrainedCameraPos = pos;
         constrainedCameraRot = rot;
 
+        Constrained?.Invoke();
     }
 
     public void UnConstrain()
     {
-        Debug.Log("unconstrained");
+        Debug.Log("UnConstrained");
         IsConstrained = false;
 
 
@@ -128,6 +135,7 @@ public class PlayerController : MonoBehaviour
 
         // REMOVE ME ASAP!@@!@@!@!!@@!
         LockCursor();
+        UnConstrained?.Invoke();
     }
 
     void HandleGravity()
@@ -140,11 +148,21 @@ public class PlayerController : MonoBehaviour
         gravityVelocity.y -= Gravity * Time.deltaTime;
     }
 
+
+    bool CanJump()
+    {
+        return Physics.Raycast(transform.position, Vector3.down, GroundCheckDistance, GroundMask);
+    }
+
+    /// <summary>
+    /// make sure this is called after Handling gravity.
+    /// </summary>
     void HandleJumping()
     {
-        if (!Physics.Raycast(transform.position, Vector3.down, GroundCheckDistance, GroundMask)) return;
+        if (!CanJump()) return;
         if (Jump.action.WasPressedThisFrame())
         {
+            Debug.Log("Jump");
             gravityVelocity.y = JumpForce;
         }
 
@@ -186,7 +204,17 @@ public class PlayerController : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        if (CanJump())
+        {
+
+            Gizmos.color = Color.green;
+        }
+        else
+        {
+
+            Gizmos.color = Color.red;
+        }
+
         Gizmos.DrawRay(transform.position, Vector3.down * GroundCheckDistance);
         Gizmos.DrawWireSphere(transform.position + Vector3.down * GroundCheckDistance, .2f);
         Handles.Label(transform.position + Vector3.down * GroundCheckDistance, "GroundCheck");

@@ -5,6 +5,6 @@
 [System.Serializable]
 public class IngredientRequirement
 {
-    public IngredientType Type;
+    public IngredientData Data;
     public int Count;
 }

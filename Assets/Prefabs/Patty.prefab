@@ -53,7 +53,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3aa7d2f4063353a40a8cea37839b140f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Grabbable
+  HoverTooltip: 
   GrabSettings: {fileID: 11400000, guid: 4226fa1d5b9264b47b627e346b1fbbd2, type: 2}
+  GizmoSize: 0.3
 --- !u!33 &3157181062257416333
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -197,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5bc36a32977d9745809e4a0527e2499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodStackIngredient
-  Type: 1
+  Data: {fileID: 11400000, guid: 741da3d437771584ca16a0d8652b63ba, type: 2}
 --- !u!114 &171079942983400014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +215,6 @@ MonoBehaviour:
   SnapSettings: {fileID: 0}
   SnapSound: {fileID: 11400000, guid: e33ae71e176e2584e84366f520aef36c, type: 2}
   DetachSound: {fileID: 0}
-  Grabbable: {fileID: 540168866430414835}
   JointPriority: 0
 --- !u!114 &1535279557526883662
 MonoBehaviour:
@@ -232,4 +233,3 @@ MonoBehaviour:
   CookRate: 4
   CookedMaterial: {fileID: 0}
   BurntMaterial: {fileID: 0}
-  SizzlingEffect: {fileID: 0}

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
@@ -8,6 +9,13 @@ using UnityEngine;
 public class OrderManager : MonoBehaviour
 {
     public static OrderManager I;
+    public List<Order> Orders = new List<Order>();
+
+
+    public event Action<Order> OrderAdded;
+    public event Action<Order> OrderRemoved;
+
+
 
 
     void Awake()
@@ -24,7 +32,6 @@ public class OrderManager : MonoBehaviour
         }
     }
 
-    public List<Order> Orders = new List<Order>();
 
 
     public void Update()
@@ -41,7 +48,7 @@ public class OrderManager : MonoBehaviour
     /// TODO dynamically calculate the order based on stuff 
     /// </summary>
     /// <returns></returns>
-    public Order GetRandomOrder()
+    public Order AddRandomOrder()
     {
         List<MenuItem> menuItems = new List<MenuItem>();
 
@@ -57,11 +64,19 @@ public class OrderManager : MonoBehaviour
 
         // calculate payout based on difficulty 
         Order order = new Order(menuItems, 100);
-        Orders.Add(order);
-        return order;
+        return AddOrder(order);
     }
 
 
+
+    public Order AddOrder(Order order)
+    {
+        Orders.Add(order);
+        OrderAdded.Invoke(order);
+        return order;
+
+
+    }
 
 
 

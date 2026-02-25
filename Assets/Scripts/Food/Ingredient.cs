@@ -10,7 +10,7 @@ using UnityEngine;
 [RequireComponent(typeof(FoodSnapper))]
 public class Ingredient : MonoBehaviour
 {
-    public IngredientType Type;
+    public IngredientData Data;
 
     private FoodSnapper snapper;
 
@@ -28,7 +28,7 @@ public class Ingredient : MonoBehaviour
     {
         if (TryGetComponent<InteractableBase>(out var interactable))
         {
-            interactable.HoverTooltip = Type.ToString();
+            interactable.HoverTooltip = Data.Type.ToString();
         }
     }
 

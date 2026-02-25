@@ -73,16 +73,16 @@ public static class OrderEvaluator
 
     }
 
-    static Dictionary<IngredientType, int> Consolidate(MenuItem item)
+    static Dictionary<IngredientData, int> Consolidate(MenuItem item)
     {
-        var map = new Dictionary<IngredientType, int>();
+        var map = new Dictionary<IngredientData, int>();
 
-        foreach (var req in item.requirements)
+        foreach (IngredientRequirement req in item.Requirements)
         {
-            if (!map.ContainsKey(req.Type))
-                map[req.Type] = 0;
+            if (!map.ContainsKey(req.Data))
+                map[req.Data] = 0;
 
-            map[req.Type] += req.Count;
+            map[req.Data] += req.Count;
         }
 
         return map;
@@ -96,12 +96,12 @@ public static class OrderEvaluator
         foreach (var menuItem in menuItems)
         {
 
-            Dictionary<IngredientType, int> consolidatedMenuItem = Consolidate(menuItem);
+            Dictionary<IngredientData, int> consolidatedMenuItem = Consolidate(menuItem);
             int menuItemDiscrepancies = 0;
             // subtract the difference for each counts of ingredients between the snapshot and menu item.
-            foreach (var (type, count) in consolidatedMenuItem)
+            foreach (var (data, count) in consolidatedMenuItem)
             {
-                if (preparedItem.Counts.TryGetValue(type, out var snapshotCount))
+                if (preparedItem.Counts.TryGetValue(data, out var snapshotCount))
                 {
                     int diff = Math.Abs(count - snapshotCount);
                     menuItemDiscrepancies += diff;

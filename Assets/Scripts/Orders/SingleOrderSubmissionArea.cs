@@ -31,7 +31,7 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     public void GenerateRandomOrder()
     {
         // Order order = Order.RandomOrder();
-        Order order = OrderManager.I.GetRandomOrder();
+        Order order = OrderManager.I.AddRandomOrder();
         this.order = order;
         Debug.Log("Random order set");
     }

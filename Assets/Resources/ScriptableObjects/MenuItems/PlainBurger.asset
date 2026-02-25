@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PlainBurger
   m_EditorClassIdentifier: Assembly-CSharp::Recipe
   Name: Plain Hamburger
-  requirements:
-  - Type: 0
+  Requirements:
+  - Data: {fileID: 11400000, guid: 741da3d437771584ca16a0d8652b63ba, type: 2}
     Count: 1
-  - Type: 1
+  - Data: {fileID: 11400000, guid: 0fd90f4aa75e00844845c8eff566dc64, type: 2}
     Count: 1
-  - Type: 0
+  - Data: {fileID: 11400000, guid: 741da3d437771584ca16a0d8652b63ba, type: 2}
     Count: 1

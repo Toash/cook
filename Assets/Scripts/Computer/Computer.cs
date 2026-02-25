@@ -6,10 +6,6 @@ public class Computer : InteractableBase
 {
     [Tooltip("Where the camera will go when used.")]
     public Transform camTarget;
-    void Awake()
-    {
-        HoverTooltip = "Computer";
-    }
     public override void Interact(InteractionContext context)
     {
         // constrain the player camera
