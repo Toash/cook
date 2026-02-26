@@ -1,3 +1,4 @@
+using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,15 +8,27 @@ using UnityEngine.Events;
 [RequireComponent(typeof(MeshCollider))]
 public class DisplayScreen : MonoBehaviour
 {
+
+    public bool HasToBeConstrainedToUse = true;
     // screen raycast
     public LayerMask RaycastMask = ~0;
-    public float MaxRaycastDistance = 50.0f;
+    public float MaxRaycastDistance = 5.0f;
     public UnityEvent<Vector2> OnCursorInput = new();
+
+
+    private Player player;
+
+    void Start()
+    {
+        //bruh 
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+    }
 
 
     // send normalized quad input to input relayer
     void Update()
     {
+        if (HasToBeConstrainedToUse && !player.Controller.IsConstrained) return;
 #if ENABLE_LEGACY_INPUT_MANAGER
         Vector3 mousePos = Input.mousePosition;
 #else
@@ -23,10 +36,7 @@ public class DisplayScreen : MonoBehaviour
 #endif
 
 
-        // construct ray from mouse position
-        // TODO: put this outside of this script.\
         Ray mouseRay = Camera.main.ScreenPointToRay(mousePos);
-        // could also just use center point of screen (if mouse is not free)
 
 
         RaycastHit hit;

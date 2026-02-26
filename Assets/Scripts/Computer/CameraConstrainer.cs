@@ -2,7 +2,10 @@ using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
 
-public class Computer : InteractableBase
+/// <summary>
+/// Contrains the camera to some position and rotation when interacted with.
+/// </summary>
+public class CameraConstrainer : InteractableBase
 {
     [Tooltip("Where the camera will go when used.")]
     public Transform camTarget;
@@ -17,6 +20,7 @@ public class Computer : InteractableBase
     GUIStyle style = new GUIStyle();
     void OnDrawGizmos()
     {
+        if (camTarget == null) return;
         style.normal.textColor = Color.green;
 
         Gizmos.color = Color.green;

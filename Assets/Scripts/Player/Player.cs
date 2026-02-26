@@ -8,15 +8,15 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerInteraction))]
 public class Player : MonoBehaviour
 {
-    public PlayerController Controller { get; private set; }
-    public PlayerGrabber Grabber { get; private set; }
-    public PlayerInteraction Interaction { get; private set; }
+    public PlayerController Controller;
+    public PlayerGrabber Grabber;
+    public PlayerInteraction Interaction;
 
-    void Awake()
-    {
-        Controller = GetComponent<PlayerController>();
-        Grabber = GetComponent<PlayerGrabber>();
-        Interaction = GetComponent<PlayerInteraction>();
-    }
+    // void Awake()
+    // {
+    //     Controller = GetComponent<PlayerController>();
+    //     Grabber = GetComponent<PlayerGrabber>();
+    //     Interaction = GetComponent<PlayerInteraction>();
+    // }
 
 }
