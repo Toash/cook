@@ -2,48 +2,65 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
 
 
+/// <summary>
+/// When detaching, detaches the higher priority 
+/// </summary>
 public enum JointPriority
 {
     FOOD = 0,
     CONTAINER = 1,
 }
 
+/// <summary>
+/// Connection between two Snappers with a Joint.
+/// </summary>
 public class SnapConnection
 {
     public FixedJoint Joint;
-    public FoodSnapper This;
-    public FoodSnapper Other;
+    public Snapper This;
+    public Snapper Other;
     public bool IsOwner;
+
+    public override string ToString()
+    {
+        return "SnapConnection: \n" +
+        "Joint: " + Joint + "\n" +
+        "This: " + This.gameObject.name + "\n" +
+        "Other: " + Other.gameObject.name + "\n" +
+        "IsOwner: " + IsOwner;
+    }
 }
 
 /// <summary>
-/// Handles snapping food together to make a FoodRoot.
+/// Snaps together with other snappers.<br/>
+/// Snappers require a Grabbable. <br/>
 /// 
-/// Can be grabbed, detached ( if attached to another snapper ), or dropped.
+/// Can be grabbed, detached ( if attached to another snapper ), or dropped.<br/>
 /// 
-/// Snapping should only occur when the player is actually holding the item. 
+/// Snapping should only occur when the player is actually holding the item. <br/>
 /// 
 /// Detached can happen both manually from the player, and by physics (from joint breaking)
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Grabbable))]
-public class FoodSnapper : MonoBehaviour
+public class Snapper : MonoBehaviour
 {
 
+    [Tooltip("Determines the snapping priority. When detaching, detaches the highest priority first.")]
+    public JointPriority JointPriority;
     [Tooltip("Auto set if not set.")]
-    public FoodSnapSettings SnapSettings;
+    public SnapperSettings SnapSettings;
     [Header("Audio")]
     public AudioDefinition SnapSound;
     public AudioDefinition DetachSound;
 
     [Header("References")]
     private Grabbable grabbable;
-    [Tooltip("Determines the snapping priority. Goes from lowest priority to highest priority")]
-    public JointPriority JointPriority;
 
     Rigidbody rb;
 
@@ -52,8 +69,10 @@ public class FoodSnapper : MonoBehaviour
     public Dictionary<JointPriority, List<SnapConnection>> SnapConnections = new Dictionary<JointPriority, List<SnapConnection>>();
 
 
-    public event Action<Ingredient> OnSnapEvent;
-    public event Action<Ingredient> OnDetachedEvent;
+    // triggered when snapped, passes in other snapper. 
+    public event Action<Snapper> OnSnapEvent;
+    // triggered when detached, passes in other snapper. 
+    public event Action<Snapper> OnDetachedEvent;
 
 
 
@@ -68,15 +87,10 @@ public class FoodSnapper : MonoBehaviour
     private float detachTimer;
     private bool canSnap
     {
-        // get
-        // {
-        //     return passedDropDelayTimer || (grabbable.IsBeingHeld() && passedDetachDelayTimer && passedGrabDelayTimer);
-
-        // }
         get
         {
+            if (grabbable == null) return false;
             return passedDetachAndDropDelayTimer || (grabbable.IsBeingHeld() && passedDetachAndDropDelayTimer && passedGrabDelayTimer);
-
         }
     }
 
@@ -103,6 +117,20 @@ public class FoodSnapper : MonoBehaviour
 
     void OnValidate()
     {
+        if (SnapSound == null)
+        {
+            SnapSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/Snap");
+        }
+        if (DetachSound == null)
+        {
+            DetachSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/Detach");
+        }
+
+        if (SnapSettings == null)
+        {
+            SnapSettings = Resources.Load<SnapperSettings>("ScriptableObjects/FoodSnapSettings/Default");
+
+        }
         if (grabbable == null)
         {
             grabbable = GetComponent<Grabbable>();
@@ -121,22 +149,6 @@ public class FoodSnapper : MonoBehaviour
         {
             SnapConnections[p] = new List<SnapConnection>();
         }
-
-        if (SnapSound == null)
-        {
-            SnapSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/Snap");
-        }
-        if (DetachSound == null)
-        {
-            DetachSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/Detach");
-        }
-
-        if (SnapSettings == null)
-        {
-            SnapSettings = Resources.Load<FoodSnapSettings>("ScriptableObjects/FoodSnapSettings/Default");
-
-        }
-
     }
 
     void Update()
@@ -164,12 +176,21 @@ public class FoodSnapper : MonoBehaviour
         grabbable.OnDrop -= OnGrabbableDrop;
 
     }
+
+    void OnDestroy()
+    {
+        // cleanup Snap collections 
+        foreach (JointPriority priority in SnapConnections.Keys)
+        {
+            DetachAllConnectedJointsByPriority(priority);
+        }
+    }
     void OnCollisionEnter(Collision collision)
     {
         Debug.Log("Collision enter");
         if (collision.rigidbody != null)
         {
-            if (collision.rigidbody.TryGetComponent<FoodSnapper>(out FoodSnapper snapper))
+            if (collision.rigidbody.TryGetComponent<Snapper>(out Snapper snapper))
             {
                 snapTimer = 0;
             }
@@ -180,7 +201,7 @@ public class FoodSnapper : MonoBehaviour
     {
         if (collision.rigidbody != null)
         {
-            if (collision.rigidbody.TryGetComponent<FoodSnapper>(out FoodSnapper snapper))
+            if (collision.rigidbody.TryGetComponent<Snapper>(out Snapper snapper))
             {
                 snapTimer += Time.deltaTime;
 
@@ -193,31 +214,86 @@ public class FoodSnapper : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Returns all of the snappers connected by snap collections recursively
+    /// </summary>
+    /// <returns></returns>
+    public List<Snapper> ConnectedSnappersDeep(bool includeSelf = true)
+    {
+        var visited = new HashSet<Snapper>();
+        var stack = new Stack<Snapper>();
+
+        visited.Add(this);
+        stack.Push(this);
+
+        while (stack.Count > 0)
+        {
+            var current = stack.Pop();
+
+            foreach (var kv in current.SnapConnections)
+            {
+                List<SnapConnection> connections = kv.Value;
+                if (connections == null) continue;
+
+                for (int i = 0; i < connections.Count; i++)
+                {
+                    var c = connections[i];
+                    if (c == null) continue;
+
+                    Snapper otherSnapper = c.Other;
+                    if (otherSnapper == null) continue;
+
+                    if (visited.Add(otherSnapper))
+                        stack.Push(otherSnapper);
+                }
+            }
+        }
+
+        if (!includeSelf) visited.Remove(this);
+        return visited.ToList();
+    }
+
+
     void OnJointBreak(float breakForce)
     {
-        Debug.Log("Joint has been broken with force " + breakForce);
+        Debug.Log("[Snapper]: Joint broken with force " + breakForce);
 
         // ensure snap connections are updated.
         CleanupBrokenConnections();
     }
 
 
-    void OnSnap(FoodSnapper other)
+    /// <summary>
+    /// Called when a snapper snaps to another snapper. Should be called on both snappers
+    /// </summary>
+    /// <param name="other"></param>
+    /// <param name="otherSnapConnection"></param>
+    void OnSnap(Snapper other, SnapConnection otherSnapConnection)
     {
-        Debug.Log("Snap");
-        AudioManager.I.PlayOneShot(SnapSound, transform.position);
+        Debug.Log("[Snapper]: Calling OnSnap on GameObject " + gameObject.name);
+        if (otherSnapConnection.IsOwner == true)
+        {
+            AudioManager.I.PlayOneShot(SnapSound, transform.position);
+        }
 
-        // OnSnapEvent.Invoke(other.ingredient);
-        // REMOVE ME ASAP!@!@!@!@!@!@ 
-        OnSnapEvent.Invoke(other.GetComponent<Ingredient>());
+        OnSnapEvent?.Invoke(other);
     }
+    /// <summary>
+    /// Called when a snapper detaches from another snapper. Should be called on both snappers
+    /// </summary>
+    /// <param name="other"></param>
+    /// <param name="otherSnapConnection"></param>
 
-    void OnDetached(FoodSnapper other)
+    void OnDetached(Snapper other, SnapConnection otherSnapConnection)
     {
-        // OnDetachedEvent.Invoke(other.ingredient);
-        AudioManager.I.PlayOneShot(DetachSound, transform.position);
-        OnDetachedEvent.Invoke(other.GetComponent<Ingredient>());
+        Debug.Log("[Snapper]: Calling OnDetached on GameObject " + gameObject.name);
 
+        if (otherSnapConnection.IsOwner == true)
+        {
+            AudioManager.I.PlayOneShot(DetachSound, transform.position);
+        }
+
+        OnDetachedEvent?.Invoke(other);
         detachTimer = 0;
         other.detachTimer = 0;
 
@@ -241,13 +317,17 @@ public class FoodSnapper : MonoBehaviour
 
 
 
-    void SnapByHighestPriority(FoodSnapper other)
+    void SnapByHighestPriority(Snapper other)
     {
+        if (other == this)
+        {
+            Debug.LogError("[Snapper]: Cannot snap to same object.");
+        }
         // only make one joint. So this only gets called once between two joints.
         // if (GetInstanceID() > other.GetInstanceID()) return;
 
         JointPriority highestPriority = (JointPriority)Math.Max((int)JointPriority, (int)other.JointPriority);
-        // Check for existing connection on other
+        // ensure an existing connection doesnt already exist.
         if (SnapConnections.TryGetValue(highestPriority, out var list) && list.Any(c => c.Other == other))
         {
             return;
@@ -255,41 +335,52 @@ public class FoodSnapper : MonoBehaviour
 
         // create joint
         Rigidbody otherRb = other.rb;
-        FixedJoint joint = gameObject.AddComponent<FixedJoint>();
+        FixedJoint fixedJoint = gameObject.AddComponent<FixedJoint>();
 
         if (SnapSettings.Infinity)
         {
-            joint.breakForce = Single.PositiveInfinity;
-            joint.breakTorque = Single.PositiveInfinity;
+            fixedJoint.breakForce = Single.PositiveInfinity;
+            fixedJoint.breakTorque = Single.PositiveInfinity;
         }
         else
         {
-            joint.breakForce = SnapSettings.BreakForce;
-            joint.breakTorque = SnapSettings.BreakTorque;
+            fixedJoint.breakForce = SnapSettings.BreakForce;
+            fixedJoint.breakTorque = SnapSettings.BreakTorque;
         }
 
-        joint.connectedBody = otherRb;
+        fixedJoint.connectedBody = otherRb;
 
 
 
+        // add snap connection to this snapper
         List<SnapConnection> snapConnections = SnapConnections[highestPriority];
-        snapConnections.Add(new SnapConnection
+        SnapConnection snapConnection =
+        new SnapConnection
         {
-            Joint = joint,
+            Joint = fixedJoint,
             This = this,
             Other = other,
             IsOwner = true
-        });
+        };
+        snapConnections.Add(snapConnection);
+
+        // add snap connection to other snapper
         List<SnapConnection> otherSnapConnections = other.SnapConnections[highestPriority];
-        otherSnapConnections.Add(new SnapConnection
+        SnapConnection otherSnapConnection = new SnapConnection
         {
-            Joint = joint,
+            Joint = fixedJoint,
             This = other,
             Other = this,
             IsOwner = false
-        });
+        };
+        otherSnapConnections.Add(otherSnapConnection);
 
-        OnSnap(other);
+        // OnSnap(this, snapConnection);
+        // other.OnSnap(other, otherSnapConnection);
+
+        OnSnap(other, otherSnapConnection);
+        other.OnSnap(this, snapConnection);
+        // OnSnap(other, otherSnapConnection);
     }
 
     public void DetachJointsByHighestPriority()
@@ -297,7 +388,7 @@ public class FoodSnapper : MonoBehaviour
         // loop through highest priority first.
         foreach (JointPriority jointType in Enum.GetValues(typeof(JointPriority)).Cast<JointPriority>().Reverse())
         {
-            if (DetachAllConnectedJointsByType(jointType))
+            if (DetachAllConnectedJointsByPriority(jointType))
             {
                 return;
             }
@@ -305,43 +396,55 @@ public class FoodSnapper : MonoBehaviour
         }
     }
     /// <summary>
-    /// Destroys the joints where the other connections point to this FoodSnapper for a given type.
+    /// Destroys the joints where the other connections point to this FoodSnapper for a given priority.
     /// </summary>
-    /// <param name="type"></param>
+    /// <param name="priority"></param>
     /// <returns></returns>
-    bool DetachAllConnectedJointsByType(JointPriority type)
+    bool DetachAllConnectedJointsByPriority(JointPriority priority)
     {
-        if (SnapConnections.TryGetValue(type, out List<SnapConnection> connections))
+        if (SnapConnections.TryGetValue(priority, out List<SnapConnection> connections))
         {
             // get snap connections that reference this snapper.
-            List<SnapConnection> allOtherConnections = GetOtherConnectionsThatConnectToThisSnapper(type);
+            List<SnapConnection> otherConnectionsToThis = GetOtherConnectionsThatConnectToThisSnapper(priority);
 
-            if (allOtherConnections.Count == 0) return false;
+            if (otherConnectionsToThis.Count == 0) return false;
 
 
             // disconnect the connections that reference to this snapper from both sides.
-            foreach (SnapConnection otherConnection in allOtherConnections)
+            foreach (SnapConnection otherConnection in otherConnectionsToThis)
             {
 
-                List<SnapConnection> otherConnections = otherConnection.This.SnapConnections[type];
-                List<SnapConnection> thisConnections = SnapConnections[type];
+                // List<SnapConnection> otherConnections = otherConnectionThatPointsToThis.This.SnapConnections[priority];
+                // List<SnapConnection> thisConnections = SnapConnections[priority];
 
-                otherConnections.RemoveAll(c => c.Other == this);
-                thisConnections.RemoveAll(c => c.Other == otherConnection.This);
+                // Snapper otherSnapper = otherConnectionThatPointsToThis.This;
 
+                // // remove other connections that reference this
+                // otherConnections.RemoveAll(c => c.Other == this);
+                // thisConnections.RemoveAll(c => c.Other == otherSnapper);
+
+                List<SnapConnection> otherConnections = otherConnection.This.SnapConnections[priority];
+                List<SnapConnection> thisConnections = SnapConnections[priority];
+
+                Snapper otherSnapper = otherConnection.This;
+
+                // remove the connection on the other snapper
+                otherConnections.Remove(otherConnection);
+
+
+
+                // remove the connection on this that points to the other snapper
+                SnapConnection connectionThatPointsToOther = thisConnections.Find(c => c.Other == otherSnapper);
+                thisConnections.Remove(connectionThatPointsToOther);
 
                 // destroy the joint.
                 Debug.Log("Destroy joint");
                 Destroy(otherConnection.Joint);
 
 
-                OnDetached(otherConnection.This);
-
-
+                OnDetached(otherSnapper, otherConnection);
+                otherSnapper.OnDetached(this, connectionThatPointsToOther);
             }
-
-
-
             return true;
         }
         return false;
@@ -391,19 +494,19 @@ public class FoodSnapper : MonoBehaviour
     }
     void CleanupBrokenConnectionsByPriority(JointPriority priority)
     {
-        if (!SnapConnections.TryGetValue(priority, out var list))
+        if (!SnapConnections.TryGetValue(priority, out var snapConnections))
             return;
 
         // loop through the connections that we have and remove any that have a null Joint. do this on both sides.
         // loop backwards beacuse we are removing items whilst iterating this
-        for (int i = list.Count - 1; i >= 0; i--)
+        for (int i = snapConnections.Count - 1; i >= 0; i--)
         {
-            var connection = list[i];
+            SnapConnection connection = snapConnections[i];
 
             if (connection.Joint == null)
             {
                 // Remove from this side
-                list.RemoveAt(i);
+                snapConnections.RemoveAt(i);
 
 
                 // Remove from other side
@@ -412,10 +515,11 @@ public class FoodSnapper : MonoBehaviour
                 {
 
                     // remove the other connection.
-                    var otherConnection = otherList.FirstOrDefault(c => c.Other == this);
+                    SnapConnection otherConnection = otherList.Find(c => c.Other == this);
                     otherList.Remove(otherConnection);
 
-                    OnDetached(connection.Other);
+                    OnDetached(connection.Other, otherConnection);
+                    connection.Other.OnDetached(this, connection);
                 }
             }
         }
@@ -425,10 +529,8 @@ public class FoodSnapper : MonoBehaviour
 
 
 #if UNITY_EDITOR
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
-        GUIStyle style = new GUIStyle();
-        style.normal.textColor = Color.orange;
 
         // string message = "";
         // message += "Can snap: " + canSnap;
@@ -446,6 +548,7 @@ public class FoodSnapper : MonoBehaviour
         Gizmos.color = Color.blue;
 
         // visualize snap connections
+        string message = "";
         foreach (JointPriority key in SnapConnections.Keys)
         {
             foreach (SnapConnection connection in SnapConnections[key])
@@ -460,10 +563,17 @@ public class FoodSnapper : MonoBehaviour
 
                 Vector3 center = a + (otherDir / 2);
 
-                Gizmos.DrawSphere(center, length);
+                Gizmos.DrawSphere(center, length / 2);
 
+
+                message += connection.ToString() + "\n";
             }
         }
+
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.blue;
+        style.fontStyle = FontStyle.Bold;
+        Handles.Label(transform.position + (Vector3.up * 1), message, style);
     }
 #endif
 

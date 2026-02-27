@@ -19,14 +19,23 @@ public class Grabbable : InteractableBase
     private bool beingHeld = false;
 
 
-    public bool IsBeingHeld()
-    {
-        return beingHeld;
-    }
 
+    void OnValidate()
+    {
+        if (GrabSettings == null)
+        {
+            GrabSettings = Resources.Load<GrabSettings>("ScriptableObjects/GrabSettings/Default");
+        }
+
+    }
     void Awake()
     {
         Rb = GetComponent<Rigidbody>();
+    }
+
+    public bool IsBeingHeld()
+    {
+        return beingHeld;
     }
     public override void Interact(InteractionContext context)
     {

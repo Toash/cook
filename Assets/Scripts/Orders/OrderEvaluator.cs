@@ -17,6 +17,9 @@ public class PreparedItemEvaluation
     }
 }
 
+/// <summary>
+/// Evaluate an order to determine to what degree the PreparedItems matches the Menu Items of the order.
+/// </summary>
 public class OrderEvaluationResult
 {
     public float Score;
@@ -44,7 +47,7 @@ public static class OrderEvaluator
     /// Evaluates an order and returns a reuslt
     /// 
     /// Given the list of Prepared Items, best matches the closes approximation. 
-    ///     The closer it is- the higher the score.
+    ///     The closer it is- the higher the score. Does this for all of the prepared items.
     /// </summary>
     /// <param name="order"></param>
     /// <param name="preparedItems"></param>

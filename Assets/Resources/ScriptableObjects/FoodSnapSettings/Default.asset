@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Default
   m_EditorClassIdentifier: Assembly-CSharp::FoodSnapSettings
   Infinity: 1
-  BreakForce: 200
-  BreakTorque: 200
+  BreakForce: 500
+  BreakTorque: 500

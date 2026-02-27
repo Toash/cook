@@ -8,6 +8,8 @@ public class GrabSettings : ScriptableObject
 
     public float Limit = 5;
 
+    public bool InfiniteBreakForceAndTorque = false;
+
     public float BreakForce = 100;
     public float BreakTorque = 100;
 

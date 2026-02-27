@@ -10,13 +10,14 @@ using UnityEngine.Events;
 public class SingleOrderSubmissionArea : MonoBehaviour
 {
     // the order that this submission area expects
-    public Order order;
-    private OrderEvaluationResult orderEvalResult;
+    public Order Order;
+    private bool hasOrder = false;
     public UnityEvent OnOrderSuccessful;
     public UnityEvent OnOrderFailed;
-    List<PreparedItem> submittedItems = new List<PreparedItem>();
 
+    private List<PreparedItem> preparedItems = new List<PreparedItem>();
     private Collider col;
+    private OrderEvaluationResult orderEvalResult;
 
 
 
@@ -26,22 +27,33 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         col = GetComponent<Collider>();
         col.isTrigger = true;
     }
+    // void FixedUpdate()
+    // {
+    //     CheckForNullPreparedItems();
+    // }
 
 
     public void GenerateRandomOrder()
     {
         // Order order = Order.RandomOrder();
         Order order = OrderManager.I.AddRandomOrder();
-        this.order = order;
+        this.Order = order;
+        hasOrder = true;
         Debug.Log("Random order set");
     }
     public void SubmitPreparedItems()
     {
-        // evaluate order
-        List<PreparedItemData> submittedItemDatas = PreparedItemData.From(submittedItems);
-        orderEvalResult = OrderEvaluator.Evaluate(order, submittedItemDatas);
+        OrderSubmissionResult result = OrderManager.I.TrySubmit(Order, preparedItems);
+        if (result.Status != OrderSubmissionStatus.Success)
+        {
+            Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order.");
+        }
 
-        MoneyManager.I.AddMoney(order.Payout);
+
+        foreach (PreparedItem item in preparedItems)
+        {
+            Destroy(item.gameObject);
+        }
     }
     void OnMenuItemAdded(PreparedItem item)
     {
@@ -53,36 +65,56 @@ public class SingleOrderSubmissionArea : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (hasOrder == false) return;
         if (other.TryGetComponent<Ingredient>(out var ingredient))
         {
-            // check for food root
-            PreparedItem root = ingredient.PreparedItem;
-            if (root != null)
+            PreparedItem preparedItem = ingredient.PreparedItem;
+            if (preparedItem != null)
             {
-                if (submittedItems.Contains(root)) return;
-                submittedItems.Add(root);
-                OnMenuItemAdded(root);
+                if (preparedItems.Contains(preparedItem)) return;
+                preparedItems.Add(preparedItem);
+                preparedItem.Destroyed += OnPreparedItemDestroyed;
+
+                OnMenuItemAdded(preparedItem);
             }
         }
     }
 
     void OnTriggerExit(Collider other)
     {
+        if (hasOrder == false) return;
         if (other.TryGetComponent<Ingredient>(out var ingredient))
         {
             // check for food root
-            PreparedItem root = ingredient.PreparedItem;
-            if (root != null)
+            PreparedItem preparedItem = ingredient.PreparedItem;
+            if (preparedItem != null)
             {
-                if (submittedItems.Contains(root))
+                if (preparedItems.Contains(preparedItem))
                 {
-                    submittedItems.Remove(root);
-                    OnMenuItemRemoved(root);
+                    preparedItems.Remove(preparedItem);
+                    preparedItem.Destroyed -= OnPreparedItemDestroyed;
+                    OnMenuItemRemoved(preparedItem);
                 }
             }
         }
     }
 
+    void OnPreparedItemDestroyed(PreparedItem item)
+    {
+        preparedItems.Remove(item);
+    }
+
+    // void CheckForNullPreparedItems()
+    // {
+    //     foreach (var item in preparedItems)
+    //     {
+
+    //         if (item == null)
+    //         {
+    //             preparedItems.Remove(item);
+    //         }
+    //     }
+    // }
 
 
 
@@ -94,10 +126,10 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         style.normal.textColor = Color.orange;
 
         string message = "";
-        if (order != null)
+        if (Order != null)
         {
             message += "Order menu items: \n";
-            foreach (var menuItem in order.MenuItems)
+            foreach (var menuItem in Order.MenuItems)
             {
                 message += menuItem.Name + "\n";
             }
@@ -105,11 +137,11 @@ public class SingleOrderSubmissionArea : MonoBehaviour
             if (orderEvalResult == null)
             {
                 // show submitted items
-                if (submittedItems.Count > 0)
+                if (preparedItems.Count > 0)
                 {
                     Gizmos.color = Color.green;
                     message += "\nFood is in area:\n";
-                    message += "Count: " + submittedItems.Count + "\n";
+                    message += "Count: " + preparedItems.Count + "\n";
                     Handles.Label(transform.position, message);
                     Gizmos.DrawWireCube(transform.position, Vector3.one);
                 }
@@ -138,14 +170,7 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         {
             message += "Waiting for order...";
             Handles.Label(transform.position, message);
-
         }
-
-
-
-
-
-
     }
 
 #endif

@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.Design.Serialization;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -43,7 +44,7 @@ public class PlayerGrabber : MonoBehaviour
     Grabbable held;
     private float handleDistanceFromCamera = 2;
 
-    private ConfigurableJoint handleJoint;
+    private ConfigurableJoint handleConfigurableJoint;
 
     void OnEnable()
     {
@@ -100,43 +101,54 @@ public class PlayerGrabber : MonoBehaviour
     }
     public void GrabGrabbable(Grabbable grabbable)
     {
-        handleJoint = GrabberHandle.transform.AddComponent<ConfigurableJoint>();
-        handleJoint.autoConfigureConnectedAnchor = false;
-        handleJoint.anchor = Vector3.zero;
-        handleJoint.connectedAnchor = Vector3.zero;
+        handleConfigurableJoint = GrabberHandle.transform.AddComponent<ConfigurableJoint>();
+        handleConfigurableJoint.autoConfigureConnectedAnchor = false;
+        handleConfigurableJoint.anchor = Vector3.zero;
+        handleConfigurableJoint.connectedAnchor = Vector3.zero;
 
-        handleJoint.xMotion = ConfigurableJointMotion.Limited;
-        handleJoint.yMotion = ConfigurableJointMotion.Limited;
-        handleJoint.zMotion = ConfigurableJointMotion.Limited;
+        handleConfigurableJoint.xMotion = ConfigurableJointMotion.Limited;
+        handleConfigurableJoint.yMotion = ConfigurableJointMotion.Limited;
+        handleConfigurableJoint.zMotion = ConfigurableJointMotion.Limited;
 
         SoftJointLimit limit = new SoftJointLimit();
         limit.limit = GrabSettings.Limit;
-        handleJoint.linearLimit = limit;
+        handleConfigurableJoint.linearLimit = limit;
 
-        handleJoint.breakForce = GrabSettings.BreakForce;
-        handleJoint.breakTorque = GrabSettings.BreakTorque;
+        if (GrabSettings.InfiniteBreakForceAndTorque)
+        {
+            handleConfigurableJoint.breakForce = Single.PositiveInfinity;
+            handleConfigurableJoint.breakTorque = Single.PositiveInfinity;
+        }
+        else
+        {
+            handleConfigurableJoint.breakForce = GrabSettings.BreakForce;
+            handleConfigurableJoint.breakTorque = GrabSettings.BreakTorque;
+        }
 
-        handleJoint.angularXMotion = ConfigurableJointMotion.Locked;
-        handleJoint.angularYMotion = ConfigurableJointMotion.Locked;
-        handleJoint.angularZMotion = ConfigurableJointMotion.Locked;
+        handleConfigurableJoint.angularXMotion = ConfigurableJointMotion.Locked;
+        handleConfigurableJoint.angularYMotion = ConfigurableJointMotion.Locked;
+        handleConfigurableJoint.angularZMotion = ConfigurableJointMotion.Locked;
 
-        JointDrive xDrive = handleJoint.xDrive;
+        JointDrive xDrive = handleConfigurableJoint.xDrive;
         xDrive.positionSpring = GrabSettings.PositionSpring;
         xDrive.positionDamper = GrabSettings.PositionDamper;
-        handleJoint.xDrive = xDrive;
+        handleConfigurableJoint.xDrive = xDrive;
 
-        JointDrive yDrive = handleJoint.yDrive;
+        JointDrive yDrive = handleConfigurableJoint.yDrive;
         yDrive.positionSpring = GrabSettings.PositionSpring;
         yDrive.positionDamper = GrabSettings.PositionDamper;
-        handleJoint.yDrive = yDrive;
+        handleConfigurableJoint.yDrive = yDrive;
 
-        JointDrive zDrive = handleJoint.zDrive;
+        JointDrive zDrive = handleConfigurableJoint.zDrive;
         zDrive.positionSpring = GrabSettings.PositionSpring;
         zDrive.positionDamper = GrabSettings.PositionDamper;
-        handleJoint.zDrive = zDrive;
+        handleConfigurableJoint.zDrive = zDrive;
 
 
-        handleJoint.connectedBody = grabbable.Rb;
+        handleConfigurableJoint.projectionMode = JointProjectionMode.None;
+
+
+        handleConfigurableJoint.connectedBody = grabbable.Rb;
 
     }
 
@@ -148,7 +160,7 @@ public class PlayerGrabber : MonoBehaviour
     public void Drop(InteractionContext context)
     {
         // held.Drop();
-        Destroy(handleJoint);
+        Destroy(handleConfigurableJoint);
         held.Drop(context);
         held = null;
 

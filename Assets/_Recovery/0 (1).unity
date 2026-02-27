@@ -364,7 +364,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PreparedItemsContainer
   preparedItems: []
-  snapper: {fileID: 78602594}
 --- !u!1 &90042927
 GameObject:
   m_ObjectHideFlags: 0

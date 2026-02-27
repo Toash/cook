@@ -18,7 +18,7 @@ public class GrabberHandle : MonoBehaviour
     void OnJointBreak(float breakForce)
     {
         DroppedByPhysics.Invoke();
-        Debug.Log("Grabber handle joint broke");
+        Debug.Log("[PLAYER GRABBER]: Grabber handle joint broke");
     }
 #if UNITY_EDITOR
     void OnDrawGizmos()
