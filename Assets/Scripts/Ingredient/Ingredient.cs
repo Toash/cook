@@ -12,11 +12,16 @@ public class Ingredient : MonoBehaviour
 {
     public IngredientData Data;
 
+    public Snapper Snapper { get; private set; }
 
 
     // what food this ingredient belongs to, if any.
-    public PreparedItem PreparedItem { get; private set; }
+    public PreparedItem PreparedItem { get; set; }
 
+    void Awake()
+    {
+        Snapper = GetComponent<Snapper>();
+    }
     void Start()
     {
         if (TryGetComponent<InteractableBase>(out var interactable))
@@ -25,18 +30,11 @@ public class Ingredient : MonoBehaviour
         }
     }
 
-
-    public void SetPreparedItem(PreparedItem root)
+    public override string ToString()
     {
-        this.PreparedItem = root;
+        return Data.Name;
     }
 
-    public void RemovePreparedItem()
-    {
-        transform.SetParent(null);
-        SetPreparedItem(null);
-
-    }
 
 
 #if UNITY_EDITOR

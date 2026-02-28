@@ -70,9 +70,9 @@ public class Snapper : MonoBehaviour
 
 
     // triggered when snapped, passes in other snapper. 
-    public event Action<Snapper> OnSnapEvent;
+    public event Action<SnapConnection> OnSnapEvent;
     // triggered when detached, passes in other snapper. 
-    public event Action<Snapper> OnDetachedEvent;
+    public event Action<SnapConnection> OnDetachedEvent;
 
 
 
@@ -167,13 +167,11 @@ public class Snapper : MonoBehaviour
 
         grabbable.OnGrab += OnGrabbableGrab;
         grabbable.OnSecondaryInteract += OnGrabbableSecondaryInteract;
-        grabbable.OnDrop += OnGrabbableDrop;
     }
     void OnDisable()
     {
         grabbable.OnGrab -= OnGrabbableGrab;
         grabbable.OnSecondaryInteract -= OnGrabbableSecondaryInteract;
-        grabbable.OnDrop -= OnGrabbableDrop;
 
     }
 
@@ -218,7 +216,7 @@ public class Snapper : MonoBehaviour
     /// Returns all of the snappers connected by snap collections recursively
     /// </summary>
     /// <returns></returns>
-    public List<Snapper> ConnectedSnappersDeep(bool includeSelf = true)
+    public List<Snapper> GetSnapperGroup(bool includeSelf = true)
     {
         var visited = new HashSet<Snapper>();
         var stack = new Stack<Snapper>();
@@ -254,6 +252,8 @@ public class Snapper : MonoBehaviour
     }
 
 
+
+
     void OnJointBreak(float breakForce)
     {
         Debug.Log("[Snapper]: Joint broken with force " + breakForce);
@@ -264,11 +264,11 @@ public class Snapper : MonoBehaviour
 
 
     /// <summary>
-    /// Called when a snapper snaps to another snapper. Should be called on both snappers
+    /// Called when a snapper snaps to another snapper. Called on both snappers
     /// </summary>
     /// <param name="other"></param>
     /// <param name="otherSnapConnection"></param>
-    void OnSnap(Snapper other, SnapConnection otherSnapConnection)
+    void OnSnap(SnapConnection otherSnapConnection)
     {
         Debug.Log("[Snapper]: Calling OnSnap on GameObject " + gameObject.name);
         if (otherSnapConnection.IsOwner == true)
@@ -276,15 +276,16 @@ public class Snapper : MonoBehaviour
             AudioManager.I.PlayOneShot(SnapSound, transform.position);
         }
 
-        OnSnapEvent?.Invoke(other);
+        // OnSnapEvent?.Invoke(other);
+        OnSnapEvent?.Invoke(otherSnapConnection);
     }
+
     /// <summary>
-    /// Called when a snapper detaches from another snapper. Should be called on both snappers
+    /// Called when a snapper detaches from another snapper. Called on both snappers
     /// </summary>
     /// <param name="other"></param>
     /// <param name="otherSnapConnection"></param>
-
-    void OnDetached(Snapper other, SnapConnection otherSnapConnection)
+    void OnDetached(SnapConnection otherSnapConnection)
     {
         Debug.Log("[Snapper]: Calling OnDetached on GameObject " + gameObject.name);
 
@@ -293,9 +294,10 @@ public class Snapper : MonoBehaviour
             AudioManager.I.PlayOneShot(DetachSound, transform.position);
         }
 
-        OnDetachedEvent?.Invoke(other);
+        // OnDetachedEvent?.Invoke(other);
+        OnDetachedEvent?.Invoke(otherSnapConnection);
         detachTimer = 0;
-        other.detachTimer = 0;
+        otherSnapConnection.This.detachTimer = 0;
 
     }
 
@@ -308,10 +310,6 @@ public class Snapper : MonoBehaviour
     void OnGrabbableSecondaryInteract(InteractionContext context)
     {
         DetachJointsByHighestPriority();
-    }
-    void OnGrabbableDrop(InteractionContext context)
-    {
-
     }
 
 
@@ -349,6 +347,8 @@ public class Snapper : MonoBehaviour
         }
 
         fixedJoint.connectedBody = otherRb;
+        fixedJoint.enableCollision = false;
+        fixedJoint.enablePreprocessing = true;
 
 
 
@@ -378,8 +378,8 @@ public class Snapper : MonoBehaviour
         // OnSnap(this, snapConnection);
         // other.OnSnap(other, otherSnapConnection);
 
-        OnSnap(other, otherSnapConnection);
-        other.OnSnap(this, snapConnection);
+        OnSnap(otherSnapConnection);
+        other.OnSnap(snapConnection);
         // OnSnap(other, otherSnapConnection);
     }
 
@@ -442,8 +442,8 @@ public class Snapper : MonoBehaviour
                 Destroy(otherConnection.Joint);
 
 
-                OnDetached(otherSnapper, otherConnection);
-                otherSnapper.OnDetached(this, connectionThatPointsToOther);
+                OnDetached(otherConnection);
+                otherSnapper.OnDetached(connectionThatPointsToOther);
             }
             return true;
         }
@@ -518,8 +518,8 @@ public class Snapper : MonoBehaviour
                     SnapConnection otherConnection = otherList.Find(c => c.Other == this);
                     otherList.Remove(otherConnection);
 
-                    OnDetached(connection.Other, otherConnection);
-                    connection.Other.OnDetached(this, connection);
+                    OnDetached(otherConnection);
+                    connection.Other.OnDetached(connection);
                 }
             }
         }

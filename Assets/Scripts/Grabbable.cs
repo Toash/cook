@@ -10,7 +10,6 @@ public class Grabbable : InteractableBase
     public GrabSettings GrabSettings;
 
     public event Action<InteractionContext> OnGrab;
-    public event Action<InteractionContext> OnDrop;
     public event Action<InteractionContext> OnSecondaryInteract;
 
     public Rigidbody Rb { get; private set; }
@@ -39,7 +38,7 @@ public class Grabbable : InteractableBase
     }
     public override void Interact(InteractionContext context)
     {
-        OnGrab.Invoke(context);
+        OnGrab?.Invoke(context);
         context.Grabber.TryGrab(this);
 
         beingHeld = true;
@@ -49,9 +48,8 @@ public class Grabbable : InteractableBase
         OnSecondaryInteract.Invoke(context);
     }
 
-    public void Drop(InteractionContext context)
+    public void Drop()
     {
-        OnDrop.Invoke(context);
         beingHeld = false;
     }
 

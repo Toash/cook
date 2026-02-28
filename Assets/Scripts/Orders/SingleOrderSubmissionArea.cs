@@ -15,11 +15,11 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     public UnityEvent OnOrderSuccessful;
     public UnityEvent OnOrderFailed;
 
-    private List<PreparedItem> preparedItems = new List<PreparedItem>();
+
+    // private List<PreparedItem> preparedItems = new List<PreparedItem>();
+    private OrderContainer container;
     private Collider col;
     private OrderEvaluationResult orderEvalResult;
-
-
 
 
     void Awake()
@@ -27,10 +27,32 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         col = GetComponent<Collider>();
         col.isTrigger = true;
     }
-    // void FixedUpdate()
-    // {
-    //     CheckForNullPreparedItems();
-    // }
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent<OrderContainer>(out var container))
+        {
+            this.container = container;
+            OnContainerAdded(container);
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent<OrderContainer>(out var container))
+        {
+            this.container = container;
+            OnContainerRemoved(container);
+        }
+    }
+
+
+    void OnContainerAdded(OrderContainer container)
+    {
+
+    }
+    void OnContainerRemoved(OrderContainer container)
+    {
+
+    }
 
 
     public void GenerateRandomOrder()
@@ -43,80 +65,14 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     }
     public void SubmitPreparedItems()
     {
-        OrderSubmissionResult result = OrderManager.I.TrySubmit(Order, preparedItems);
+        OrderSubmissionResult result = OrderManager.I.TrySubmit(Order, container.PreparedItems);
         if (result.Status != OrderSubmissionStatus.Success)
         {
             Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order.");
         }
 
-
-        foreach (PreparedItem item in preparedItems)
-        {
-            Destroy(item.gameObject);
-        }
+        Destroy(container.gameObject);
     }
-    void OnMenuItemAdded(PreparedItem item)
-    {
-    }
-    void OnMenuItemRemoved(PreparedItem root)
-    {
-
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (hasOrder == false) return;
-        if (other.TryGetComponent<Ingredient>(out var ingredient))
-        {
-            PreparedItem preparedItem = ingredient.PreparedItem;
-            if (preparedItem != null)
-            {
-                if (preparedItems.Contains(preparedItem)) return;
-                preparedItems.Add(preparedItem);
-                preparedItem.Destroyed += OnPreparedItemDestroyed;
-
-                OnMenuItemAdded(preparedItem);
-            }
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (hasOrder == false) return;
-        if (other.TryGetComponent<Ingredient>(out var ingredient))
-        {
-            // check for food root
-            PreparedItem preparedItem = ingredient.PreparedItem;
-            if (preparedItem != null)
-            {
-                if (preparedItems.Contains(preparedItem))
-                {
-                    preparedItems.Remove(preparedItem);
-                    preparedItem.Destroyed -= OnPreparedItemDestroyed;
-                    OnMenuItemRemoved(preparedItem);
-                }
-            }
-        }
-    }
-
-    void OnPreparedItemDestroyed(PreparedItem item)
-    {
-        preparedItems.Remove(item);
-    }
-
-    // void CheckForNullPreparedItems()
-    // {
-    //     foreach (var item in preparedItems)
-    //     {
-
-    //         if (item == null)
-    //         {
-    //             preparedItems.Remove(item);
-    //         }
-    //     }
-    // }
-
-
 
 #if UNITY_EDITOR
     void OnDrawGizmos()
@@ -137,11 +93,10 @@ public class SingleOrderSubmissionArea : MonoBehaviour
             if (orderEvalResult == null)
             {
                 // show submitted items
-                if (preparedItems.Count > 0)
+                if (container != null)
                 {
                     Gizmos.color = Color.green;
                     message += "\nFood is in area:\n";
-                    message += "Count: " + preparedItems.Count + "\n";
                     Handles.Label(transform.position, message);
                     Gizmos.DrawWireCube(transform.position, Vector3.one);
                 }

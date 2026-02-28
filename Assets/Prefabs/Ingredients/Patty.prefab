@@ -199,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5bc36a32977d9745809e4a0527e2499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodStackIngredient
-  Data: {fileID: 11400000, guid: 741da3d437771584ca16a0d8652b63ba, type: 2}
+  Data: {fileID: 11400000, guid: 0fd90f4aa75e00844845c8eff566dc64, type: 2}
 --- !u!114 &171079942983400014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,10 +212,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944b15392521cab4d906b33495de27ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodSnapper
-  SnapSettings: {fileID: 0}
-  SnapSound: {fileID: 11400000, guid: e33ae71e176e2584e84366f520aef36c, type: 2}
-  DetachSound: {fileID: 0}
   JointPriority: 0
+  SnapSettings: {fileID: 11400000, guid: 3d8d2695b965b8a4585467ee3045ef30, type: 2}
+  SnapSound: {fileID: 11400000, guid: e33ae71e176e2584e84366f520aef36c, type: 2}
+  DetachSound: {fileID: 11400000, guid: 047c8a183a850384ba184c18c93cb981, type: 2}
 --- !u!114 &1535279557526883662
 MonoBehaviour:
   m_ObjectHideFlags: 0

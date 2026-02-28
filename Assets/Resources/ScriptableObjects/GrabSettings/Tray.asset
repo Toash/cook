@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b701565f2a4934429dda07d30c24cc0, type: 3}
-  m_Name: Default
+  m_Name: Tray
   m_EditorClassIdentifier: Assembly-CSharp::GrabSettings
   PositionSpring: 400
   PositionDamper: 50
   Limit: 1
-  InfiniteBreakForceAndTorque: 0
+  InfiniteBreakForceAndTorque: 1
   BreakForce: 100
   BreakTorque: 20
   SpeedMultiplier: 1

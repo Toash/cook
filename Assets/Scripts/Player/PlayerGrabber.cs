@@ -8,7 +8,6 @@ using UnityEngine.Rendering;
 
 public class PlayerGrabber : MonoBehaviour
 {
-    public GrabSettings GrabSettings;
     public float MinCamDist = 1;
     public float MaxCamDist = 3;
     public float ScrollSensitivity = .1f;
@@ -48,17 +47,17 @@ public class PlayerGrabber : MonoBehaviour
 
     void OnEnable()
     {
-        GrabberHandle.DroppedByPhysics += OnHandleDrop;
+        GrabberHandle.DroppedByPhysics += DroppedByPhysics;
     }
     void OnDisable()
     {
-        GrabberHandle.DroppedByPhysics -= OnHandleDrop;
+        GrabberHandle.DroppedByPhysics -= DroppedByPhysics;
     }
 
 
     void Update()
     {
-        GrabLight.SetActive(isHolding);
+        // GrabLight.SetActive(isHolding);
         HandleHandleRotation();
         float scrollDelta = Scroll.action.ReadValue<float>();
         float delta = scrollDelta * ScrollSensitivity;
@@ -71,7 +70,7 @@ public class PlayerGrabber : MonoBehaviour
     {
         if (context.Type == InteractType.Primary)
         {
-            Drop(context);
+            DropByInteraction(context);
         }
         else if (context.Type == InteractType.Secondary)
         {
@@ -99,50 +98,90 @@ public class PlayerGrabber : MonoBehaviour
         playerController.SetSpeedMultiplier(target.GrabSettings.SpeedMultiplier);
 
     }
+
+    void DropByInteraction(InteractionContext context)
+    {
+        Destroy(handleConfigurableJoint);
+        HandleDrop();
+    }
+    void DroppedByPhysics()
+    {
+        HandleDrop();
+    }
+
+    void HandleDrop()
+    {
+        held.Drop();
+        held = null;
+        playerController.SetSpeedMultiplier(1);
+        handlePitch = 0;
+        handleYaw = 0;
+    }
     public void GrabGrabbable(Grabbable grabbable)
     {
+        GrabSettings grabbableSettings = grabbable.GrabSettings;
         handleConfigurableJoint = GrabberHandle.transform.AddComponent<ConfigurableJoint>();
         handleConfigurableJoint.autoConfigureConnectedAnchor = false;
         handleConfigurableJoint.anchor = Vector3.zero;
         handleConfigurableJoint.connectedAnchor = Vector3.zero;
 
+        // motion
         handleConfigurableJoint.xMotion = ConfigurableJointMotion.Limited;
         handleConfigurableJoint.yMotion = ConfigurableJointMotion.Limited;
         handleConfigurableJoint.zMotion = ConfigurableJointMotion.Limited;
 
         SoftJointLimit limit = new SoftJointLimit();
-        limit.limit = GrabSettings.Limit;
+        limit.limit = grabbableSettings.Limit;
         handleConfigurableJoint.linearLimit = limit;
 
-        if (GrabSettings.InfiniteBreakForceAndTorque)
+        if (grabbableSettings.InfiniteBreakForceAndTorque)
         {
             handleConfigurableJoint.breakForce = Single.PositiveInfinity;
             handleConfigurableJoint.breakTorque = Single.PositiveInfinity;
         }
         else
         {
-            handleConfigurableJoint.breakForce = GrabSettings.BreakForce;
-            handleConfigurableJoint.breakTorque = GrabSettings.BreakTorque;
+            handleConfigurableJoint.breakForce = grabbableSettings.BreakForce;
+            handleConfigurableJoint.breakTorque = grabbableSettings.BreakTorque;
         }
 
-        handleConfigurableJoint.angularXMotion = ConfigurableJointMotion.Locked;
-        handleConfigurableJoint.angularYMotion = ConfigurableJointMotion.Locked;
-        handleConfigurableJoint.angularZMotion = ConfigurableJointMotion.Locked;
-
         JointDrive xDrive = handleConfigurableJoint.xDrive;
-        xDrive.positionSpring = GrabSettings.PositionSpring;
-        xDrive.positionDamper = GrabSettings.PositionDamper;
+        xDrive.positionSpring = grabbableSettings.PositionSpring;
+        xDrive.positionDamper = grabbableSettings.PositionDamper;
         handleConfigurableJoint.xDrive = xDrive;
 
         JointDrive yDrive = handleConfigurableJoint.yDrive;
-        yDrive.positionSpring = GrabSettings.PositionSpring;
-        yDrive.positionDamper = GrabSettings.PositionDamper;
+        yDrive.positionSpring = grabbableSettings.PositionSpring;
+        yDrive.positionDamper = grabbableSettings.PositionDamper;
         handleConfigurableJoint.yDrive = yDrive;
 
         JointDrive zDrive = handleConfigurableJoint.zDrive;
-        zDrive.positionSpring = GrabSettings.PositionSpring;
-        zDrive.positionDamper = GrabSettings.PositionDamper;
+        zDrive.positionSpring = grabbableSettings.PositionSpring;
+        zDrive.positionDamper = grabbableSettings.PositionDamper;
         handleConfigurableJoint.zDrive = zDrive;
+
+        // angular motion
+        handleConfigurableJoint.angularXMotion = ConfigurableJointMotion.Limited;
+        handleConfigurableJoint.angularYMotion = ConfigurableJointMotion.Limited;
+        handleConfigurableJoint.angularZMotion = ConfigurableJointMotion.Limited;
+
+
+        // angular limits
+        SoftJointLimit softJointLimit = new();
+        softJointLimit.limit = 1;
+        handleConfigurableJoint.lowAngularXLimit = softJointLimit;
+        handleConfigurableJoint.highAngularXLimit = softJointLimit;
+        handleConfigurableJoint.angularYLimit = softJointLimit;
+        handleConfigurableJoint.angularZLimit = softJointLimit;
+
+
+
+        // // spring
+        // SoftJointLimitSpring softJointLimitSpring = handleConfigurableJoint.angularXLimitSpring;
+        // // softJointLimitSpring.damper= 1;
+        // handleConfigurableJoint.angularXLimitSpring = softJointLimitSpring;
+        // handleConfigurableJoint.angularYZLimitSpring = softJointLimitSpring;
+
 
 
         handleConfigurableJoint.projectionMode = JointProjectionMode.None;
@@ -152,28 +191,12 @@ public class PlayerGrabber : MonoBehaviour
 
     }
 
-    public void OnHandleDrop()
-    {
-        held = null;
-        playerController.SetSpeedMultiplier(1);
-    }
-    public void Drop(InteractionContext context)
-    {
-        // held.Drop();
-        Destroy(handleConfigurableJoint);
-        held.Drop(context);
-        held = null;
-
-        playerController.SetSpeedMultiplier(1);
-        handlePitch = 0;
-        handleYaw = 0;
-    }
-
     public void SecondaryInteract(InteractionContext context)
     {
         if (held == null) return;
         held.SecondaryInteract(context);
     }
+
 
 
 
@@ -187,7 +210,14 @@ public class PlayerGrabber : MonoBehaviour
 
             // Handle.transform.localRotation = Quaternion.Euler(handlePitch, handleYaw, 0);
         }
-        GrabberHandle.HandleRb.MoveRotation(Quaternion.Euler(handlePitch, handleYaw, 0));
+
+        // rotate through rigidbody in local space.
+        Quaternion localRot = Quaternion.Euler(handlePitch, handleYaw, 0);
+        Quaternion worldRot = GrabberHandle.transform.parent.rotation * localRot;
+
+        GrabberHandle.HandleRb.MoveRotation(worldRot);
+
+        // GrabberHandle.HandleRb.MoveRotation(Quaternion.Euler(handlePitch, handleYaw, 0));
 
 
     }
