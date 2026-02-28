@@ -13,26 +13,26 @@ public class DisplayMultipleOrdersUI : MonoBehaviour
 
     void OnEnable()
     {
-        OrderManager.OrderAdded += OnAddOrder;
-        OrderManager.OrderRemoved += OnRemoveOrder;
+        OrderManager.ActiveOrderAdded += OnAddOrder;
+        OrderManager.ActiveOrderRemoved += OnRemoveOrder;
     }
     void OnDisable()
     {
-        OrderManager.OrderAdded -= OnAddOrder;
-        OrderManager.OrderRemoved -= OnRemoveOrder;
+        OrderManager.ActiveOrderAdded -= OnAddOrder;
+        OrderManager.ActiveOrderRemoved -= OnRemoveOrder;
     }
 
 
     void OnAddOrder(Order order)
     {
         ClearFlexContainer();
-        Populate(OrderManager.I.Orders);
+        Populate(OrderManager.I.ActiveOrders);
 
     }
     void OnRemoveOrder(Order order)
     {
         ClearFlexContainer();
-        Populate(OrderManager.I.Orders);
+        Populate(OrderManager.I.ActiveOrders);
 
     }
 

@@ -16,13 +16,11 @@ public class PreparedItem : MonoBehaviour
     public List<Ingredient> Ingredients = new List<Ingredient>();
 
     public event System.Action IngredientDetached;
-    public event System.Action<PreparedItem> Destroyed;
 
 
     void OnDestroy()
     {
-        Destroyed?.Invoke(this);
-
+        DestroyIngredients();
     }
 
     void OnIngredientAttached(SnapConnection connection)
@@ -172,6 +170,20 @@ public class PreparedItem : MonoBehaviour
         {
             Destroy(gameObject);
             return;
+        }
+
+    }
+
+    /// <summary>
+    /// Destroys all of the ingredients in this PreparedItem
+    /// </summary>
+    void DestroyIngredients()
+    {
+        for (int i = Ingredients.Count - 1; i >= 0; i--)
+        {
+            var ingredient = Ingredients[i];
+            RemoveIngredient(ingredient);
+            Destroy(ingredient.gameObject);
         }
 
     }

@@ -1,17 +1,31 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-/// <summary>
-/// Keeps track of orders and manages them
-/// </summary>
 public class OrderManager : MonoBehaviour
 {
     public static OrderManager I;
-    public List<Order> Orders = new List<Order>();
 
 
-    public event Action<Order> OrderAdded;
-    public event Action<Order> OrderRemoved;
+    /// <summary>
+    /// Where npcs go to order.
+    /// </summary>
+    public OrderLocation OrderLocation;
+    /// <summary>
+    /// Order that the player has to acknowledge before it gets added to the active orders.
+    /// </summary>
+    public Order ProposedOrder = null;
+
+    /// <summary>
+    /// Orders that the player has to currently make.
+    /// </summary>
+    public List<Order> ActiveOrders = new List<Order>();
+
+
+    public event Action<Order> ProposedOrderAdded;
+    public event Action<Order> ProposedOrderRemoved;
+
+    public event Action<Order> ActiveOrderAdded;
+    public event Action<Order> ActiveOrderRemoved;
 
 
 
@@ -34,22 +48,15 @@ public class OrderManager : MonoBehaviour
 
     public void Update()
     {
-        foreach (var order in Orders)
+        foreach (var order in ActiveOrders)
         {
             order.TimeSinceOrdered += Time.deltaTime;
         }
     }
 
-    /// <summary>
-    /// Gets a random order
-    /// 
-    /// TODO dynamically calculate the order based on stuff 
-    /// </summary>
-    /// <returns></returns>
-    public Order AddRandomOrder()
+    public Order GenerateRandomOrder()
     {
         List<MenuItem> menuItems = new List<MenuItem>();
-
 
         // probably get this based on some difficulty thing
         int menuItemCount = 1;
@@ -60,9 +67,29 @@ public class OrderManager : MonoBehaviour
             menuItems.Add(item);
         }
 
-        // calculate payout based on difficulty 
+        // TODO calculate price based on menu items
         Order order = new Order(menuItems, 100);
-        return AddOrder(order);
+        return AddToActiveOrders(order);
+    }
+
+    public void ProposeOrder(Order order)
+    {
+        if (ProposedOrder != null)
+        {
+            Debug.LogWarning("[OrderManager]: Trying to propose Order but it already exists...");
+            return;
+        }
+        Debug.Log("[OrderManager]: Proposed order");
+        ProposedOrder = order;
+        ProposedOrderAdded?.Invoke(order);
+    }
+
+    public void AcknowledgeProposedOrder()
+    {
+        Debug.Log("[OrderManager]: Acknowledged proposed order");
+        ProposedOrderRemoved?.Invoke(ProposedOrder);
+        ActiveOrders.Add(ProposedOrder);
+        ProposedOrder = null;
     }
 
     public OrderSubmissionResult TrySubmit(Order order, List<PreparedItem> preparedItems)
@@ -90,17 +117,17 @@ public class OrderManager : MonoBehaviour
     }
 
 
-    public Order AddOrder(Order order)
+    public Order AddToActiveOrders(Order order)
     {
-        Orders.Add(order);
-        OrderAdded?.Invoke(order);
+        ActiveOrders.Add(order);
+        ActiveOrderAdded?.Invoke(order);
         return order;
     }
 
     public void RemoveOrder(Order order)
     {
-        if (!Orders.Remove(order)) return;
-        OrderRemoved?.Invoke(order);
+        if (!ActiveOrders.Remove(order)) return;
+        ActiveOrderRemoved?.Invoke(order);
     }
 
 

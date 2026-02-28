@@ -71,6 +71,11 @@ public class SingleOrderSubmissionArea : MonoBehaviour
             Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order.");
         }
 
+
+        foreach (PreparedItem item in container.PreparedItems)
+        {
+            Destroy(item.gameObject);
+        }
         Destroy(container.gameObject);
     }
 

@@ -10,6 +10,7 @@ public class MenuItem : ScriptableObject
     public string Name;
     // what is in the order
     public List<IngredientRequirement> Requirements = new List<IngredientRequirement>();
+    public float BasePrice = 10;
 
     public static MenuItem GetRandomMenuItem()
     {
