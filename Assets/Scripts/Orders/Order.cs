@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.InputSystem.Android;
 
+
 /// <summary>
 /// Represents an order
 /// Customer can place an order in restaurant
@@ -13,28 +14,36 @@ using UnityEngine.InputSystem.Android;
 /// 
 /// Submission areas look for order. 
 /// </summary>
-[System.Serializable]
 public class Order
 {
-    public static int Counter = 1;
-    public int OrderNumber;
+    public NPC Owner;
     public List<MenuItem> MenuItems;
-
     public int Payout;
 
+
+    public static int Counter = 1;
+    public int ID;
     // long order time bad.
     public float TimeSinceOrdered;
 
 
     // orders should be created through order manager.
-    public Order(List<MenuItem> items, int Payout)
+    // public Order(List<MenuItem> items, int Payout)
+    // {
+    //     OrderNumber = Counter;
+    //     Counter++;
+
+    //     this.MenuItems = items;
+    //     this.Payout = Payout;
+    // }
+    public Order(OrderProposition proposition)
     {
-        OrderNumber = Counter;
+        ID = Counter;
         Counter++;
 
-        this.MenuItems = items;
-        this.Payout = Payout;
-
+        this.MenuItems = proposition.MenuItems;
+        this.Payout = proposition.Payout;
+        this.Owner = proposition.Proposer;
     }
 
 

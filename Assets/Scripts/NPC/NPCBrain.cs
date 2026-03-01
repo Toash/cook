@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,9 +10,12 @@ using UnityEngine.AI;
 /// States should exist as children of this.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(NPC))]
 public class NPCBrain : MonoBehaviour
 {
 
+    public NPCState InitialState;
+    [ReadOnly]
     public NPCState CurrentState;
 
 
@@ -19,20 +23,35 @@ public class NPCBrain : MonoBehaviour
     /// Invoked when the NPC becomes first in line.
     /// </summary>
     public event Action<NPCBrain> BecameFirstInLine;
+    public NavMeshAgent Agent;
     /// <summary>
-    ///  the current order location that the npc is at.
+    ///  the current int that the npc is in.
     /// </summary>
-    private OrderLocation currentOrderLocation;
+    [ReadOnly]
+    public OrderLine CurrentOrderLine;
 
+    /// <summary>
+    /// The current order that is associated with the NPC.
+    /// </summary>
+    [ReadOnly]
+    public Order CurrentOrder;
+
+    [ShowInInspector, ReadOnly]
     public Dictionary<string, NPCState> RegisteredStates = new();
 
-    public NavMeshAgent Agent;
+
+    public NPC NPC { get; private set; }
+
 
     void OnValidate()
     {
         if (Agent == null)
         {
             Agent = GetComponent<NavMeshAgent>();
+        }
+        if (NPC == null)
+        {
+            NPC = GetComponent<NPC>();
         }
     }
 
@@ -44,8 +63,14 @@ public class NPCBrain : MonoBehaviour
             {
                 Debug.Log("[NPCBrain]: Adding state " + state.StateName + " to RegisteredStates.");
                 RegisteredStates.Add(state.StateName, state);
+                state.Brain = this;
             }
         }
+    }
+    void Start()
+    {
+        CurrentState = InitialState;
+        CurrentState.OnEnter(this);
     }
     void Update()
     {
@@ -71,35 +96,23 @@ public class NPCBrain : MonoBehaviour
 
 
 
-    public void SetCurrentOrderLocation(OrderLocation loc)
+    public void SetCurrentOrderLocation(OrderLine loc)
     {
-        this.currentOrderLocation = loc;
+        this.CurrentOrderLine = loc;
     }
-    public OrderLocation GetCurrentOrderLocation()
+    public OrderLine GetCurrentOrderLocation()
     {
-        return this.currentOrderLocation;
-    }
-    public void EnterLine()
-    {
-
-        currentOrderLocation.AddToLine(this);
-        currentOrderLocation.NowFirstInLine += OnFirstInLineChanged;
-
-    }
-    public void ExitLine()
-    {
-        currentOrderLocation.RemoveFromLine();
-        currentOrderLocation.NowFirstInLine -= OnFirstInLineChanged;
+        return this.CurrentOrderLine;
     }
     /// <summary>
     /// Pass this as callbakc when subscribing to an OrderLocation line.
     /// </summary>
     /// <param name="brain"></param>
-    void OnFirstInLineChanged(NPCBrain brain)
+    public void OnFirstInLineChanged(NPCBrain brain)
     {
         if (brain != this) return;
         Debug.Log("[NPCBrain]: Became first in line");
-        BecameFirstInLine?.Invoke(this);
+        BecameFirstInLine?.Invoke(brain);
     }
 
 
@@ -109,7 +122,10 @@ public class NPCBrain : MonoBehaviour
     {
         style.normal.textColor = Color.blue;
         style.fontStyle = FontStyle.Bold;
-        Handles.Label(transform.position, "Current State: " + CurrentState.StateName, style);
+        if (CurrentState != null)
+        {
+            Handles.Label(transform.position, "Current State: " + CurrentState.StateName, style);
+        }
 
     }
 #endif

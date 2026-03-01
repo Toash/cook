@@ -21,6 +21,7 @@ public class Ingredient : MonoBehaviour
     void Awake()
     {
         Snapper = GetComponent<Snapper>();
+        Snapper.SetJointType(JointType.Food);
     }
     void Start()
     {

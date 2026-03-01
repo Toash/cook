@@ -19,6 +19,15 @@ EasyRoads3D/
 EasyRoads3D scenes/
 ProceduralUIImage/
 
+# Ignore the auto-generated AOT compatibility dll.
+/Assets/Plugins/Sirenix/Assemblies/AOT/*
+
+# Ignore all unpacked demos.
+/Assets/Plugins/Sirenix/Demos/*
+
+# But keep the demo packages themselves.
+!/Assets/Plugins/Sirenix/Demos/*.unitypackage 
+
 
 # By default unity supports Blender asset imports, *.blend1 blender files do not need to be commited to version control.
 *.blend1

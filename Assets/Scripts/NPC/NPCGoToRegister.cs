@@ -31,10 +31,6 @@ public class NPCGoToRegister : NPCState
         // reached the register.
         if (AgentUtils.HasAgentReachedDestination(brain.Agent))
         {
-            // add to line
-            // brain.OrderLocation.AddToLine(brain);
-            // brain.OrderLocation.NowFirstInLine += brain.OnFirstInLineChanged;
-            brain.EnterLine();
             brain.ChangeState("NPCWaitInLine");
 
         }

@@ -1,29 +1,31 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 public class OrderManager : MonoBehaviour
 {
     public static OrderManager I;
 
 
-    /// <summary>
-    /// Where npcs go to order.
-    /// </summary>
-    public OrderLocation OrderLocation;
+    public OrderLine OrderLocation;
+    public OrderWaitingSpot WaitingSpot;
+
+
     /// <summary>
     /// Order that the player has to acknowledge before it gets added to the active orders.
     /// </summary>
-    public Order ProposedOrder = null;
+    public OrderProposition ProposedOrder = null;
+
+    // TODO: add way for player to reject order (out of stock), or counter offer.
+    public event Action<Order> ProposedOrderAcknowledged;
+    public event Action<OrderProposition> ProposedOrderAdded;
+    public event Action<OrderProposition> ProposedOrderRemoved;
+
 
     /// <summary>
     /// Orders that the player has to currently make.
     /// </summary>
     public List<Order> ActiveOrders = new List<Order>();
-
-
-    public event Action<Order> ProposedOrderAdded;
-    public event Action<Order> ProposedOrderRemoved;
-
     public event Action<Order> ActiveOrderAdded;
     public event Action<Order> ActiveOrderRemoved;
 
@@ -54,7 +56,22 @@ public class OrderManager : MonoBehaviour
         }
     }
 
-    public Order GenerateRandomOrder()
+    public Order GetActiveOrderFromID(int ID)
+    {
+        foreach (var order in ActiveOrders)
+        {
+            if (order.ID == ID)
+            {
+                return order;
+            }
+        }
+
+        Debug.Log("[OrderManager]: Could not find associated order from ID " + ID + "!");
+        return null;
+
+    }
+
+    public OrderProposition GenerateRandomOrderProposition(NPC proposer)
     {
         List<MenuItem> menuItems = new List<MenuItem>();
 
@@ -68,11 +85,12 @@ public class OrderManager : MonoBehaviour
         }
 
         // TODO calculate price based on menu items
-        Order order = new Order(menuItems, 100);
-        return AddToActiveOrders(order);
+        OrderProposition order = new OrderProposition(proposer, menuItems, 100);
+        return order;
+        // return AddToActiveOrders(order);
     }
 
-    public void ProposeOrder(Order order)
+    public void ProposeOrder(OrderProposition prop)
     {
         if (ProposedOrder != null)
         {
@@ -80,16 +98,23 @@ public class OrderManager : MonoBehaviour
             return;
         }
         Debug.Log("[OrderManager]: Proposed order");
-        ProposedOrder = order;
-        ProposedOrderAdded?.Invoke(order);
+        ProposedOrder = prop;
+        ProposedOrderAdded?.Invoke(prop);
     }
 
     public void AcknowledgeProposedOrder()
     {
         Debug.Log("[OrderManager]: Acknowledged proposed order");
         ProposedOrderRemoved?.Invoke(ProposedOrder);
-        ActiveOrders.Add(ProposedOrder);
+
+
+        Order newOrder = new Order(ProposedOrder);
+
+        AddToActiveOrders(newOrder);
         ProposedOrder = null;
+
+
+        ProposedOrderAcknowledged?.Invoke(newOrder);
     }
 
     public OrderSubmissionResult TrySubmit(Order order, List<PreparedItem> preparedItems)

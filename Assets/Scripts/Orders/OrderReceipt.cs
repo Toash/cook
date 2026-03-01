@@ -1,0 +1,36 @@
+using TMPro;
+using UnityEditor;
+using UnityEngine;
+/// <summary>
+/// World object that the player attaches to a container- to associate it with an active order.
+/// 
+/// This is required in order to identity an OrderContainer
+/// </summary>
+[RequireComponent(typeof(Snapper))]
+public class OrderReceipt : MonoBehaviour
+{
+    public TMP_Text IDText;
+    public int OrderID { get; private set; }
+
+    // TODO reference to text in world space ui
+
+
+    void Awake()
+    {
+        var snapper = GetComponent<Snapper>();
+        snapper.SetJointType(JointType.Receipt);
+    }
+    public void Init(int ID)
+    {
+        this.OrderID = ID;
+        IDText.text = ID.ToString();
+    }
+
+
+#if UNITY_EDITOR
+    void OnDrawGizmos()
+    {
+        Handles.Label(transform.position, "OrderReceipt with ID: " + OrderID);
+    }
+#endif
+}
