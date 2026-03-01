@@ -9,6 +9,6 @@ public class Button : InteractableBase
     public override void Interact(InteractionContext context)
     {
         UnityEngine.Debug.Log("Pressed button");
-        Pressed.Invoke();
+        Pressed?.Invoke();
     }
 }

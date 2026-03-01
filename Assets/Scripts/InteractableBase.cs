@@ -11,8 +11,21 @@ public abstract class InteractableBase : MonoBehaviour
 
     // public virtual string HoverTooltip { get; set; } = "";
     public string HoverTooltip = "";
+    void Awake()
+    {
+        SetLayer();
+    }
+    void Start()
+    {
+        SetLayer();
 
+    }
     void OnValidate()
+    {
+        SetLayer();
+    }
+
+    void SetLayer()
     {
         int interactLayer = LayerMask.NameToLayer("Interact");
         if (interactLayer == -1)
@@ -22,6 +35,7 @@ public abstract class InteractableBase : MonoBehaviour
         }
 
         gameObject.layer = interactLayer;
+
     }
 
     public virtual void OnHoverEnter() { }

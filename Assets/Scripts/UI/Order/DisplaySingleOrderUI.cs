@@ -20,7 +20,7 @@ public class DisplaySingleOrderUI : MonoBehaviour
     {
         this.displayedOrder = order;
 
-        OrderNumber.text = "Order #: " + order.OrderNumber.ToString();
+        OrderNumber.text = "Order #: " + order.ID.ToString();
         Payout.text = "$" + order.Payout.ToString();
 
 

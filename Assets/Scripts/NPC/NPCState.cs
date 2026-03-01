@@ -1,8 +1,15 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public abstract class NPCState : MonoBehaviour
 {
+
+    [ShowInInspector]
     public abstract string StateName { get; }
+    [HideInInspector]
+    public NPCBrain Brain;
+
+
     public abstract void OnEnter(NPCBrain brain);
     public abstract void OnUpdate(NPCBrain brain);
     public abstract void OnFixedUpdate(NPCBrain brain);

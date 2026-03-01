@@ -7,14 +7,27 @@ public class NPCWaitInLine : NPCState
 
     public override string StateName => "NPCWaitInLine";
 
+    void OnNewFirstInLine(NPCBrain brain)
+    {
+        Debug.Log("[NPC]: First in line");
+        brain.ChangeState("NPCOrdering");
+    }
     public override void OnEnter(NPCBrain brain)
     {
+        brain.CurrentOrderLine.AddNPCToLine(brain);
+        // already first in line
+        if (brain.CurrentOrderLine.GetFirstNPCInLine() == brain)
+        {
+            OnNewFirstInLine(brain);
+            return;
+        }
+
+        // not already first in line, subscribe to event that tells us when .
         brain.BecameFirstInLine += OnNewFirstInLine;
     }
 
     public override void OnExit(NPCBrain brain)
     {
-        brain.BecameFirstInLine -= OnNewFirstInLine;
     }
 
     public override void OnFixedUpdate(NPCBrain brain)
@@ -27,9 +40,4 @@ public class NPCWaitInLine : NPCState
     }
 
 
-    void OnNewFirstInLine(NPCBrain brain)
-    {
-        // go to order
-        brain.ChangeState("NPCOrdering");
-    }
 }

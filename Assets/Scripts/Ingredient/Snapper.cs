@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.OdinInspector;
 using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
@@ -12,8 +13,19 @@ using UnityEngine;
 /// </summary>
 public enum JointPriority
 {
-    FOOD = 0,
-    CONTAINER = 1,
+    Default = 0,
+    Container = 1,
+}
+
+/// <summary>
+/// Determines what type of Joint can snap to one another.
+/// </summary>
+public enum JointType
+{
+    Food,
+    Container,
+    Receipt, // receipts should ONLY be snapped to containers.
+
 }
 
 /// <summary>
@@ -51,8 +63,12 @@ public class SnapConnection
 public class Snapper : MonoBehaviour
 {
 
+    [Tooltip("Determines what type of snappers can snap to others.")]
+    [ShowInInspector]
+    public JointType JointType { get; private set; }
     [Tooltip("Determines the snapping priority. When detaching, detaches the highest priority first.")]
-    public JointPriority JointPriority;
+    [ShowInInspector]
+    public JointPriority JointPriority { get; private set; }
     [Tooltip("Auto set if not set.")]
     public SnapperSettings SnapSettings;
     [Header("Audio")]
@@ -85,13 +101,16 @@ public class Snapper : MonoBehaviour
     private float timeSinceGrabbed;
     private float snapTimer;
     private float detachTimer;
-    private bool canSnap
+    private bool canSnap(Snapper other)
     {
-        get
+        // if other is null, just ignore joint type checks.
+        if (other != null)
         {
-            if (grabbable == null) return false;
-            return passedDetachAndDropDelayTimer || (grabbable.IsBeingHeld() && passedDetachAndDropDelayTimer && passedGrabDelayTimer);
+            if (!JointTypesCanSnap(other)) return false;
         }
+
+        if (grabbable == null) return false;
+        return passedDetachAndDropDelayTimer || (grabbable.IsBeingHeld() && passedDetachAndDropDelayTimer && passedGrabDelayTimer);
     }
 
 
@@ -110,6 +129,16 @@ public class Snapper : MonoBehaviour
         {
             return timeSinceGrabbed >= timeSinceGrabbedDelay;
         }
+    }
+
+    public void SetJointType(JointType type)
+    {
+        this.JointType = type;
+    }
+
+    public void SetJointPriority(JointPriority priority)
+    {
+        this.JointPriority = priority;
     }
 
     // period of time after detaching in which the food can attach. (for dropping food onto another.)
@@ -131,14 +160,14 @@ public class Snapper : MonoBehaviour
             SnapSettings = Resources.Load<SnapperSettings>("ScriptableObjects/FoodSnapSettings/Default");
 
         }
-        if (grabbable == null)
-        {
-            grabbable = GetComponent<Grabbable>();
-        }
     }
 
     void Awake()
     {
+        if (grabbable == null)
+        {
+            grabbable = GetComponent<Grabbable>();
+        }
         rb = GetComponent<Rigidbody>();
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         // ingredient = GetComponent<FoodIngredient>();
@@ -188,7 +217,7 @@ public class Snapper : MonoBehaviour
         Debug.Log("Collision enter");
         if (collision.rigidbody != null)
         {
-            if (collision.rigidbody.TryGetComponent<Snapper>(out Snapper snapper))
+            if (collision.rigidbody.TryGetComponent<Snapper>(out Snapper other))
             {
                 snapTimer = 0;
             }
@@ -199,18 +228,34 @@ public class Snapper : MonoBehaviour
     {
         if (collision.rigidbody != null)
         {
-            if (collision.rigidbody.TryGetComponent<Snapper>(out Snapper snapper))
+            if (collision.rigidbody.TryGetComponent<Snapper>(out Snapper other))
             {
                 snapTimer += Time.deltaTime;
 
-                if (canSnap)
+                if (canSnap(other))
                 {
-                    SnapByHighestPriority(snapper);
+                    SnapByHighestPriority(other);
                 }
             }
         }
 
     }
+
+
+    public bool JointTypesCanSnap(Snapper other)
+    {
+        if (JointType == JointType.Receipt && other.JointType == JointType.Food)
+        {
+            return false;
+        }
+        if (JointType == JointType.Food && other.JointType == JointType.Receipt)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /// <summary>
     /// Returns all of the snappers connected by snap collections recursively
@@ -538,7 +583,7 @@ public class Snapper : MonoBehaviour
 
         // Handles.Label(transform.position, message);
 
-        if (canSnap)
+        if (canSnap(null))
         {
 
             Gizmos.color = Color.green;
@@ -549,6 +594,9 @@ public class Snapper : MonoBehaviour
 
         // visualize snap connections
         string message = "";
+
+        message += "JointType: " + JointType.ToString() + "\n";
+
         foreach (JointPriority key in SnapConnections.Keys)
         {
             foreach (SnapConnection connection in SnapConnections[key])
