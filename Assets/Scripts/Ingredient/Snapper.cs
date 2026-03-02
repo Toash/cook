@@ -48,6 +48,7 @@ public class SnapConnection
     }
 }
 
+
 /// <summary>
 /// Snaps together with other snappers.<br/>
 /// Snappers require a Grabbable. <br/>
@@ -57,6 +58,7 @@ public class SnapConnection
 /// Snapping should only occur when the player is actually holding the item. <br/>
 /// 
 /// Detached can happen both manually from the player, and by physics (from joint breaking)
+/// 
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Grabbable))]
@@ -78,16 +80,14 @@ public class Snapper : MonoBehaviour
     [Header("References")]
     private Grabbable grabbable;
 
-    Rigidbody rb;
+    public Rigidbody Rigidbody { get; private set; }
 
     // public Dictionary<JointPriority, FixedJoint> JointsDict = new Dictionary<JointPriority, FixedJoint>();
     // public Dictionary<JointPriority, SnapConnection> SnapConnections = new Dictionary<JointPriority, SnapConnection>();
     public Dictionary<JointPriority, List<SnapConnection>> SnapConnections = new Dictionary<JointPriority, List<SnapConnection>>();
 
 
-    // triggered when snapped, passes in other snapper. 
     public event Action<SnapConnection> OnSnapEvent;
-    // triggered when detached, passes in other snapper. 
     public event Action<SnapConnection> OnDetachedEvent;
 
 
@@ -168,8 +168,8 @@ public class Snapper : MonoBehaviour
         {
             grabbable = GetComponent<Grabbable>();
         }
-        rb = GetComponent<Rigidbody>();
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        Rigidbody = GetComponent<Rigidbody>();
+        Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
         // ingredient = GetComponent<FoodIngredient>();
 
 
@@ -241,6 +241,32 @@ public class Snapper : MonoBehaviour
 
     }
 
+    public static Snapper GetThis(SnapConnection connection)
+    {
+        Snapper thisSnapper;
+        if (connection.IsOwner == true)
+        {
+            thisSnapper = connection.This;
+        }
+        else
+        {
+            thisSnapper = connection.Other;
+        }
+        return thisSnapper;
+    }
+    public static Snapper GetOther(SnapConnection connection)
+    {
+        Snapper otherSnapper;
+        if (connection.IsOwner == true)
+        {
+            otherSnapper = connection.Other;
+        }
+        else
+        {
+            otherSnapper = connection.This;
+        }
+        return otherSnapper;
+    }
 
     public bool JointTypesCanSnap(Snapper other)
     {
@@ -312,37 +338,38 @@ public class Snapper : MonoBehaviour
     /// Called when a snapper snaps to another snapper. Called on both snappers
     /// </summary>
     /// <param name="other"></param>
-    /// <param name="otherSnapConnection"></param>
-    void OnSnap(SnapConnection otherSnapConnection)
+    /// <param name="currentSnapConnection"></param>
+    void OnSnap(SnapConnection currentSnapConnection)
     {
         Debug.Log("[Snapper]: Calling OnSnap on GameObject " + gameObject.name);
-        if (otherSnapConnection.IsOwner == true)
+        if (currentSnapConnection.IsOwner == true)
         {
             AudioManager.I.PlayOneShot(SnapSound, transform.position);
         }
 
         // OnSnapEvent?.Invoke(other);
-        OnSnapEvent?.Invoke(otherSnapConnection);
+        OnSnapEvent?.Invoke(currentSnapConnection);
     }
 
     /// <summary>
     /// Called when a snapper detaches from another snapper. Called on both snappers
     /// </summary>
     /// <param name="other"></param>
-    /// <param name="otherSnapConnection"></param>
-    void OnDetached(SnapConnection otherSnapConnection)
+    /// <param name="currentSnapConnection"></param>
+    void OnDetached(SnapConnection currentSnapConnection)
     {
         Debug.Log("[Snapper]: Calling OnDetached on GameObject " + gameObject.name);
 
-        if (otherSnapConnection.IsOwner == true)
+        if (currentSnapConnection.IsOwner == true)
         {
             AudioManager.I.PlayOneShot(DetachSound, transform.position);
         }
 
         // OnDetachedEvent?.Invoke(other);
-        OnDetachedEvent?.Invoke(otherSnapConnection);
+        OnDetachedEvent?.Invoke(currentSnapConnection);
         detachTimer = 0;
-        otherSnapConnection.This.detachTimer = 0;
+        currentSnapConnection.This.detachTimer = 0;
+        currentSnapConnection.Other.detachTimer = 0;
 
     }
 
@@ -377,7 +404,7 @@ public class Snapper : MonoBehaviour
         }
 
         // create joint
-        Rigidbody otherRb = other.rb;
+        Rigidbody otherRb = other.Rigidbody;
         FixedJoint fixedJoint = gameObject.AddComponent<FixedJoint>();
 
         if (SnapSettings.Infinity)
@@ -423,8 +450,11 @@ public class Snapper : MonoBehaviour
         // OnSnap(this, snapConnection);
         // other.OnSnap(other, otherSnapConnection);
 
-        OnSnap(otherSnapConnection);
-        other.OnSnap(snapConnection);
+        // OnSnap(otherSnapConnection);
+        // other.OnSnap(snapConnection);
+
+        OnSnap(snapConnection);
+        other.OnSnap(otherSnapConnection);
         // OnSnap(other, otherSnapConnection);
     }
 
@@ -487,8 +517,11 @@ public class Snapper : MonoBehaviour
                 Destroy(otherConnection.Joint);
 
 
-                OnDetached(otherConnection);
-                otherSnapper.OnDetached(connectionThatPointsToOther);
+                // OnDetached(otherConnection);
+                // otherSnapper.OnDetached(connectionThatPointsToOther);
+
+                OnDetached(connectionThatPointsToOther);
+                otherSnapper.OnDetached(otherConnection);
             }
             return true;
         }

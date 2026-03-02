@@ -7,8 +7,20 @@ public class OrderManager : MonoBehaviour
     public static OrderManager I;
 
 
-    public OrderLine OrderLocation;
+    /// <summary>
+    /// Spots NPCS wait to order something
+    /// </summary>
+    public OrderLine OrderLine;
+
+    /// <summary>
+    /// Spots NPCS wait while an order is being made 
+    /// </summary>
     public OrderWaitingSpot WaitingSpot;
+
+    /// <summary>
+    /// Spot Player submits Made orders, and where NPCS pick up their orders.
+    /// </summary>
+    public SingleOrderSubmissionArea OrderSubmissionArea;
 
 
     /// <summary>
@@ -26,6 +38,7 @@ public class OrderManager : MonoBehaviour
     /// Orders that the player has to currently make.
     /// </summary>
     public List<Order> ActiveOrders = new List<Order>();
+    public event Action<Order> ActiveOrderMade;
     public event Action<Order> ActiveOrderAdded;
     public event Action<Order> ActiveOrderRemoved;
 
@@ -137,6 +150,12 @@ public class OrderManager : MonoBehaviour
 
         MoneyManager.I.AddMoney(payout);
         Debug.Log("[OrderManager]: Returning order information.");
+
+
+        // remove from active orders.
+        RemoveActiveOrder(order);
+        ActiveOrderMade?.Invoke(order);
+
         return new OrderSubmissionResult(OrderSubmissionStatus.Success, order, eval, payout);
 
     }
@@ -149,7 +168,7 @@ public class OrderManager : MonoBehaviour
         return order;
     }
 
-    public void RemoveOrder(Order order)
+    public void RemoveActiveOrder(Order order)
     {
         if (!ActiveOrders.Remove(order)) return;
         ActiveOrderRemoved?.Invoke(order);

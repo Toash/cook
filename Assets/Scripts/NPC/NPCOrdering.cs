@@ -10,6 +10,7 @@ public class NPCOrdering : NPCState
     void OnProposedOrderAcknowledged(Order order)
     {
         if (order.Owner != Brain.NPC) return;
+        Brain.CurrentOrderID = order.ID;
 
         Brain.ChangeState("NPCWaitForOrder");
 
@@ -18,8 +19,8 @@ public class NPCOrdering : NPCState
     public override void OnEnter(NPCBrain brain)
     {
         OrderManager.I.ProposedOrderAcknowledged += OnProposedOrderAcknowledged;
-        var order = OrderManager.I.GenerateRandomOrderProposition(brain.NPC);
-        OrderManager.I.ProposeOrder(order);
+        var prop = OrderManager.I.GenerateRandomOrderProposition(brain.NPC);
+        OrderManager.I.ProposeOrder(prop);
     }
 
     public override void OnExit(NPCBrain brain)

@@ -14,6 +14,7 @@ public class OrderLine : MonoBehaviour
 
     /// <summary>
     ///  NPCS in line
+    ///  TODO: generate positions based on line position.
     /// </summary>
     [ShowInInspector, ReadOnly]
     public Queue<NPCBrain> Line = new();
@@ -68,9 +69,9 @@ public class OrderLine : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(transform.position, .3f);
+        Gizmos.DrawWireSphere(transform.position, .3f);
 
-        Handles.Label(transform.position, "OrderLocation");
+        Handles.Label(transform.position, "OrderLine");
     }
 #endif
 

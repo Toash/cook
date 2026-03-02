@@ -13,9 +13,10 @@ public class NPCGoToRegister : NPCState
 
     public override void OnEnter(NPCBrain brain)
     {
-        brain.SetCurrentOrderLocation(OrderManager.I.OrderLocation);
+        var OrderLine = OrderManager.I.OrderLine;
+        brain.SetCurrentOrderLine(OrderLine);
         // go to order location
-        brain.Agent.SetDestination(brain.GetCurrentOrderLocation().transform.position);
+        brain.Agent.SetDestination(OrderLine.transform.position);
     }
 
     public override void OnExit(NPCBrain brain)

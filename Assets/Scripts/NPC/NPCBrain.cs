@@ -25,7 +25,7 @@ public class NPCBrain : MonoBehaviour
     public event Action<NPCBrain> BecameFirstInLine;
     public NavMeshAgent Agent;
     /// <summary>
-    ///  the current int that the npc is in.
+    ///  the current line that the npc is in.
     /// </summary>
     [ReadOnly]
     public OrderLine CurrentOrderLine;
@@ -34,7 +34,7 @@ public class NPCBrain : MonoBehaviour
     /// The current order that is associated with the NPC.
     /// </summary>
     [ReadOnly]
-    public Order CurrentOrder;
+    public int CurrentOrderID;
 
     [ShowInInspector, ReadOnly]
     public Dictionary<string, NPCState> RegisteredStates = new();
@@ -96,11 +96,11 @@ public class NPCBrain : MonoBehaviour
 
 
 
-    public void SetCurrentOrderLocation(OrderLine loc)
+    public void SetCurrentOrderLine(OrderLine loc)
     {
         this.CurrentOrderLine = loc;
     }
-    public OrderLine GetCurrentOrderLocation()
+    public OrderLine GetCurrentOrderLine()
     {
         return this.CurrentOrderLine;
     }

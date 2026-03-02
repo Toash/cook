@@ -13,13 +13,17 @@ public class Ingredient : MonoBehaviour
     public IngredientData Data;
 
     public Snapper Snapper { get; private set; }
+    public Grabbable Grabbable { get; private set; }
 
 
     // what food this ingredient belongs to, if any.
     public PreparedItem PreparedItem { get; set; }
 
+
+
     void Awake()
     {
+        Grabbable = GetComponent<Grabbable>();
         Snapper = GetComponent<Snapper>();
         Snapper.SetJointType(JointType.Food);
     }
