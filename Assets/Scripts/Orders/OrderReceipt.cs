@@ -14,11 +14,14 @@ public class OrderReceipt : MonoBehaviour
 
     // TODO reference to text in world space ui
 
+    public Snapper Snapper { get; private set; }
+    public Grabbable Grabbable { get; private set; }
 
     void Awake()
     {
-        var snapper = GetComponent<Snapper>();
-        snapper.SetJointType(JointType.Receipt);
+        Grabbable = GetComponent<Grabbable>();
+        Snapper = GetComponent<Snapper>();
+        Snapper.SetJointType(JointType.Receipt);
     }
     public void Init(int ID)
     {

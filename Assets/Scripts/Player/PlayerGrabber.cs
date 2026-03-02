@@ -70,7 +70,7 @@ public class PlayerGrabber : MonoBehaviour
     {
         if (context.Type == InteractType.Primary)
         {
-            DropByInteraction(context);
+            Drop();
         }
         else if (context.Type == InteractType.Secondary)
         {
@@ -99,7 +99,7 @@ public class PlayerGrabber : MonoBehaviour
 
     }
 
-    void DropByInteraction(InteractionContext context)
+    public void Drop()
     {
         Destroy(handleConfigurableJoint);
         HandleDrop();

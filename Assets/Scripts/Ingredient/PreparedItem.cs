@@ -23,22 +23,18 @@ public class PreparedItem : MonoBehaviour
         DestroyIngredients();
     }
 
-    void OnIngredientAttached(SnapConnection connection)
+    void OnIngredientAttachedToIngredient(SnapConnection connection)
     {
-        if (connection.Other.TryGetComponent<Ingredient>(out var ingredient))
+        Debug.Log("[PreparedItem]: Ingredient attached: " + connection);
+        // add to prepared item if snapper has an ingredient
+        if (connection.This.TryGetComponent<Ingredient>(out var ingredient))
         {
             if (ingredient.PreparedItem == null)
             {
                 AddIngredient(ingredient);
             }
         }
-        else
-        {
-            Debug.LogError("[PreparedItem]: Could not find ingredient on the other snapper.");
-        }
-
-        // todo when we add to existing PreparedItem, why is it from connection.This and not connection.Other?
-        if (connection.This.TryGetComponent<Ingredient>(out var thisIngredient))
+        if (connection.Other.TryGetComponent<Ingredient>(out var thisIngredient))
         {
             if (thisIngredient.PreparedItem == null)
             {
@@ -51,7 +47,7 @@ public class PreparedItem : MonoBehaviour
     /// Handles which group should still be a PreparedItem when an ingredient gets detached.
     /// </summary>
     /// <param name="connection"></param>
-    void OnIngredientDetached(SnapConnection connection)
+    void OnIngredientDetachedFromIngredient(SnapConnection connection)
     {
         // get two groups
         //      one group that includes the container(may just only be the container), keep prepared item
@@ -88,15 +84,6 @@ public class PreparedItem : MonoBehaviour
             {
                 Debug.LogError("[PreparedItem]: When detaching ingredient, could not find OrderContainer in either group. A PreparedItem should belong to an OrderContainer.");
             }
-        }
-        else if (connection.Other.TryGetComponent<OrderContainer>(out var container))
-        {
-            // whole prepared item has been detached from the container
-            Disband();
-        }
-        else
-        {
-            Debug.LogError("[PreparedItem]:  Other does not contain an Ingredient or OrderContainer.");
         }
     }
 
@@ -135,8 +122,8 @@ public class PreparedItem : MonoBehaviour
         Ingredients.Add(ingredient);
         ingredient.transform.SetParent(transform);
 
-        ingredient.Snapper.OnSnapEvent += OnIngredientAttached;
-        ingredient.Snapper.OnDetachedEvent += OnIngredientDetached;
+        ingredient.Snapper.OnSnapEvent += OnIngredientAttachedToIngredient;
+        ingredient.Snapper.OnDetachedEvent += OnIngredientDetachedFromIngredient;
 
         // ingredient.SetPreparedItem(this);
         ingredient.PreparedItem = this;
@@ -162,8 +149,8 @@ public class PreparedItem : MonoBehaviour
         ingredient.transform.SetParent(null);
         ingredient.PreparedItem = null;
 
-        ingredient.Snapper.OnSnapEvent -= OnIngredientAttached;
-        ingredient.Snapper.OnDetachedEvent -= OnIngredientDetached;
+        ingredient.Snapper.OnSnapEvent -= OnIngredientAttachedToIngredient;
+        ingredient.Snapper.OnDetachedEvent -= OnIngredientDetachedFromIngredient;
 
 
         if (Ingredients.Count == 0)

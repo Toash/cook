@@ -20,9 +20,11 @@ public class OrderContainer : MonoBehaviour
 
     public OrderReceipt Receipt;
     private Snapper snapper;
+    private Grabbable grabbable;
 
     void Awake()
     {
+        grabbable = GetComponent<Grabbable>();
         snapper = GetComponent<Snapper>();
         snapper.SetJointPriority(JointPriority.Container);
         snapper.SetJointType(JointType.Container);
@@ -30,44 +32,84 @@ public class OrderContainer : MonoBehaviour
     void OnEnable()
     {
         snapper.OnSnapEvent += OnSnap;
-        snapper.OnDetachedEvent += DetachPreparedItem;
+        snapper.OnDetachedEvent += OnDetached;
     }
     void OnDisable()
     {
         snapper.OnSnapEvent -= OnSnap;
-        snapper.OnDetachedEvent -= DetachPreparedItem;
+        snapper.OnDetachedEvent -= OnDetached;
     }
 
 
     public bool CanSubmit()
     {
-        return Receipt != null;
+        bool hasPreparedItems = PreparedItems.Count > 0;
+        bool hasReceipt = Receipt != null;
+
+        if (!hasReceipt)
+        {
+            Debug.LogError("[OrderContainer]: Cannot submit, does not have receipt");
+        }
+
+        if (!hasPreparedItems)
+        {
+            Debug.LogError("[OrderContainer]: Cannot submit, does not have atleast 1 prepared item.");
+        }
+
+
+        return hasReceipt && hasPreparedItems;
+    }
+
+    public Order GetLinkedOrder()
+    {
+        if (Receipt == null)
+        {
+            Debug.LogError("[OrderContainer]: Could not get linked order. Receipt is null.");
+            return null;
+        }
+
+        var order = OrderManager.I.GetActiveOrderFromID(Receipt.OrderID);
+        return order;
+    }
+
+    public int GetOrderID()
+    {
+        return Receipt.OrderID;
     }
 
 
     void OnSnap(SnapConnection connection)
     {
-        if (connection.Other.TryGetComponent<Ingredient>(out var _))
+        Snapper otherSnapper = Snapper.GetOther(connection);
+        if (otherSnapper.TryGetComponent<Ingredient>(out var _))
         {
             // the other snapper is an ingredient, make a prepared item.
             CreatePreparedItem(connection);
         }
-        else if (connection.Other.TryGetComponent<OrderReceipt>(out var receipt))
+        else if (otherSnapper.TryGetComponent<OrderReceipt>(out var receipt))
         {
             LinkOrder(receipt);
+        }
+        else
+        {
+            Debug.LogError("[OrderContainer]: Error OnSnap. Could not find appropriate component.");
         }
     }
 
     void OnDetached(SnapConnection connection)
     {
-        if (connection.Other.TryGetComponent<Ingredient>(out var _))
+        Snapper otherSnapper = Snapper.GetOther(connection);
+        if (otherSnapper.TryGetComponent<Ingredient>(out var _))
         {
-            // the other snapper is an ingredient, make a prepared item.
             DetachPreparedItem(connection);
         }
-        else if (connection.Other.TryGetComponent<OrderReceipt>(out var receipt))
+        else if (otherSnapper.TryGetComponent<OrderReceipt>(out var receipt))
         {
             UnlinkOrder(receipt);
+        }
+        else
+        {
+            Debug.LogError("[OrderContainer]: Error OnDetach. Could not find appropriate component");
         }
     }
 
@@ -95,9 +137,11 @@ public class OrderContainer : MonoBehaviour
     /// <param name="connection"></param>
     void CreatePreparedItem(SnapConnection connection)
     {
+        Snapper otherSnapper = Snapper.GetOther(connection);
+
         List<Ingredient> ingredients = new();
 
-        List<Snapper> connectedSnappers = connection.Other.GetSnapperGroup();
+        List<Snapper> connectedSnappers = otherSnapper.GetSnapperGroup();
         foreach (var snapper in connectedSnappers)
         {
             if (snapper.TryGetComponent<Ingredient>(out var ingredient))
@@ -106,7 +150,6 @@ public class OrderContainer : MonoBehaviour
                 Debug.Log("[OrderContainer]: Creating prepared item with ingredient: " + ingredient);
                 ingredients.Add(ingredient);
             }
-
         }
 
         PreparedItem item = PreparedItem.Create(ingredients);
@@ -122,18 +165,51 @@ public class OrderContainer : MonoBehaviour
     /// <param name="connection"></param>
     void DetachPreparedItem(SnapConnection connection)
     {
-        // get prepared item from the other and remove that
-        if (connection.Other.TryGetComponent<Ingredient>(out var ingredient))
+        Debug.Log("detach:" + connection);
+        Snapper otherSnapper = Snapper.GetOther(connection);
+        if (otherSnapper.TryGetComponent<Ingredient>(out var ingredient))
         {
             PreparedItem preparedItem = ingredient.PreparedItem;
+            if (preparedItem == null)
+            {
+                Debug.LogError("[OrderContainer]: PreparedItem was null when trying to detach ingredient");
+            }
             // preparedItem.transform.SetParent(null);
             PreparedItems.Remove(preparedItem);
 
             preparedItem.Disband();
 
             Debug.Log("[PreparedItemsContainer]: Disbanded prepared item on container");
-
         }
+    }
+
+    /// <summary>
+    /// Call when giving to NPCs - permenantly removes physics and parents everything to the container so it moves as one unit.
+    /// </summary>
+    public void Freeze()
+    {
+        snapper.enabled = false;
+        grabbable.enabled = false;
+        GetComponent<Rigidbody>().isKinematic = true;
+
+        foreach (var item in PreparedItems)
+        {
+            foreach (var ingredient in item.Ingredients)
+            {
+
+                ingredient.Grabbable.enabled = false;
+                ingredient.Snapper.enabled = false;
+                ingredient.Snapper.Rigidbody.isKinematic = true;
+
+                ingredient.gameObject.transform.SetParent(transform);
+            }
+        }
+
+        Receipt.Grabbable.enabled = false;
+        Receipt.Snapper.enabled = false;
+        Receipt.Snapper.Rigidbody.isKinematic = true;
+
+        Receipt.gameObject.transform.SetParent(transform);
 
     }
 
@@ -161,7 +237,7 @@ public class OrderContainer : MonoBehaviour
         {
             style.normal.textColor = Color.blue;
             style.fontStyle = FontStyle.Bold;
-            Handles.Label(transform.position + (Vector3.up * .2f), "Associated Order ID:" + Receipt.OrderID);
+            Handles.Label(transform.position + (Vector3.up * .3f), "Associated Order ID:" + Receipt.OrderID, style);
         }
 
 

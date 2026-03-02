@@ -1,28 +1,47 @@
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// Auto submits when receciving an active order
+/// Auto submits when receciving an OrderContainer that is linked to an active order.  <br/>
+/// Is also the place where npc picks up an order.
 /// </summary>
 [RequireComponent(typeof(Collider))]
 public class SingleOrderSubmissionArea : MonoBehaviour
 {
-    // the order that this submission area expects
+    [ReadOnly, Tooltip("The current container that is in the area.")]
+    public OrderContainer CurrentContainer = null;
+    [Tooltip("Where to snap the container to when sbumitting.")]
+    public Transform OrderContainerSnap;
+    [Tooltip("Where NPC will go to pickup their order.")]
+    public Transform PickupSpot;
+
     public UnityEvent OnOrderSuccessful;
     public UnityEvent OnOrderFailed;
 
 
-    // private List<PreparedItem> preparedItems = new List<PreparedItem>();
     private Collider col;
-    private OrderEvaluationResult orderEvalResult;
+    private Player player;
 
 
     void Awake()
     {
+        if (OrderContainerSnap == null)
+        {
+            Debug.LogError("Could not find OrderContainerSnap");
+        }
         col = GetComponent<Collider>();
         col.isTrigger = true;
+    }
+    void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        if (player == null)
+        {
+            Debug.LogError("[OrderSubmissionArea]: Could not find player");
+        }
     }
     void OnTriggerEnter(Collider other)
     {
@@ -38,6 +57,7 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         // check if can submit
         if (container.CanSubmit())
         {
+            CurrentContainer = container;
             SubmitContainer(container);
         }
     }
@@ -45,8 +65,7 @@ public class SingleOrderSubmissionArea : MonoBehaviour
 
     public void SubmitContainer(OrderContainer container)
     {
-        int id = container.Receipt.OrderID;
-        Order order = OrderManager.I.GetActiveOrderFromID(id);
+        Order order = container.GetLinkedOrder();
 
         OrderSubmissionResult result = OrderManager.I.TrySubmit(order, container.PreparedItems);
 
@@ -55,14 +74,31 @@ public class SingleOrderSubmissionArea : MonoBehaviour
             Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order.");
         }
 
+        // stop player from grabbing
+        player.Grabber.Drop();
 
-        // destroy everything (for now)
-        Destroy(container.Receipt.gameObject);
-        foreach (PreparedItem item in container.PreparedItems)
+        // Freeze physics on the ordercontainer
+        container.Freeze();
+
+
+        //snap order to location
+        container.transform.position = OrderContainerSnap.position;
+        container.transform.rotation = OrderContainerSnap.rotation;
+    }
+
+
+    public bool TryPickup(int orderId, Transform handSocket, out OrderContainer container)
+    {
+        if (orderId != CurrentContainer.GetOrderID())
         {
-            Destroy(item.gameObject);
+            container = null;
+            return false;
         }
-        Destroy(container.gameObject);
+
+        container = CurrentContainer;
+
+        CurrentContainer = null;
+        return true;
     }
 
 #if UNITY_EDITOR
@@ -75,6 +111,12 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         string message = "";
         message += "Submission Area";
         Handles.Label(transform.position, message);
+
+        if (OrderContainerSnap != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(OrderContainerSnap.transform.position, .3f);
+        }
     }
 
 #endif
