@@ -75,10 +75,10 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         }
 
         // stop player from grabbing
-        player.Grabber.Drop();
+        // player.PhysicsGrabber.Drop();
 
         // Freeze physics on the ordercontainer
-        container.Freeze();
+        // container.Freeze();
 
 
         //snap order to location

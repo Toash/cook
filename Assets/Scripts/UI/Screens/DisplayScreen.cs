@@ -28,7 +28,7 @@ public class DisplayScreen : MonoBehaviour
     // send normalized quad input to input relayer
     void Update()
     {
-        if (HasToBeConstrainedToUse && !player.Controller.IsConstrained) return;
+        if (HasToBeConstrainedToUse && !player.Controller.IsCameraContrained) return;
 #if ENABLE_LEGACY_INPUT_MANAGER
         Vector3 mousePos = Input.mousePosition;
 #else

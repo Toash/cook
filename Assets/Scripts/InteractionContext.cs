@@ -1,3 +1,6 @@
+using System.Numerics;
+using UnityEngine;
+
 public enum InteractType
 {
     Primary,
@@ -7,16 +10,15 @@ public enum InteractType
 public class InteractionContext
 {
     public InteractType Type;
+    public Player Player;
     public PlayerController Controller;
     public PlayerInteraction Interaction;
-    public PlayerGrabber Grabber;
+    public PlayerPhysicsGrabber Grabber;
 
-    public InteractionContext(InteractType type, PlayerController controller, PlayerInteraction interaction, PlayerGrabber grabber)
+    public InteractionContext(InteractType type, Player player)
     {
         this.Type = type;
-        this.Controller = controller;
-        this.Interaction = interaction;
-        this.Grabber = grabber;
+        this.Player = player;
     }
 
 }

@@ -14,14 +14,16 @@ using UnityEngine;
 public class PreparedItem : MonoBehaviour
 {
     public List<Ingredient> Ingredients = new List<Ingredient>();
-
     public event System.Action IngredientDetached;
-
-
+    public int IngredientCount()
+    {
+        return Ingredients.Count;
+    }
     void OnDestroy()
     {
         DestroyIngredients();
     }
+
 
     void OnIngredientAttachedToIngredient(SnapConnection connection)
     {
@@ -122,8 +124,8 @@ public class PreparedItem : MonoBehaviour
         Ingredients.Add(ingredient);
         ingredient.transform.SetParent(transform);
 
-        ingredient.Snapper.OnSnapEvent += OnIngredientAttachedToIngredient;
-        ingredient.Snapper.OnDetachedEvent += OnIngredientDetachedFromIngredient;
+        ingredient.Snapper.OnSnap += OnIngredientAttachedToIngredient;
+        ingredient.Snapper.OnDetached += OnIngredientDetachedFromIngredient;
 
         // ingredient.SetPreparedItem(this);
         ingredient.PreparedItem = this;
@@ -149,8 +151,8 @@ public class PreparedItem : MonoBehaviour
         ingredient.transform.SetParent(null);
         ingredient.PreparedItem = null;
 
-        ingredient.Snapper.OnSnapEvent -= OnIngredientAttachedToIngredient;
-        ingredient.Snapper.OnDetachedEvent -= OnIngredientDetachedFromIngredient;
+        ingredient.Snapper.OnSnap -= OnIngredientAttachedToIngredient;
+        ingredient.Snapper.OnDetached -= OnIngredientDetachedFromIngredient;
 
 
         if (Ingredients.Count == 0)
@@ -189,45 +191,6 @@ public class PreparedItem : MonoBehaviour
     }
 
 
-
-
-
-
-    public int IngredientCount()
-    {
-        return Ingredients.Count;
-    }
-    // public static PreparedItem CreateItemFromIngredient(Ingredient ingredient)
-    // {
-    //     GameObject rootObj = new GameObject("Prepared Item");
-    //     rootObj.transform.position = ingredient.transform.position;
-    //     PreparedItem foodRoot = rootObj.AddComponent<PreparedItem>();
-
-    //     foodRoot.Ingredients.Add(ingredient);
-    //     ingredient.transform.SetParent(rootObj.transform);
-
-
-    //     return foodRoot;
-    // }
-    // public static PreparedItem GetGreater(PreparedItem a, PreparedItem b)
-    // {
-    //     if (b.IngredientCount() > a.IngredientCount())
-    //     {
-    //         return b;
-    //     }
-    //     return a;
-
-    // }
-    // public void Merge(PreparedItem other)
-    // {
-    //     // loop thorugh prepared items from other, and add to this.
-    //     foreach (var ing in other.Ingredients)
-    //     {
-    //         AddIngredient(ing);
-    //     }
-    //     Destroy(other.gameObject);
-
-    // }
 
 
 

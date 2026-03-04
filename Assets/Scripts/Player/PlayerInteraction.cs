@@ -3,12 +3,18 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
+
+public class InteractionHit
+{
+    public bool HitValid;
+    public RaycastHit Hit;
+}
+[RequireComponent(typeof(Player))]
 public class PlayerInteraction : MonoBehaviour
 {
     public float InteractRange = 3;
-
     public PlayerController Controller;
-    public PlayerGrabber Grabber;
     public Transform CamRoot;
     public InputActionReference PrimaryInteract;
     public InputActionReference SecondaryInteract;
@@ -16,21 +22,25 @@ public class PlayerInteraction : MonoBehaviour
 
     public event Action<InteractableBase> OnInteractableChanged;
 
+    private Player player;
     private InteractableBase hoveredInteractable;
-
-#if UNITY_EDITOR
-    private Vector3 hitPoint;
-#endif
+    private InteractionHit interactionHit = new InteractionHit();
 
 
 
+
+    void Awake()
+    {
+        player = GetComponent<Player>();
+    }
 
     void Update()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(CamRoot.position, CamRoot.forward, out hit, InteractRange, InteractionMask))
+        // bool hitValid;
+        // RaycastHit hit;
+        if (Physics.Raycast(CamRoot.position, CamRoot.forward, out interactionHit.Hit, InteractRange, InteractionMask))
         {
-            if (hit.collider.TryGetComponent<InteractableBase>(out var currentInteractable))
+            if (interactionHit.Hit.collider.TryGetComponent<InteractableBase>(out var currentInteractable))
             {
                 TryHighlightHoverInteractable(false);
                 if (currentInteractable != hoveredInteractable)
@@ -42,15 +52,12 @@ public class PlayerInteraction : MonoBehaviour
                 hoveredInteractable = currentInteractable;
                 TryHighlightHoverInteractable(true);
 
-#if UNITY_EDITOR
-                hitPoint = hit.point;
-#endif
             }
 
         }
         else
         {
-            // aiming away from an interactable
+            // not looking at interactable 
             TryHighlightHoverInteractable(false);
             if (hoveredInteractable != null)
             {
@@ -81,19 +88,29 @@ public class PlayerInteraction : MonoBehaviour
 
     void HandleInteraction(InteractType type)
     {
-        InteractionContext context = new InteractionContext(type, Controller, this, Grabber);
-        if (Controller.IsConstrained == true)
+        InteractionContext context = new InteractionContext(type, GetComponent<Player>());
+
+        // based on some player subsystem
+        if (Controller.IsCameraContrained == true)
         {
-            Controller.UnConstrain();
+            Controller.UnConstrainCamera();
             return;
         }
 
-        if (Grabber.isHolding)
+        if (Controller.IsBodyContrained == true)
         {
-            Grabber.OnInteractAndHolding(context);
+            Controller.UnconstrainBody();
             return;
         }
 
+        if (player.ItemHolder.isHolding)
+        {
+            player.ItemHolder.OnInteractAndHolding(context);
+            return;
+        }
+
+
+        // based on raycast
         if (hoveredInteractable != null)
         {
             hoveredInteractable.Interact(context);
@@ -114,18 +131,23 @@ public class PlayerInteraction : MonoBehaviour
 
 
 #if UNITY_EDITOR
+    GUIStyle style = new();
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.blue;
         Gizmos.DrawRay(CamRoot.position, CamRoot.forward * InteractRange);
 
-        if (hoveredInteractable != null)
-        {
-            Handles.Label(hitPoint, "Interactable hit point");
-            Gizmos.DrawWireSphere(hitPoint, .2f);
+        style.normal.textColor = Color.blue;
+        Gizmos.DrawWireSphere(CamRoot.position, InteractRange);
+        Handles.Label(CamRoot.position + CamRoot.forward * InteractRange, "Interact Range");
 
-            Handles.Label(transform.position, "Current interactable: " + hoveredInteractable.transform.name);
-        }
+        // if (hoveredInteractable != null)
+        // {
+        //     Handles.Label(hitPoint, "Interactable hit point");
+        //     Gizmos.DrawWireSphere(hitPoint, .2f);
+
+        //     Handles.Label(transform.position, "Current interactable: " + hoveredInteractable.transform.name);
+        // }
 
     }
 #endif
