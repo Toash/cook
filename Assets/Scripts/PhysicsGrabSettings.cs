@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Grab Settings", menuName = "Grabbable / Grab Settings")]
-public class GrabSettings : ScriptableObject
+public class PhysicsGrabSettings : ScriptableObject
 {
     public float PositionSpring = 80;
     public float PositionDamper = 20;

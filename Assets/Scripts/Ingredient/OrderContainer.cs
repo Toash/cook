@@ -20,24 +20,23 @@ public class OrderContainer : MonoBehaviour
 
     public OrderReceipt Receipt;
     private Snapper snapper;
-    private Grabbable grabbable;
+    private PhysicsGrabbable grabbable;
 
     void Awake()
     {
-        grabbable = GetComponent<Grabbable>();
+        grabbable = GetComponent<PhysicsGrabbable>();
         snapper = GetComponent<Snapper>();
-        snapper.SetJointPriority(JointPriority.Container);
-        snapper.SetJointType(JointType.Container);
+        snapper.SetSnapType(SnapType.Container);
     }
     void OnEnable()
     {
-        snapper.OnSnapEvent += OnSnap;
-        snapper.OnDetachedEvent += OnDetached;
+        snapper.OnSnap += OnSnap;
+        snapper.OnDetached += OnDetached;
     }
     void OnDisable()
     {
-        snapper.OnSnapEvent -= OnSnap;
-        snapper.OnDetachedEvent -= OnDetached;
+        snapper.OnSnap -= OnSnap;
+        snapper.OnDetached -= OnDetached;
     }
 
 
@@ -80,7 +79,7 @@ public class OrderContainer : MonoBehaviour
 
     void OnSnap(SnapConnection connection)
     {
-        Snapper otherSnapper = Snapper.GetOther(connection);
+        Snapper otherSnapper = SnapConnection.GetOther(connection);
         if (otherSnapper.TryGetComponent<Ingredient>(out var _))
         {
             // the other snapper is an ingredient, make a prepared item.
@@ -98,7 +97,7 @@ public class OrderContainer : MonoBehaviour
 
     void OnDetached(SnapConnection connection)
     {
-        Snapper otherSnapper = Snapper.GetOther(connection);
+        Snapper otherSnapper = SnapConnection.GetOther(connection);
         if (otherSnapper.TryGetComponent<Ingredient>(out var _))
         {
             DetachPreparedItem(connection);
@@ -137,7 +136,7 @@ public class OrderContainer : MonoBehaviour
     /// <param name="connection"></param>
     void CreatePreparedItem(SnapConnection connection)
     {
-        Snapper otherSnapper = Snapper.GetOther(connection);
+        Snapper otherSnapper = SnapConnection.GetOther(connection);
 
         List<Ingredient> ingredients = new();
 
@@ -166,7 +165,7 @@ public class OrderContainer : MonoBehaviour
     void DetachPreparedItem(SnapConnection connection)
     {
         Debug.Log("detach:" + connection);
-        Snapper otherSnapper = Snapper.GetOther(connection);
+        Snapper otherSnapper = SnapConnection.GetOther(connection);
         if (otherSnapper.TryGetComponent<Ingredient>(out var ingredient))
         {
             PreparedItem preparedItem = ingredient.PreparedItem;
@@ -183,35 +182,6 @@ public class OrderContainer : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Call when giving to NPCs - permenantly removes physics and parents everything to the container so it moves as one unit.
-    /// </summary>
-    public void Freeze()
-    {
-        snapper.enabled = false;
-        grabbable.enabled = false;
-        GetComponent<Rigidbody>().isKinematic = true;
-
-        foreach (var item in PreparedItems)
-        {
-            foreach (var ingredient in item.Ingredients)
-            {
-
-                ingredient.Grabbable.enabled = false;
-                ingredient.Snapper.enabled = false;
-                ingredient.Snapper.Rigidbody.isKinematic = true;
-
-                ingredient.gameObject.transform.SetParent(transform);
-            }
-        }
-
-        Receipt.Grabbable.enabled = false;
-        Receipt.Snapper.enabled = false;
-        Receipt.Snapper.Rigidbody.isKinematic = true;
-
-        Receipt.gameObject.transform.SetParent(transform);
-
-    }
 
 
     public static bool ContainsContainerInGroup(List<Snapper> snappers)

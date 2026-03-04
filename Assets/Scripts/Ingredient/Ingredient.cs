@@ -12,20 +12,19 @@ public class Ingredient : MonoBehaviour
 {
     public IngredientData Data;
 
-    public Snapper Snapper { get; private set; }
-    public Grabbable Grabbable { get; private set; }
+    public PhysicsGrabbable Grabbable { get; private set; }
 
 
     // what food this ingredient belongs to, if any.
     public PreparedItem PreparedItem { get; set; }
+    public Snapper Snapper { get; private set; }
 
 
 
     void Awake()
     {
-        Grabbable = GetComponent<Grabbable>();
+        Grabbable = GetComponent<PhysicsGrabbable>();
         Snapper = GetComponent<Snapper>();
-        Snapper.SetJointType(JointType.Food);
     }
     void Start()
     {
@@ -43,9 +42,21 @@ public class Ingredient : MonoBehaviour
 
 
 #if UNITY_EDITOR
+    GUIStyle style = new();
     void OnDrawGizmosSelected()
     {
-        Handles.Label(transform.position + Vector3.up * .2f, "PreparedItem: " + PreparedItem);
+        style.normal.textColor = Color.green;
+        if (Data != null)
+        {
+            Handles.Label(transform.position + transform.forward * 0.5f, $"Ingredient: {Data.Name}", style);
+        }
+        else
+        {
+            style.normal.textColor = Color.red;
+            Handles.Label(transform.position + transform.forward * 0.5f, $"Ingredient needs data!", style);
+
+        }
+
 
     }
 #endif

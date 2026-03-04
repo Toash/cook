@@ -11,13 +11,13 @@ public class CrosshairUI : MonoBehaviour
 
     void OnEnable()
     {
-        player.Controller.Constrained += HideCrosshair;
-        player.Controller.UnConstrained += ShowCrosshair;
+        player.Controller.CameraConstrained += HideCrosshair;
+        player.Controller.CameraUnconstrained += ShowCrosshair;
     }
     void OnDisable()
     {
-        player.Controller.Constrained -= HideCrosshair;
-        player.Controller.UnConstrained -= ShowCrosshair;
+        player.Controller.CameraConstrained -= HideCrosshair;
+        player.Controller.CameraUnconstrained -= ShowCrosshair;
     }
 
 

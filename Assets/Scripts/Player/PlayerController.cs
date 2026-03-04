@@ -30,8 +30,10 @@ public class PlayerController : MonoBehaviour
     public InputActionReference RightClick;
 
     // events
-    public event System.Action Constrained;
-    public event System.Action UnConstrained;
+    public event System.Action BodyConstrained;
+    public event System.Action BodyUnconstrained;
+    public event System.Action CameraConstrained;
+    public event System.Action CameraUnconstrained;
 
 
     Vector3 moveVelocity = Vector3.zero;
@@ -47,8 +49,11 @@ public class PlayerController : MonoBehaviour
     Vector3 constrainedCameraPos;
     Quaternion constrainedCameraRot;
 
+    ConstrainedContext constrainedContext;
 
-    public bool IsConstrained { get; private set; } = false;
+
+    public bool IsBodyContrained { get; private set; } = false;
+    public bool IsCameraContrained { get; private set; } = false;
 
     void Awake()
     {
@@ -64,25 +69,31 @@ public class PlayerController : MonoBehaviour
         HandleCameraConstraint();
 
         HandleGravity();
-        if (!IsConstrained)
+        if (!IsCameraContrained && !IsBodyContrained)
         {
             HandleJumping();
             HandleWishVelocity();
             HandleAcceleratingVelocity();
+        }
+        if (!IsCameraContrained)
+        {
             HandleLooking();
         }
 
 
 
-        Vector3 totalVelocity = moveVelocity + gravityVelocity;
-        CharController.Move(totalVelocity * Time.deltaTime);
+        if (CharController.enabled)
+        {
+            Vector3 totalVelocity = moveVelocity + gravityVelocity;
+            CharController.Move(totalVelocity * Time.deltaTime);
+        }
 
     }
 
     void HandleCameraConstraint()
     {
 
-        if (IsConstrained)
+        if (IsCameraContrained)
         {
             CamRoot.position = Vector3.Lerp(CamRoot.position, constrainedCameraPos, Time.deltaTime * ConstrainSpeed);
             CamRoot.rotation = Quaternion.Slerp(CamRoot.rotation, constrainedCameraRot, Time.deltaTime * ConstrainSpeed);
@@ -106,23 +117,67 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
+    /// <summary>
+    /// Lock player pos onto transform. used for car seat.
+    /// </summary>
+    /// <param name="constraint"></param>
+    public void ConstrainBody(ConstrainedContext constrainedContext)
+    {
+        if (IsBodyContrained) return;
+        Debug.Log("[PlayerController]: Constrained Body");
+        IsBodyContrained = true;
+        moveVelocity = Vector3.zero;
+
+        CharController.enabled = false;
+
+        this.constrainedContext = constrainedContext;
+
+
+        transform.position = constrainedContext.Constraint.position;
+        transform.rotation = constrainedContext.Constraint.rotation;
+
+
+        BodyConstrained?.Invoke();
+    }
+    public void UnconstrainBody()
+    {
+        if (!IsBodyContrained) return;
+        Debug.Log("[PlayerController]: UnConstrained Body");
+        IsBodyContrained = false;
+        moveVelocity = Vector3.zero;
+
+        constrainedContext.Constrainer.OnUnConstrained();
+        transform.position = constrainedContext.UnConstraint.position;
+        transform.rotation = constrainedContext.UnConstraint.rotation;
+
+        CharController.enabled = true;
+
+        this.constrainedContext = null;
+
+
+        BodyUnconstrained?.Invoke();
+    }
+    /// <summary>
+    /// Lock camera at a position and rotation. Used for interacting with world screens.
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="rot"></param>
     public void ConstrainCamera(Vector3 pos, Quaternion rot)
     {
-        Debug.Log("Constrained");
-        IsConstrained = true;
+        IsCameraContrained = true;
         moveVelocity = Vector3.zero;
         // CamRoot.position = pos;
         // CamRoot.rotation = rot;
         constrainedCameraPos = pos;
         constrainedCameraRot = rot;
 
-        Constrained?.Invoke();
+        CameraConstrained?.Invoke();
     }
 
-    public void UnConstrain()
+    public void UnConstrainCamera()
     {
         Debug.Log("UnConstrained");
-        IsConstrained = false;
+        IsCameraContrained = false;
 
 
         // sync the yaw and pitch back.
@@ -135,7 +190,7 @@ public class PlayerController : MonoBehaviour
 
         // REMOVE ME ASAP!@@!@@!@!!@@!
         LockCursor();
-        UnConstrained?.Invoke();
+        CameraUnconstrained?.Invoke();
     }
 
     void HandleGravity()

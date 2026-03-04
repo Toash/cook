@@ -6,7 +6,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
-public class PlayerGrabber : MonoBehaviour
+/// <summary>
+/// Deprecated, player uses ItemHolder to pick things up now (non physics)
+/// </summary>
+public class PlayerPhysicsGrabber : MonoBehaviour
 {
     public float MinCamDist = 1;
     public float MaxCamDist = 3;
@@ -40,7 +43,7 @@ public class PlayerGrabber : MonoBehaviour
         }
     }
 
-    Grabbable held;
+    PhysicsGrabbable held;
     private float handleDistanceFromCamera = 2;
 
     private ConfigurableJoint handleConfigurableJoint;
@@ -66,7 +69,7 @@ public class PlayerGrabber : MonoBehaviour
 
         GrabberHandle.transform.position = CamRoot.transform.position + (CamRoot.forward * handleDistanceFromCamera);
     }
-    public void OnInteractAndHolding(InteractionContext context)
+    public void OnInteractAndGrabbing(InteractionContext context)
     {
         if (context.Type == InteractType.Primary)
         {
@@ -79,7 +82,7 @@ public class PlayerGrabber : MonoBehaviour
         }
 
     }
-    public void TryGrab(Grabbable target)
+    public void TryGrab(PhysicsGrabbable target)
     {
         if (isHolding) return;
 
@@ -117,9 +120,9 @@ public class PlayerGrabber : MonoBehaviour
         handlePitch = 0;
         handleYaw = 0;
     }
-    public void GrabGrabbable(Grabbable grabbable)
+    public void GrabGrabbable(PhysicsGrabbable grabbable)
     {
-        GrabSettings grabbableSettings = grabbable.GrabSettings;
+        PhysicsGrabSettings grabbableSettings = grabbable.GrabSettings;
         handleConfigurableJoint = GrabberHandle.transform.AddComponent<ConfigurableJoint>();
         handleConfigurableJoint.autoConfigureConnectedAnchor = false;
         handleConfigurableJoint.anchor = Vector3.zero;
@@ -176,14 +179,6 @@ public class PlayerGrabber : MonoBehaviour
 
 
 
-        // // spring
-        // SoftJointLimitSpring softJointLimitSpring = handleConfigurableJoint.angularXLimitSpring;
-        // // softJointLimitSpring.damper= 1;
-        // handleConfigurableJoint.angularXLimitSpring = softJointLimitSpring;
-        // handleConfigurableJoint.angularYZLimitSpring = softJointLimitSpring;
-
-
-
         handleConfigurableJoint.projectionMode = JointProjectionMode.None;
 
 
@@ -208,7 +203,6 @@ public class PlayerGrabber : MonoBehaviour
             handlePitch += mouseDelta.y * RotateSensitivity;
             handleYaw += mouseDelta.x * RotateSensitivity;
 
-            // Handle.transform.localRotation = Quaternion.Euler(handlePitch, handleYaw, 0);
         }
 
         // rotate through rigidbody in local space.
@@ -217,39 +211,10 @@ public class PlayerGrabber : MonoBehaviour
 
         GrabberHandle.HandleRb.MoveRotation(worldRot);
 
-        // GrabberHandle.HandleRb.MoveRotation(Quaternion.Euler(handlePitch, handleYaw, 0));
 
 
     }
 
-    // void HandleHandleRotation()
-    // {
-    //     bool rotating = Rotate.action.IsPressed();
-
-    //     if (rotating && !wasRotating)
-    //         targetRot = GrabberHandle.HandleRb.rotation;
-
-    //     if (rotating)
-    //     {
-    //         Vector2 md = Mouse.action.ReadValue<Vector2>();
-
-    //         float yawDeg = md.x * RotateSensitivity;
-    //         float pitchDeg = -md.y * RotateSensitivity;
-
-    //         // yaw around world up
-    //         var yaw = Quaternion.AngleAxis(yawDeg, Vector3.up);
-
-    //         // pitch around handle's local right axis (after yaw)
-    //         var right = (yaw * GrabberHandle.HandleRb.rotation) * Vector3.right;
-    //         var pitch = Quaternion.AngleAxis(pitchDeg, right);
-
-    //         targetRot = pitch * yaw * targetRot;
-
-    //         GrabberHandle.HandleRb.MoveRotation(targetRot);
-    //     }
-
-    //     wasRotating = rotating;
-    // }
 
 
 

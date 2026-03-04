@@ -3,11 +3,15 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// Deprecated - Holdables are used instead for items. (non physics)
+/// Something that can be grabbed by the player with physics.
+/// </summary>
 [RequireComponent(typeof(Rigidbody))]
-public class Grabbable : InteractableBase
+public class PhysicsGrabbable : InteractableBase
 {
 
-    public GrabSettings GrabSettings;
+    public PhysicsGrabSettings GrabSettings;
 
     public event Action<InteractionContext> OnGrab;
     public event Action<InteractionContext> OnSecondaryInteract;
@@ -23,7 +27,7 @@ public class Grabbable : InteractableBase
     {
         if (GrabSettings == null)
         {
-            GrabSettings = Resources.Load<GrabSettings>("ScriptableObjects/GrabSettings/Default");
+            GrabSettings = Resources.Load<PhysicsGrabSettings>("ScriptableObjects/GrabSettings/Default");
         }
 
     }
