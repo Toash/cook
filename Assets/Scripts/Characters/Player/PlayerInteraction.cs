@@ -42,7 +42,7 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (interactionHit.Hit.collider.TryGetComponent<InteractableBase>(out var currentInteractable))
             {
-                TryHighlightHoverInteractable(false);
+                // TryHighlightHoverInteractable(false);
                 if (currentInteractable != hoveredInteractable)
                 {
 
@@ -50,7 +50,7 @@ public class PlayerInteraction : MonoBehaviour
 
                 }
                 hoveredInteractable = currentInteractable;
-                TryHighlightHoverInteractable(true);
+                // TryHighlightHoverInteractable(true);
 
             }
 
@@ -81,6 +81,9 @@ public class PlayerInteraction : MonoBehaviour
     {
         oldInteractable?.OnHoverExit();
         newInteractable?.OnHoverEnter();
+
+        oldInteractable?.SetOutline(false);
+        newInteractable?.SetOutline(true);
 
         OnInteractableChanged.Invoke(newInteractable);
 
@@ -122,11 +125,7 @@ public class PlayerInteraction : MonoBehaviour
     void TryHighlightHoverInteractable(bool highlight)
     {
         if (hoveredInteractable == null) return;
-        if (hoveredInteractable.transform.TryGetComponent<Highlightable>(out Highlightable highlightable))
-        {
-            highlightable.SetHighlight(highlight);
-        }
-
+        hoveredInteractable.SetOutline(highlight);
     }
 
 

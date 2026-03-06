@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Lock player pos onto transform. used for car seat.
+    /// Lock player pos onto transform. 
     /// </summary>
     /// <param name="constraint"></param>
     public void ConstrainBody(ConstrainedContext constrainedContext)
@@ -135,6 +135,7 @@ public class PlayerController : MonoBehaviour
 
         transform.position = constrainedContext.Constraint.position;
         transform.rotation = constrainedContext.Constraint.rotation;
+        transform.SetParent(constrainedContext.Constraint);
 
 
         BodyConstrained?.Invoke();

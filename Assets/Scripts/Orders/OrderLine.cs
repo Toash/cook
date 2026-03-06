@@ -13,6 +13,10 @@ public class OrderLine : MonoBehaviour
     public bool IsOccupied { get; private set; }
 
     /// <summary>
+    /// The transform that npcs in this line will look at. <br/>
+    /// </summary>
+    public Transform NPCLookAt;
+    /// <summary>
     ///  NPCS in line
     ///  TODO: generate positions based on line position.
     /// </summary>

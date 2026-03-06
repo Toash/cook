@@ -8,13 +8,11 @@ using UnityEngine.Events;
 /// Auto submits when receciving an OrderContainer that is linked to an active order.  <br/>
 /// Is also the place where npc picks up an order.
 /// </summary>
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Snapper))]
 public class SingleOrderSubmissionArea : MonoBehaviour
 {
     [ReadOnly, Tooltip("The current container that is in the area.")]
     public OrderContainer CurrentContainer = null;
-    [Tooltip("Where to snap the container to when sbumitting.")]
-    public Transform OrderContainerSnap;
     [Tooltip("Where NPC will go to pickup their order.")]
     public Transform PickupSpot;
 
@@ -22,18 +20,14 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     public UnityEvent OnOrderFailed;
 
 
-    private Collider col;
     private Player player;
+    private Snapper snapper;
 
 
     void Awake()
     {
-        if (OrderContainerSnap == null)
-        {
-            Debug.LogError("Could not find OrderContainerSnap");
-        }
-        col = GetComponent<Collider>();
-        col.isTrigger = true;
+        snapper = GetComponent<Snapper>();
+
     }
     void Start()
     {
@@ -43,17 +37,31 @@ public class SingleOrderSubmissionArea : MonoBehaviour
             Debug.LogError("[OrderSubmissionArea]: Could not find player");
         }
     }
-    void OnTriggerEnter(Collider other)
+
+
+    void OnEnable()
     {
-        if (other.TryGetComponent<OrderContainer>(out var container))
-        {
-            OnContainerAdded(container);
-        }
+        snapper.OnChildSnapped += OnSnap;
+
     }
 
 
+    void OnSnap(Snapper otherSnapper)
+    {
+        var container = otherSnapper.GetComponent<OrderContainer>();
+        if (container != null)
+        {
+            OnContainerAdded(container);
+        }
+        else
+        {
+            Debug.LogWarning("[OrderSubmissionArea]: OrderSubmissionArea expects a container");
+
+        }
+    }
     void OnContainerAdded(OrderContainer container)
     {
+        Debug.Log("[OrderSubmissionArea]: Container Entered Submission Area");
         // check if can submit
         if (container.CanSubmit())
         {
@@ -71,19 +79,8 @@ public class SingleOrderSubmissionArea : MonoBehaviour
 
         if (result.Status != OrderSubmissionStatus.Success)
         {
-            Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order.");
+            Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order. Status was not Success");
         }
-
-        // stop player from grabbing
-        // player.PhysicsGrabber.Drop();
-
-        // Freeze physics on the ordercontainer
-        // container.Freeze();
-
-
-        //snap order to location
-        container.transform.position = OrderContainerSnap.position;
-        container.transform.rotation = OrderContainerSnap.rotation;
     }
 
 
@@ -112,11 +109,6 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         message += "Submission Area";
         Handles.Label(transform.position, message);
 
-        if (OrderContainerSnap != null)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(OrderContainerSnap.transform.position, .3f);
-        }
     }
 
 #endif

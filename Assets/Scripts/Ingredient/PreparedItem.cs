@@ -11,10 +11,18 @@ using UnityEngine;
 /// 
 /// Is made up of ingredients, position is the first ingredient.
 /// </summary>
-public class PreparedItem : MonoBehaviour
+public class PreparedItem
 {
     public List<Ingredient> Ingredients = new List<Ingredient>();
-    public event System.Action IngredientDetached;
+    public override string ToString()
+    {
+        string ret = $"PreparedItem with {Ingredients.Count} ingredients.\n";
+        foreach (var ingredient in Ingredients)
+        {
+            ret += $"  - {ingredient}\n";
+        }
+        return ret;
+    }
     public int IngredientCount()
     {
         return Ingredients.Count;
@@ -25,66 +33,34 @@ public class PreparedItem : MonoBehaviour
     }
 
 
-    void OnIngredientAttachedToIngredient(SnapConnection connection)
+    void OnIngredientAttachedToIngredient(Snapper otherSnapper)
     {
-        Debug.Log("[PreparedItem]: Ingredient attached: " + connection);
-        // add to prepared item if snapper has an ingredient
-        if (connection.This.TryGetComponent<Ingredient>(out var ingredient))
+        Debug.Log("[PreparedItem]: Ingredient attached: " + otherSnapper);
+        var snappers = otherSnapper.GetSnapperChildrenRecursive();
+        foreach (var snapper in snappers)
         {
-            if (ingredient.PreparedItem == null)
+            if (snapper.TryGetComponent<Ingredient>(out var ingredient))
             {
-                AddIngredient(ingredient);
-            }
-        }
-        if (connection.Other.TryGetComponent<Ingredient>(out var thisIngredient))
-        {
-            if (thisIngredient.PreparedItem == null)
-            {
-                AddIngredient(thisIngredient);
+                if (Ingredients.Contains(ingredient))
+                {
+                    AddIngredient(ingredient);
+                }
             }
         }
     }
 
-    /// <summary>
-    /// Handles which group should still be a PreparedItem when an ingredient gets detached.
-    /// </summary>
-    /// <param name="connection"></param>
-    void OnIngredientDetachedFromIngredient(SnapConnection connection)
+    void OnIngredientDetachedFromIngredient(Snapper otherSnapper)
     {
-        // get two groups
-        //      one group that includes the container(may just only be the container), keep prepared item
-        //      another group that doesnt include hte container, remove ingredients from the prepared item (loop).
-
-        if (connection.Other.TryGetComponent<Ingredient>(out var otherIngredient))
+        Debug.Log("[PreparedItem]: Ingredient detached: " + otherSnapper);
+        var snappers = otherSnapper.GetSnapperChildrenRecursive();
+        foreach (var snapper in snappers)
         {
-            // which group contains the container?
-            List<Snapper> thisSide = connection.This.GetSnapperGroup();
-            List<Snapper> otherSide = connection.Other.GetSnapperGroup();
-
-            // remove ingredients on the group that does not contain the container
-            if (OrderContainer.ContainsContainerInGroup(thisSide))
+            if (snapper.TryGetComponent<Ingredient>(out var ingredient))
             {
-                foreach (var snapper in otherSide)
+                if (Ingredients.Contains(ingredient))
                 {
-                    if (snapper.TryGetComponent<Ingredient>(out var ingredient))
-                    {
-                        RemoveIngredient(ingredient);
-                    }
+                    RemoveIngredient(ingredient);
                 }
-            }
-            else if (OrderContainer.ContainsContainerInGroup(otherSide))
-            {
-                foreach (var snapper in thisSide)
-                {
-                    if (snapper.TryGetComponent<Ingredient>(out var ingredient))
-                    {
-                        RemoveIngredient(ingredient);
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogError("[PreparedItem]: When detaching ingredient, could not find OrderContainer in either group. A PreparedItem should belong to an OrderContainer.");
             }
         }
     }
@@ -98,9 +74,8 @@ public class PreparedItem : MonoBehaviour
     public static PreparedItem Create(List<Ingredient> ingredients)
     {
         if (ingredients.Count == 0) return null;
-        GameObject obj = new GameObject("Prepared Item");
-        obj.transform.position = ingredients.First().transform.position;
-        PreparedItem preparedItem = obj.AddComponent<PreparedItem>();
+
+        PreparedItem preparedItem = new();
         preparedItem.AddIngredients(ingredients);
 
         Debug.Log("[PreparedItem]: Creating with " + ingredients.Count + " ingredients.");
@@ -122,13 +97,12 @@ public class PreparedItem : MonoBehaviour
         }
 
         Ingredients.Add(ingredient);
-        ingredient.transform.SetParent(transform);
 
-        ingredient.Snapper.OnSnap += OnIngredientAttachedToIngredient;
-        ingredient.Snapper.OnDetached += OnIngredientDetachedFromIngredient;
+        ingredient.Snapper.OnChildSnapped += OnIngredientAttachedToIngredient;
+        ingredient.Snapper.OnChildDetached += OnIngredientDetachedFromIngredient;
 
-        // ingredient.SetPreparedItem(this);
         ingredient.PreparedItem = this;
+        Debug.Log("[PreparedItem]: Added ingredient: " + ingredient);
     }
     public void AddIngredients(List<Ingredient> ingredients)
     {
@@ -146,21 +120,13 @@ public class PreparedItem : MonoBehaviour
     public void RemoveIngredient(Ingredient ingredient)
     {
         if (!Ingredients.Remove(ingredient)) return;
-        // ingredient.RemovePreparedItem();
 
         ingredient.transform.SetParent(null);
         ingredient.PreparedItem = null;
 
-        ingredient.Snapper.OnSnap -= OnIngredientAttachedToIngredient;
-        ingredient.Snapper.OnDetached -= OnIngredientDetachedFromIngredient;
-
-
-        if (Ingredients.Count == 0)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
+        ingredient.Snapper.OnChildSnapped -= OnIngredientAttachedToIngredient;
+        ingredient.Snapper.OnChildDetached -= OnIngredientDetachedFromIngredient;
+        Debug.Log("[PreparedItem]: Removed ingredient: " + ingredient);
     }
 
     /// <summary>
@@ -172,7 +138,6 @@ public class PreparedItem : MonoBehaviour
         {
             var ingredient = Ingredients[i];
             RemoveIngredient(ingredient);
-            Destroy(ingredient.gameObject);
         }
 
     }
@@ -186,30 +151,7 @@ public class PreparedItem : MonoBehaviour
         {
             RemoveIngredient(Ingredients[i]);
         }
-
-        Destroy(gameObject);
     }
-
-
-
-
-
-
-#if UNITY_EDITOR
-    void OnDrawGizmos()
-    {
-        if (Ingredients.Count > 0)
-        {
-            GUIStyle style = new GUIStyle();
-            style.normal.textColor = Color.green;
-            style.fontStyle = FontStyle.Bold;
-            // Handles.Label(transform.position + Vector3.up * .6f, "Food root", style);
-            string message = "PreparedItem";
-            message += "\nIngredient count: " + IngredientCount();
-            Handles.Label(Ingredients.First<Ingredient>().transform.position + Vector3.up * .6f, message, style);
-        }
-    }
-#endif
 
 
 

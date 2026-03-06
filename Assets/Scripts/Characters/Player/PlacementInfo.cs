@@ -1,12 +1,20 @@
 
 using UnityEngine;
-public class PlacementRaycastInfo
+/// <summary>
+/// Information for the placement of held items;
+/// </summary>
+public class PlacementInfo
 {
     public bool WorldRaycastValid;
     public RaycastHit WorldRaycastHit;
+    public float WorldPlacementYaw; // the current yaw of the holdable, used for rotation while placing.
+
 
     public bool SnapRaycastValid;
     public RaycastHit SnapRaycastHit;
+
+
+
 
     public bool TryGetSnapArea(out SnapArea snapArea)
     {
@@ -28,16 +36,24 @@ public class PlacementRaycastInfo
         }
     }
 
-    public bool TryGetWorldPlacementPos(out Vector3 pos)
+    /// <summary>
+    /// tries to get the position and rotation of a world placement if it is valid
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="rot"></param>
+    /// <returns></returns>
+    public bool TryGetWorldPlacementPosAndRot(out Vector3 pos, out Quaternion rot)
     {
         if (!WorldRaycastValid)
         {
             pos = Vector3.zero;
+            rot = Quaternion.identity;
             return false;
         }
         else
         {
             pos = WorldRaycastHit.point;
+            rot = Quaternion.Euler(0, WorldPlacementYaw, 0);
             return true;
         }
 

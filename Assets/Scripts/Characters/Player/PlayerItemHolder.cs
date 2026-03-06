@@ -3,6 +3,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// System for holding items.  that can be used.
@@ -19,6 +20,14 @@ public class PlayerItemHolder : MonoBehaviour
     public LayerMask PlacingMask;
     [Tooltip("Mask used for determining where snap points are.")]
     public LayerMask SnapMask;
+
+
+    [Header("Input")]
+    public InputActionReference RotatePlacementAction;
+    public InputActionReference LookAction;
+    public float RotateSpeed = 5f; // how fast the item rotates when rotating placement preview.
+
+
     [HideInInspector]
     public float PlacingRange; // same as interact range
 
@@ -35,9 +44,10 @@ public class PlayerItemHolder : MonoBehaviour
     [ShowInInspector, ReadOnly]
     private Holdable itemInHand;
     [ShowInInspector, ReadOnly]
-    private PlacementRaycastInfo placementRaycastInfo = new();
+    private PlacementInfo placementInfo = new();
     [ShowInInspector, ReadOnly]
     private PlacementPreview placementPreview = new();
+    private GameObject handVisual = null;
 
     private Player player;
     void Awake()
@@ -53,10 +63,19 @@ public class PlayerItemHolder : MonoBehaviour
     {
         if (!isHolding) return;
 
-        placementRaycastInfo.WorldRaycastValid = Physics.Raycast(CamRoot.position, CamRoot.forward, out placementRaycastInfo.WorldRaycastHit, PlacingRange, PlacingMask, QueryTriggerInteraction.Ignore);
-        placementRaycastInfo.SnapRaycastValid = Physics.Raycast(CamRoot.position, CamRoot.forward, out placementRaycastInfo.SnapRaycastHit, PlacingRange, SnapMask, QueryTriggerInteraction.Collide);
+        placementInfo.WorldRaycastValid = Physics.Raycast(CamRoot.position, CamRoot.forward, out placementInfo.WorldRaycastHit, PlacingRange, PlacingMask, QueryTriggerInteraction.Ignore);
+        placementInfo.SnapRaycastValid = Physics.Raycast(CamRoot.position, CamRoot.forward, out placementInfo.SnapRaycastHit, PlacingRange, SnapMask, QueryTriggerInteraction.Collide);
 
-        HandlePlacementPreview(placementPreview, placementRaycastInfo, itemInHand);
+        HandlePlacementPreview(placementPreview, placementInfo, itemInHand);
+        if (isHolding)
+        {
+            if (RotatePlacementAction.action.IsPressed())
+            {
+
+                Vector2 delta = LookAction.action.ReadValue<Vector2>();
+                placementInfo.WorldPlacementYaw += delta.x * RotateSpeed;
+            }
+        }
     }
 
     public void OnInteractAndHolding(InteractionContext context)
@@ -66,38 +85,37 @@ public class PlayerItemHolder : MonoBehaviour
             // try place via snapping
             if (itemInHand.TryGetComponent<Snapper>(out var _))
             {
-                if (placementRaycastInfo.SnapRaycastValid)
+                if (placementInfo.SnapRaycastValid)
                 {
-                    if (TryPlaceOnSnapper(placementRaycastInfo))
+                    if (TryPlaceOnSnapper(placementInfo))
                     {
                         return;
                     }
                 }
             }
 
-            if (placementRaycastInfo.WorldRaycastValid)
+            if (placementInfo.TryGetWorldPlacementPosAndRot(out var pos, out var rot))
             {
-                // or, place on surface. 
-                TryPlaceOnSurface(placementRaycastInfo.WorldRaycastHit.point);
+                TryPlaceOnSurface(pos, rot);
             }
         }
 
     }
-    void HandlePlacementPreview(PlacementPreview preview, PlacementRaycastInfo placementInfo, Holdable heldHoldable)
+    void HandlePlacementPreview(PlacementPreview preview, PlacementInfo placementInfo, Holdable heldHoldable)
     {
-        // snap point
-        if (placementInfo.TryGetSnapArea(out var snapPoint))
+        // if we have a snapper and it can snap to the snap area. preview for place on snap area.
+        if (placementInfo.TryGetSnapArea(out SnapArea snapArea) && heldHoldable.TryGetComponent<Snapper>(out var snapper) && snapper.CanSnap(snapArea.ParentSnapper))
         {
             preview.IsShowing = true;
-            preview.Position = snapPoint.transform.position;
-            preview.Rotation = snapPoint.transform.rotation;
+            preview.Position = snapArea.GetSnapPoint(placementInfo);
+            preview.Rotation = snapArea.GetSnapRotation(placementInfo);
         }
-        // world surface 
-        else if (placementInfo.TryGetWorldPlacementPos(out var pos))
+        // preview for place on world.
+        else if (placementInfo.TryGetWorldPlacementPosAndRot(out var worldPos, out var worldRot))
         {
             preview.IsShowing = true;
-            preview.Position = pos;
-            preview.Rotation = Quaternion.identity;
+            preview.Position = worldPos;
+            preview.Rotation = worldRot;
         }
         else
         {
@@ -110,7 +128,7 @@ public class PlayerItemHolder : MonoBehaviour
         {
             if (preview.PreviewObject == null)
             {
-                preview.PreviewObject = Instantiate(heldHoldable.GetVisualRoot());
+                preview.PreviewObject = heldHoldable.GetParentChildLinkedVisualRootClone();
                 // set layer to ignore raycast
                 preview.PreviewObject.layer = LayerMask.NameToLayer("Ignore Raycast");
                 foreach (Transform t in preview.PreviewObject.GetComponentsInChildren<Transform>())
@@ -134,32 +152,50 @@ public class PlayerItemHolder : MonoBehaviour
     /// <summary>
     /// Callback for when a holdable is placed
     /// </summary>
-    void OnPlace()
+    void OnAfterPlace()
     {
-        DropHoldable(itemInHand);
+        itemInHand.gameObject.SetActive(true);
+        itemInHand.SetNotHolding();
+        itemInHand = null;
         TryDeletePreview(placementPreview);
+        placementInfo.WorldPlacementYaw = 0;
+        if (handVisual != null)
+        {
+            Destroy(handVisual);
+            handVisual = null;
+        }
     }
     public void TryHold(Holdable target)
     {
         if (isHolding) return;
 
-        // set parent of the target to the hand socket. keep world position
+
+        if (target.TryGetComponent<Snapper>(out var snapper))
+        {
+            // detach from all parent snap connections
+            foreach (var connection in snapper.SnapConnections)
+            {
+                connection.Parent.ChildDetached(snapper);
+            }
+            snapper.SnapConnections.Clear();
+            snapper.transform.SetParent(null);
+        }
+
+
+
+
+        // parent and position to hand. and disable it
         target.transform.SetParent(HoldSpot, worldPositionStays: true);
-
-        // lerp local pos to Vector3 zero
-        // lerpm rotation to identity
-
         target.transform.localPosition = Vector3.zero;
         target.transform.rotation = HoldSpot.rotation;
+        target.gameObject.SetActive(false);
 
+        // generate a visual root clone and parent to hand
+        handVisual = target.GetParentChildLinkedVisualRootClone();
+        handVisual.transform.SetParent(HoldSpot, worldPositionStays: true);
+        handVisual.transform.rotation = HoldSpot.rotation;
 
         itemInHand = target;
-    }
-
-    void DropHoldable(Holdable holdable)
-    {
-        holdable.SetNotHolding();
-        itemInHand = null;
     }
 
 
@@ -167,7 +203,7 @@ public class PlayerItemHolder : MonoBehaviour
     /// Tries to place the held item if it can.
     /// </summary>
     /// <param name="pos"></param>
-    public bool TryPlaceOnSurface(Vector3 pos)
+    public bool TryPlaceOnSurface(Vector3 pos, Quaternion rot)
     {
         if (!isHolding) return false;
         Debug.Log("[PlayerItemHolder]: Trying to place on surface.");
@@ -176,13 +212,13 @@ public class PlayerItemHolder : MonoBehaviour
         //place
         itemInHand.transform.SetParent(null);
         itemInHand.transform.position = pos;
-        itemInHand.transform.rotation = Quaternion.identity;
+        itemInHand.transform.rotation = rot;
 
-        OnPlace();
+        OnAfterPlace();
         return true;
     }
 
-    public bool TryPlaceOnSnapper(PlacementRaycastInfo placementRaycastInfo)
+    public bool TryPlaceOnSnapper(PlacementInfo placementRaycastInfo)
     {
         if (!isHolding) return false;
 
@@ -198,7 +234,7 @@ public class PlayerItemHolder : MonoBehaviour
                 {
                     //place
                     heldSnapper.SnapToArea(placementRaycastInfo, otherSnapper, otherSnapPoint);
-                    OnPlace();
+                    OnAfterPlace();
                     return true;
                 }
             }
@@ -241,12 +277,12 @@ public class PlayerItemHolder : MonoBehaviour
         {
             Gizmos.color = Color.green;
             Gizmos.DrawRay(CamRoot.transform.position, CamRoot.forward * PlacingRange);
-            if (placementRaycastInfo.WorldRaycastValid)
+            if (placementInfo.WorldRaycastValid)
             {
                 style.normal.textColor = Color.green;
-                Gizmos.DrawWireSphere(placementRaycastInfo.WorldRaycastHit.point, .3f);
+                Gizmos.DrawWireSphere(placementInfo.WorldRaycastHit.point, .3f);
 
-                Handles.Label(placementRaycastInfo.WorldRaycastHit.point, placementRaycastInfo.WorldRaycastHit.collider.name);
+                Handles.Label(placementInfo.WorldRaycastHit.point, placementInfo.WorldRaycastHit.collider.name);
             }
 
         }

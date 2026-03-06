@@ -8,8 +8,6 @@ using UnityEngine;
 public class Holdable : InteractableBase
 {
 
-    [Tooltip("Root object for whatever visually represents this item. Ex. used for previews when placing said item if its held.")]
-    public GameObject VisualRoot;
     public event Action<InteractionContext> OnHeld;
     public event Action<InteractionContext> OnSecondaryInteract;
 
@@ -48,7 +46,8 @@ public class Holdable : InteractableBase
     public override void Interact(InteractionContext context)
     {
         OnHeld?.Invoke(context);
-        context.Player.ItemHolder.TryHold(GetHoldableRoot());
+        // context.Player.ItemHolder.TryHold(GetHoldableRoot());
+        context.Player.ItemHolder.TryHold(this);
 
         beingHeld = true;
     }
@@ -67,24 +66,32 @@ public class Holdable : InteractableBase
     /// Combines linked visuals into one gameobject
     /// </summary>
     /// <param name="visualRoot"></param>
-    public GameObject GetVisualRoot()
+    public GameObject GetParentChildLinkedVisualRootClone()
     {
         var holdables = GetHoldableRoot().GetComponentsInChildren<Holdable>();
-        GameObject visualRoot = GetHoldableRoot().VisualRoot;
+        // GameObject visualRoot = Instantiate(GetHoldableRoot().VisualRoot);
 
-        foreach (var holdable in holdables)
+        int i = 0;
+        GameObject parent = null;
+        foreach (Holdable holdable in holdables)
         {
-            if (holdable == this) continue;
+            GameObject holdableVisualRoot = Instantiate(holdable.VisualRoot, holdable.VisualRoot.transform.position, holdable.VisualRoot.transform.rotation);
+            holdableVisualRoot.layer = LayerMask.NameToLayer("Holding");
+            foreach (var obj in holdableVisualRoot.GetComponentsInChildren<Transform>())
+            {
+                obj.gameObject.layer = LayerMask.NameToLayer("Holding");
+            }
+            if (i == 0)
+            {
+                // parent
+                parent = holdableVisualRoot;
 
-            holdable.VisualRoot.transform.SetParent(visualRoot.transform, true);
+            }
+            holdableVisualRoot.transform.SetParent(parent.transform);
+            i++;
 
-            // transform relative to the root.
-            // var relPos = visualRoot.transform.InverseTransformPoint(holdable.VisualRoot.transform.position);
-            // var relRot = Quaternion.Inverse(visualRoot.transform.rotation) * holdable.VisualRoot.transform.rotation;
-            // clone.transform.localPosition = relPos;
-            // clone.transform.localRotation = relRot;
         }
-        return visualRoot;
+        return parent;
     }
 
 

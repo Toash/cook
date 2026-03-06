@@ -7,6 +7,7 @@ using UnityEngine;
 /// This is required in order to identity an OrderContainer
 /// </summary>
 [RequireComponent(typeof(Snapper))]
+[RequireComponent(typeof(Holdable))]
 public class OrderReceipt : MonoBehaviour
 {
     public TMP_Text IDText;
@@ -17,6 +18,13 @@ public class OrderReceipt : MonoBehaviour
     public Snapper Snapper { get; private set; }
     public PhysicsGrabbable Grabbable { get; private set; }
 
+    void OnValidate()
+    {
+        if (TryGetComponent<Collider>(out var collider))
+        {
+            collider.isTrigger = true;
+        }
+    }
     void Awake()
     {
         Grabbable = GetComponent<PhysicsGrabbable>();

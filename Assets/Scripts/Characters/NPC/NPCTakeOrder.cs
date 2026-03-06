@@ -16,6 +16,7 @@ public class NPCTakeOrder : NPCState
     {
         submitArea = OrderManager.I.OrderSubmissionArea;
         Brain.Agent.SetDestination(submitArea.PickupSpot.position);
+
     }
 
     public override void OnExit(NPCBrain brain)

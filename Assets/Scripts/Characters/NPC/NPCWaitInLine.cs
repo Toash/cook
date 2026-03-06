@@ -15,6 +15,10 @@ public class NPCWaitInLine : NPCState
     public override void OnEnter(NPCBrain brain)
     {
         brain.CurrentOrderLine.AddNPCToLine(brain);
+
+        brain.NPC.Visuals.SetLookAtTarget(brain.CurrentOrderLine.NPCLookAt);
+
+
         // already first in line
         if (brain.CurrentOrderLine.GetFirstNPCInLine() == brain)
         {
