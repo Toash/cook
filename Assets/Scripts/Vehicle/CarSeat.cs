@@ -7,20 +7,20 @@ using UnityEngine;
 public class CarSeat : InteractableBase, IConstrainer
 {
     [ReadOnly]
-    public Player Player;
+    public Player PlayerInSeat;
     // where the player should snap to.
     public Transform Seat;
     public Transform GetOut;
     public override void Interact(InteractionContext context)
     {
-        Player = context.Player;
-        Player.Controller.ConstrainBody(new ConstrainedContext(this, Seat, GetOut));
+        PlayerInSeat = context.Player;
+        PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, Seat, GetOut));
 
     }
 
     public void OnUnConstrained()
     {
-        Player = null;
+        PlayerInSeat = null;
     }
 
 #if UNITY_EDITOR

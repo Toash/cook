@@ -11,9 +11,9 @@ using UnityEngine;
 
 /// <summary>
 /// System for snapping objects together.  <br/>
-/// Uses transform hiearchy for snapping
+/// Uses transform hiearchy for snapping <br/>
+/// Snapping connections are one way (child to parent).  <br/>
 /// </summary>
-[RequireComponent(typeof(Holdable))]
 public class Snapper : MonoBehaviour
 {
 
@@ -23,11 +23,12 @@ public class Snapper : MonoBehaviour
     [ShowInInspector]
     public SnapType SnapType { get; private set; }
 
+    [Sirenix.OdinInspector.ReadOnly]
     public List<SnapConnection> SnapConnections = new List<SnapConnection>();
 
 
-    public event Action<SnapConnection> OnSnap;
-    public event Action<SnapConnection> OnDetached;
+    public event Action<Snapper> OnChildSnapped;
+    public event Action<Snapper> OnChildDetached;
     public bool CanSnap(Snapper other)
     {
         // if other is null, just ignore joint type checks.
@@ -59,46 +60,27 @@ public class Snapper : MonoBehaviour
     }
 
 
-    public void SnapToArea(PlacementRaycastInfo placementRaycastInfo, Snapper otherSnapper, SnapArea otherSnapArea)
+    public void SnapToArea(PlacementInfo placementRaycastInfo, Snapper parentSnapper, SnapArea parentSnapArea)
     {
-        if (!CanSnap(otherSnapper))
+        if (!CanSnap(parentSnapper))
         {
-            Debug.Log("Cannot snap " + gameObject.name + " to " + otherSnapper.gameObject.name + " due to incompatible snap types.");
+            Debug.Log("Cannot snap " + gameObject.name + " to " + parentSnapper.gameObject.name + " due to incompatible snap types.");
             return;
         }
 
-        // update snap connections 
-        SnapConnection thisConnection = new SnapConnection(this, otherSnapper, otherSnapArea);
-        SnapConnection otherConnection = new SnapConnection(otherSnapper, this, otherSnapArea);
+        SnapConnection thisConnection = new SnapConnection(parentSnapper);
         SnapConnections.Add(thisConnection);
-        otherSnapper.SnapConnections.Add(otherConnection);
-
-        _OnSnap(thisConnection);
-        otherSnapper._OnSnap(otherConnection);
+        parentSnapper.ChildSnapped(this);
 
 
-        // actually snap the object
-        if (otherSnapArea.SnapToCenter)
-        {
-            transform.position = otherSnapArea.transform.position;
-        }
-        else
-        {
-            transform.position = placementRaycastInfo.SnapRaycastHit.point;
-        }
-        transform.rotation = otherSnapArea.transform.rotation;
-
-        transform.SetParent(otherSnapper.transform);
-
+        // actually place
+        transform.position = parentSnapArea.GetSnapPoint(placementRaycastInfo);
+        transform.rotation = parentSnapArea.GetSnapRotation(placementRaycastInfo);
+        transform.SetParent(parentSnapper.transform);
     }
 
 
-
-    // / <summary>
-    // / Returns all of the snappers connected by snap collections recursively
-    // / </summary>
-    // / <returns></returns>
-    public List<Snapper> GetSnapperGroup(bool includeSelf = true)
+    public List<Snapper> GetSnapperChildrenRecursive(bool includeSelf = true)
     {
         var visited = new HashSet<Snapper>();
         var stack = new Stack<Snapper>();
@@ -112,7 +94,7 @@ public class Snapper : MonoBehaviour
 
             foreach (SnapConnection connection in current.SnapConnections)
             {
-                Snapper otherSnapper = connection.Other;
+                Snapper otherSnapper = connection.Parent;
                 if (otherSnapper == null) continue;
 
                 if (visited.Add(otherSnapper))
@@ -124,15 +106,14 @@ public class Snapper : MonoBehaviour
         return visited.ToList();
     }
 
-    /// <summary>
-    /// Called when a snapper snaps to another snapper. Called on both snappers
-    /// </summary>
-    /// <param name="other"></param>
-    /// <param name="currentSnapConnection"></param>
-    void _OnSnap(SnapConnection currentSnapConnection)
+    void ChildSnapped(Snapper child)
     {
-        Debug.Log("[Snapper]: Calling OnSnap with connection  " + currentSnapConnection);
-        OnSnap?.Invoke(currentSnapConnection);
+        OnChildSnapped?.Invoke(child);
+    }
+
+    public void ChildDetached(Snapper child)
+    {
+        OnChildDetached?.Invoke(child);
     }
 
 

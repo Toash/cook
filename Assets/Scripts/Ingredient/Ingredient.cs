@@ -12,8 +12,6 @@ public class Ingredient : MonoBehaviour
 {
     public IngredientData Data;
 
-    public PhysicsGrabbable Grabbable { get; private set; }
-
 
     // what food this ingredient belongs to, if any.
     public PreparedItem PreparedItem { get; set; }
@@ -21,9 +19,15 @@ public class Ingredient : MonoBehaviour
 
 
 
+    void OnValidate()
+    {
+        if (TryGetComponent<Collider>(out var collider))
+        {
+            collider.isTrigger = true;
+        }
+    }
     void Awake()
     {
-        Grabbable = GetComponent<PhysicsGrabbable>();
         Snapper = GetComponent<Snapper>();
     }
     void Start()

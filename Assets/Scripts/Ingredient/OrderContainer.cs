@@ -30,13 +30,13 @@ public class OrderContainer : MonoBehaviour
     }
     void OnEnable()
     {
-        snapper.OnSnap += OnSnap;
-        snapper.OnDetached += OnDetached;
+        snapper.OnChildSnapped += OnSnap;
+        snapper.OnChildDetached += OnDetached;
     }
     void OnDisable()
     {
-        snapper.OnSnap -= OnSnap;
-        snapper.OnDetached -= OnDetached;
+        snapper.OnChildSnapped -= OnSnap;
+        snapper.OnChildDetached -= OnDetached;
     }
 
 
@@ -77,38 +77,28 @@ public class OrderContainer : MonoBehaviour
     }
 
 
-    void OnSnap(SnapConnection connection)
+    void OnSnap(Snapper otherSnapper)
     {
-        Snapper otherSnapper = SnapConnection.GetOther(connection);
         if (otherSnapper.TryGetComponent<Ingredient>(out var _))
         {
             // the other snapper is an ingredient, make a prepared item.
-            CreatePreparedItem(connection);
+            CreatePreparedItem(otherSnapper);
         }
         else if (otherSnapper.TryGetComponent<OrderReceipt>(out var receipt))
         {
             LinkOrder(receipt);
         }
-        else
-        {
-            Debug.LogError("[OrderContainer]: Error OnSnap. Could not find appropriate component.");
-        }
     }
 
-    void OnDetached(SnapConnection connection)
+    void OnDetached(Snapper otherSnapper)
     {
-        Snapper otherSnapper = SnapConnection.GetOther(connection);
         if (otherSnapper.TryGetComponent<Ingredient>(out var _))
         {
-            DetachPreparedItem(connection);
+            DetachPreparedItem(otherSnapper);
         }
         else if (otherSnapper.TryGetComponent<OrderReceipt>(out var receipt))
         {
             UnlinkOrder(receipt);
-        }
-        else
-        {
-            Debug.LogError("[OrderContainer]: Error OnDetach. Could not find appropriate component");
         }
     }
 
@@ -134,13 +124,12 @@ public class OrderContainer : MonoBehaviour
     /// Create prepared item on order container.
     /// </summary>
     /// <param name="connection"></param>
-    void CreatePreparedItem(SnapConnection connection)
+    void CreatePreparedItem(Snapper otherSnapper)
     {
-        Snapper otherSnapper = SnapConnection.GetOther(connection);
 
         List<Ingredient> ingredients = new();
 
-        List<Snapper> connectedSnappers = otherSnapper.GetSnapperGroup();
+        List<Snapper> connectedSnappers = otherSnapper.GetSnapperChildrenRecursive();
         foreach (var snapper in connectedSnappers)
         {
             if (snapper.TryGetComponent<Ingredient>(out var ingredient))
@@ -162,10 +151,8 @@ public class OrderContainer : MonoBehaviour
     /// Detach prepraed item from order container.
     /// </summary>
     /// <param name="connection"></param>
-    void DetachPreparedItem(SnapConnection connection)
+    void DetachPreparedItem(Snapper otherSnapper)
     {
-        Debug.Log("detach:" + connection);
-        Snapper otherSnapper = SnapConnection.GetOther(connection);
         if (otherSnapper.TryGetComponent<Ingredient>(out var ingredient))
         {
             PreparedItem preparedItem = ingredient.PreparedItem;
@@ -199,15 +186,23 @@ public class OrderContainer : MonoBehaviour
 
 #if UNITY_EDITOR
     GUIStyle style = new();
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
-        Handles.Label(transform.position, "Prepared Item Count: " + PreparedItems.Count.ToString());
+        style.normal.textColor = Color.blue;
+        style.fontStyle = FontStyle.Bold;
+        string message = "";
+        message += "Prepared Items Count: " + PreparedItems.Count + "\n";
+        Handles.Label(transform.position, message, style);
+        foreach (var item in PreparedItems)
+        {
+            message += item.ToString() + "\n";
+            Handles.Label(transform.position + (Vector3.up * .2f), message, style);
+        }
 
         if (Receipt != null)
         {
-            style.normal.textColor = Color.blue;
-            style.fontStyle = FontStyle.Bold;
-            Handles.Label(transform.position + (Vector3.up * .3f), "Associated Order ID:" + Receipt.OrderID, style);
+            message += "Associated Order ID:" + Receipt.OrderID + "\n";
+            Handles.Label(transform.position + (Vector3.up * .3f), message, style);
         }
 
 

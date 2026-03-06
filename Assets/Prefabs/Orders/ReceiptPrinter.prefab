@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce7b7ad000a3be345a844f3d9b3fc1f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OrderReceiptPrinter
-  ReceiptPrefab: {fileID: 1122431376056710096, guid: f126875932273114e90f2c8523df3a79, type: 3}
+  ReceiptPrefab: {fileID: 4364911229386095459, guid: 9949d823e054fd14a834a609833f6757, type: 3}
   SpawnLocation: {fileID: 6390742484552317299}
 --- !u!1 &8286926237709044249
 GameObject:

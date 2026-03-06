@@ -8,6 +8,7 @@ public class NPC : MonoBehaviour
     public string NPCName = "Timmy";
 
     public NPCBrain Brain;
+    public CharacterVisual Visuals;
 
 
 

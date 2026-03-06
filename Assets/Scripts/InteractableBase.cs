@@ -1,16 +1,23 @@
 
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
 /// Represents an object that the player can interact with
 /// </summary>
 [RequireComponent(typeof(Collider))]
-[RequireComponent(typeof(Highlightable))]
+// [RequireComponent(typeof(Highlightable))]
 public abstract class InteractableBase : MonoBehaviour
 {
 
+    [Tooltip("Root object for whatever visually represents this item.")]
+    public GameObject VisualRoot;
     // public virtual string HoverTooltip { get; set; } = "";
     public string HoverTooltip = "";
+    // List<Outline> outlines = new();
+
+    Outline outline = null;
     void Awake()
     {
         SetLayer();
@@ -18,8 +25,32 @@ public abstract class InteractableBase : MonoBehaviour
     void Start()
     {
         SetLayer();
+        if (VisualRoot != null)
+        {
+            // foreach (var obj in VisualRoot.GetComponentsInChildren<Transform>())
+            // {
+            //     if (obj == VisualRoot.transform) continue;
+            //     var outline = obj.AddComponent<Outline>();
+            //     outline.OutlineWidth = 8f;
+            //     outlines.Add(outline);
+            // }
+            outline = VisualRoot.AddComponent<Outline>();
+            outline.OutlineWidth = 5f;
+            SetOutline(false);
 
+
+        }
     }
+    public void SetOutline(bool boolean)
+    {
+        // foreach (Outline outline in outlines)
+        // {
+        //     outline.enabled = boolean;
+        // }
+
+        outline.enabled = boolean;
+    }
+
     void OnValidate()
     {
         SetLayer();

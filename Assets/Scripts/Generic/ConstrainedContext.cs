@@ -2,6 +2,7 @@ using UnityEngine;
 public class ConstrainedContext
 {
     public IConstrainer Constrainer;
+
     public Transform Constraint;
     public Transform UnConstraint;
 

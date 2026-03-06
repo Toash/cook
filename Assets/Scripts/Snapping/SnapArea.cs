@@ -24,7 +24,7 @@ public class SnapArea : MonoBehaviour
             gameObject.layer = LayerMask.NameToLayer("Snapping");
         }
 
-        if (col == null) col = GetComponent<SphereCollider>();
+        if (col == null) col = GetComponent<Collider>();
         col.isTrigger = true;
     }
     void Awake()
@@ -33,6 +33,30 @@ public class SnapArea : MonoBehaviour
     }
 
 
+    public Vector3 GetSnapPoint(PlacementInfo placementInfo)
+    {
+        if (SnapToCenter)
+        {
+            return transform.position;
+        }
+        else
+        {
+            return placementInfo.SnapRaycastHit.point;
+        }
+    }
+
+    public Quaternion GetSnapRotation(PlacementInfo placementInfo)
+    {
+        if (SnapToCenter)
+        {
+            return transform.rotation;
+        }
+        else
+        {
+            return Quaternion.identity;
+        }
+    }
+
 #if UNITY_EDITOR
 
     GUIStyle style = new();
@@ -40,12 +64,15 @@ public class SnapArea : MonoBehaviour
     {
         style.normal.textColor = Color.orange;
         Gizmos.color = Color.orange;
-        Handles.Label(transform.position, "Snap Area");
+        string message = "";
+        message += "Snap Area\n";
+        Handles.Label(transform.position, message, style);
 
         if (ParentSnapper == null)
         {
             style.normal.textColor = Color.red;
-            Handles.Label(transform.position, "Parent Snapper is not set!", style);
+            message += "Parent Snapper is not set!";
+            Handles.Label(transform.position, message, style);
         }
     }
 #endif
