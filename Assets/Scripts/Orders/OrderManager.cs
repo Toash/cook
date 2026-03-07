@@ -1,26 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 public class OrderManager : MonoBehaviour
 {
     public static OrderManager I;
 
 
-    /// <summary>
-    /// Spots NPCS wait to order something
-    /// </summary>
-    public OrderLine OrderLine;
-
-    /// <summary>
-    /// Spots NPCS wait while an order is being made 
-    /// </summary>
-    public OrderWaitingSpot WaitingSpot;
-
-    /// <summary>
-    /// Spot Player submits Made orders, and where NPCS pick up their orders.
-    /// </summary>
-    public SingleOrderSubmissionArea OrderSubmissionArea;
 
 
     /// <summary>

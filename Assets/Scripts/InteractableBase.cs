@@ -1,6 +1,3 @@
-
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -43,10 +40,7 @@ public abstract class InteractableBase : MonoBehaviour
     }
     public void SetOutline(bool boolean)
     {
-        // foreach (Outline outline in outlines)
-        // {
-        //     outline.enabled = boolean;
-        // }
+        if (outline == null) return;
 
         outline.enabled = boolean;
     }
