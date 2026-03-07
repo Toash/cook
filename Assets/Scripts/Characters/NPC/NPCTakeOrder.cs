@@ -1,6 +1,5 @@
 
 using UnityEngine;
-using UnityEngine.AI;
 
 public class NPCTakeOrder : NPCState
 {
@@ -9,12 +8,12 @@ public class NPCTakeOrder : NPCState
     /// <summary>
     /// Where order will go when picked up
     /// </summary>
-    public Transform HandSocket;
+    //public Transform HandSocket;
 
     SingleOrderSubmissionArea submitArea;
     public override void OnEnter(NPCBrain brain)
     {
-        submitArea = OrderManager.I.OrderSubmissionArea;
+        submitArea = Brain.CurrentFoodTruck.OrderSubmissionArea;
         Brain.Agent.SetDestination(submitArea.PickupSpot.position);
 
     }
@@ -31,13 +30,14 @@ public class NPCTakeOrder : NPCState
     {
         if (AgentUtils.HasAgentReachedDestination(Brain.Agent))
         {
-            if (submitArea.TryPickup(Brain.CurrentOrderID, HandSocket, out var container))
+            if (submitArea.TryTakeContainer(Brain.CurrentOrderID, out var container))
             {
 
                 Debug.Log("[NPC]: Picked up order");
-                container.transform.SetParent(HandSocket, worldPositionStays: false);
+                //container.transform.SetParent(HandSocket, worldPositionStays: false);
+                Brain.NPC.Hand.Hold(container.gameObject);
 
-                Brain.ChangeState("NPCWaitForOrder");
+                Brain.ChangeState("NPCEatFood");
 
             }
         }

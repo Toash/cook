@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -84,7 +83,13 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     }
 
 
-    public bool TryPickup(int orderId, Transform handSocket, out OrderContainer container)
+    /// <summary>
+    /// Gives a reference to the container if it is linked to the orderid.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <param name="container"></param>
+    /// <returns></returns>
+    public bool TryTakeContainer(int orderId, out OrderContainer container)
     {
         if (orderId != CurrentContainer.GetOrderID())
         {

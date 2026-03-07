@@ -1,6 +1,5 @@
-using System;
-using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,6 +15,7 @@ public class OrderLine : MonoBehaviour
     /// The transform that npcs in this line will look at. <br/>
     /// </summary>
     public Transform NPCLookAt;
+    public float LineSpacing = 1f;
     /// <summary>
     ///  NPCS in line
     ///  TODO: generate positions based on line position.
@@ -36,6 +36,19 @@ public class OrderLine : MonoBehaviour
     public NPCBrain GetFirstNPCInLine()
     {
         return Line.Peek();
+    }
+    public Vector3 GetLinePositionForNPC(NPCBrain npc)
+    {
+        int index = 0;
+        foreach (var npcInLine in Line)
+        {
+            if (npcInLine == npc)
+            {
+                break;
+            }
+            index++;
+        }
+        return transform.position + transform.forward * LineSpacing * index;
     }
 
     /// <summary>
@@ -74,8 +87,22 @@ public class OrderLine : MonoBehaviour
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, .3f);
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward);
 
         Handles.Label(transform.position, "OrderLine");
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        foreach (var npc in Line)
+        {
+            var pos = GetLinePositionForNPC(npc);
+
+            Gizmos.DrawSphere(pos, .2f);
+        }
+
+
+
     }
 #endif
 

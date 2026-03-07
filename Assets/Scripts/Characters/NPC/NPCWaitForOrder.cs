@@ -1,7 +1,3 @@
-
-using UnityEngine;
-using UnityEngine.AI;
-
 public class NPCWaitForOrder : NPCState
 {
     public override string StateName => "NPCWaitForOrder";
@@ -16,7 +12,7 @@ public class NPCWaitForOrder : NPCState
     }
     public override void OnEnter(NPCBrain brain)
     {
-        brain.Agent.SetDestination(OrderManager.I.WaitingSpot.transform.position);
+        brain.Agent.SetDestination(Brain.CurrentFoodTruck.WaitingSpot.transform.position);
         OrderManager.I.ActiveOrderMade += OnActiveOrderMade;
     }
 

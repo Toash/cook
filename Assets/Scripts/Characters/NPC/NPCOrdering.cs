@@ -1,7 +1,3 @@
-
-using UnityEngine;
-using UnityEngine.AI;
-
 public class NPCOrdering : NPCState
 {
     public override string StateName => "NPCOrdering";
@@ -26,6 +22,7 @@ public class NPCOrdering : NPCState
     public override void OnExit(NPCBrain brain)
     {
         OrderManager.I.ProposedOrderAcknowledged -= OnProposedOrderAcknowledged;
+        Brain.NPC.Visuals.SetLookAtTarget(null);
         // if (brain.CurrentOrderLine.RemoveNPCFromLineIfFirst(brain))
         // {
         //     Destroy(brain.gameObject);

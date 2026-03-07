@@ -6,6 +6,9 @@ public abstract class NPCState : MonoBehaviour
 
     [ShowInInspector]
     public abstract string StateName { get; }
+
+    [HideInInspector]
+    public NPC NPC;
     [HideInInspector]
     public NPCBrain Brain;
 

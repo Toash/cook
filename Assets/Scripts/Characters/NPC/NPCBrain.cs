@@ -1,6 +1,7 @@
+using Assets.Scripts.Vehicle;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,37 +12,41 @@ using UnityEngine.AI;
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(NPC))]
+
+[RequireComponent(typeof(Rigidbody))] // used for checking ontriggerenters
+
 public class NPCBrain : MonoBehaviour
 {
 
+    [Header("States")]
     public NPCState InitialState;
     [ReadOnly]
     public NPCState CurrentState;
 
+    [ShowInInspector, ReadOnly]
+    public Dictionary<string, NPCState> RegisteredStates = new();
 
+    [Header("References")]
+    public NPC NPC { get; private set; }
+    public NavMeshAgent Agent;
+
+    // ------- FOOD TRUCK-----------------    
+
+    [ReadOnly]
+    public FoodTruck CurrentFoodTruck;
+    //[ReadOnly]
+    //public OrderLine CurrentOrderLine;
+    [ReadOnly]
+    public int CurrentOrderID;
     /// <summary>
     /// Invoked when the NPC becomes first in line.
     /// </summary>
     public event Action<NPCBrain> BecameFirstInLine;
-    public NavMeshAgent Agent;
-    /// <summary>
-    ///  the current line that the npc is in.
-    /// </summary>
-    [ReadOnly]
-    public OrderLine CurrentOrderLine;
+    public event Action LineChanged;
+    public event Action<FoodTruck> EnteredFoodTruck;
 
-    /// <summary>
-    /// The current order that is associated with the NPC.
-    /// </summary>
-    [ReadOnly]
-    public int CurrentOrderID;
-
-    [ShowInInspector, ReadOnly]
-    public Dictionary<string, NPCState> RegisteredStates = new();
-
-
-    public NPC NPC { get; private set; }
-
+    private Rigidbody rb;
+    public SphereCollider TriggerCol;
 
     void OnValidate()
     {
@@ -52,6 +57,17 @@ public class NPCBrain : MonoBehaviour
         if (NPC == null)
         {
             NPC = GetComponent<NPC>();
+        }
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
+        if (TriggerCol != null)
+        {
+            TriggerCol.isTrigger = true;
+            TriggerCol.gameObject.layer = LayerMask.NameToLayer("NPCTrigger");
         }
     }
 
@@ -64,6 +80,7 @@ public class NPCBrain : MonoBehaviour
                 Debug.Log("[NPCBrain]: Adding state " + state.StateName + " to RegisteredStates.");
                 RegisteredStates.Add(state.StateName, state);
                 state.Brain = this;
+                state.NPC = NPC;
             }
         }
     }
@@ -71,6 +88,18 @@ public class NPCBrain : MonoBehaviour
     {
         CurrentState = InitialState;
         CurrentState.OnEnter(this);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Entered trigger: " + other.name);
+        if (other.attachedRigidbody.TryGetComponent<FoodTruck>(out var truck))
+        {
+            //CurrentFoodTruck = truck;
+            //ChangeState("NPCWaitInLine");
+            EnteredFoodTruck?.Invoke(truck);
+        }
+
     }
     void Update()
     {
@@ -96,20 +125,13 @@ public class NPCBrain : MonoBehaviour
 
 
 
-    public void SetCurrentOrderLine(OrderLine loc)
-    {
-        this.CurrentOrderLine = loc;
-    }
-    public OrderLine GetCurrentOrderLine()
-    {
-        return this.CurrentOrderLine;
-    }
     /// <summary>
     /// Pass this as callbakc when subscribing to an OrderLocation line.
     /// </summary>
     /// <param name="brain"></param>
     public void OnFirstInLineChanged(NPCBrain brain)
     {
+        LineChanged?.Invoke();
         if (brain != this) return;
         Debug.Log("[NPCBrain]: Became first in line");
         BecameFirstInLine?.Invoke(brain);
@@ -125,6 +147,11 @@ public class NPCBrain : MonoBehaviour
         if (CurrentState != null)
         {
             Handles.Label(transform.position, "Current State: " + CurrentState.StateName, style);
+        }
+
+        if (CurrentFoodTruck != null)
+        {
+            Handles.Label(transform.position + (Vector3.up * .1f), "In food truck", style);
         }
 
     }
