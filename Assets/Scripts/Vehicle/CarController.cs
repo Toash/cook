@@ -1,17 +1,18 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class CarControl : MonoBehaviour
 {
     public CarSeat Seat;
+    public WheelControl[] Wheels;
     [Header("Car Properties")]
-    public float motorTorque = 2000f;
-    public float brakeTorque = 2000f;
-    public float targetTopSpeed = 20f;
+    public float motorTorque = 1000f;
+    public float brakeTorque = 3000f;
+    public float targetTopSpeed = 8f;
     public float steeringRange = 30f;
     public float steeringRangeAtMaxSpeed = 10f;
     public float centreOfGravityOffset = -1f;
 
-    private WheelControl[] wheels;
     private Rigidbody rigidBody;
 
     private CarInputActions carControls; // Reference to the new input system
@@ -53,7 +54,7 @@ public class CarControl : MonoBehaviour
         rigidBody.centerOfMass = centerOfMass;
 
         // Get all wheel components attached to the car
-        wheels = GetComponentsInChildren<WheelControl>();
+        // Wheels = GetComponentsInChildren<WheelControl>();
     }
 
     void FixedUpdate()
@@ -77,7 +78,7 @@ public class CarControl : MonoBehaviour
         // Determine if the player is accelerating or trying to reverse
         bool isAccelerating = Mathf.Sign(vInput) == Mathf.Sign(forwardSpeed);
 
-        foreach (var wheel in wheels)
+        foreach (WheelControl wheel in Wheels)
         {
             // Apply steering to wheels that support steering
             if (wheel.steerable)

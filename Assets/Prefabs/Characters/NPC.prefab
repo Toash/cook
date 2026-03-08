@@ -75,6 +75,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f3ba3500f0654d4a9b0365204591f76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCEatFood
+  NPC: {fileID: 0}
   Brain: {fileID: 0}
 --- !u!1 &3717195410337276628
 GameObject:
@@ -162,7 +163,7 @@ Transform:
   - {fileID: 7637566618039733053}
   m_Father: {fileID: 1348562496413235146}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4050630625744256808
+--- !u!1 &4841843319136678093
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -170,22 +171,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1914073717708278146}
-  - component: {fileID: 8736760517826843459}
+  - component: {fileID: 7509430121266211660}
+  - component: {fileID: 342488477072559919}
   m_Layer: 0
-  m_Name: State_WanderWaypoint
+  m_Name: State_DailySchedule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1914073717708278146
+--- !u!4 &7509430121266211660
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4050630625744256808}
+  m_GameObject: {fileID: 4841843319136678093}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -194,20 +195,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1348562496413235146}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8736760517826843459
+--- !u!114 &342488477072559919
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4050630625744256808}
+  m_GameObject: {fileID: 4841843319136678093}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ee78825a414650448112e69cf80a86e, type: 3}
+  m_Script: {fileID: 11500000, guid: 8ebef5f78587c694b9c971e36b9f78f6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCWanderWaypoints
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCDailySchedule
+  NPC: {fileID: 0}
   Brain: {fileID: 0}
-  Waypoints: []
 --- !u!1 &7014186654436273406
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,6 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c75b9ddcf61f8e440bb6960321833373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCTakeOrder
+  NPC: {fileID: 0}
   Brain: {fileID: 0}
 --- !u!1 &7754067278454972157
 GameObject:
@@ -297,6 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca3ea7be31156b24590f65abc2930461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCWaitForOrder
+  NPC: {fileID: 0}
   Brain: {fileID: 0}
 --- !u!1 &7906136040077889905
 GameObject:
@@ -342,6 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b8fadaff820cd745bc9f658d56dfd0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCOrdering
+  NPC: {fileID: 0}
   Brain: {fileID: 0}
 --- !u!1 &8878942809382534289
 GameObject:
@@ -387,6 +391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f76e203161fc7424c8410ed9438ef910, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCWaitInLine
+  NPC: {fileID: 0}
   Brain: {fileID: 0}
 --- !u!1 &8984296238825137311
 GameObject:
@@ -397,14 +402,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1348562496413235146}
-  - component: {fileID: 375583950525526969}
   - component: {fileID: 6343099179267865205}
+  - component: {fileID: 375583950525526969}
   - component: {fileID: 2082934842838044331}
   - component: {fileID: 4934541047721041560}
   - component: {fileID: 1899074016397035575}
   - component: {fileID: 681720254803484829}
   - component: {fileID: 7161403267277774175}
   - component: {fileID: 2639083710166535590}
+  - component: {fileID: 6249997067289295144}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -425,7 +431,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1914073717708278146}
+  - {fileID: 7509430121266211660}
   - {fileID: 6932652742809201315}
   - {fileID: 457782456931729780}
   - {fileID: 5879522471466468158}
@@ -435,6 +441,24 @@ Transform:
   - {fileID: 7092826566749458655}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6343099179267865205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8984296238825137311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 522c4b26916232c45aa524276d9022d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
+  InitialState: {fileID: 342488477072559919}
+  CurrentState: {fileID: 0}
+  Agent: {fileID: 375583950525526969}
+  CurrentFoodTruck: {fileID: 0}
+  CurrentOrderID: 0
+  TriggerCol: {fileID: 5156730865897685090}
 --- !u!195 &375583950525526969
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -457,28 +481,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6343099179267865205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8984296238825137311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 522c4b26916232c45aa524276d9022d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
-  InitialState: {fileID: 8736760517826843459}
-  CurrentState: {fileID: 0}
-  Schedule:
-    Activities:
-    - StartTime: 0
-      EndTime: 0
-  Agent: {fileID: 375583950525526969}
-  CurrentFoodTruck: {fileID: 0}
-  CurrentOrderID: 0
-  TriggerCol: {fileID: 5156730865897685090}
 --- !u!33 &2082934842838044331
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -500,6 +502,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   Brain: {fileID: 6343099179267865205}
+  Schedule: {fileID: 6249997067289295144}
   Movement: {fileID: 681720254803484829}
   Hand: {fileID: 2639083710166535590}
   Visuals: {fileID: 1899074016397035575}
@@ -573,6 +576,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCHand
   HandRoot: {fileID: 5791525744563834885}
+--- !u!114 &6249997067289295144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8984296238825137311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d27a627c9810454eb4fa7a2d893bfc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCSchedule
+  Schedule:
+    Activities:
+    - LocationData: {fileID: 11400000, guid: ec0871cb5f9fb0647a6016189817af58, type: 2}
+      StartHour: 7
+      StartMinute: 0
+      EndHour: 14
+      EndMinute: 0
+    - LocationData: {fileID: 11400000, guid: b29a0de0e8979a346afc347eafe07805, type: 2}
+      StartHour: 16
+      StartMinute: 0
+      EndHour: 19
+      EndMinute: 0
 --- !u!1001 &7959179005760810198
 PrefabInstance:
   m_ObjectHideFlags: 0

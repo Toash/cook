@@ -19,6 +19,7 @@ EasyRoads3D/
 EasyRoads3D scenes/
 ProceduralUIImage/
 EVP5/
+ithappy/
 
 # Ignore the auto-generated AOT compatibility dll.
 /Assets/Plugins/Sirenix/Assemblies/AOT/*

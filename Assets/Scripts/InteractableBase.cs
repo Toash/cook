@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -10,11 +11,11 @@ public abstract class InteractableBase : MonoBehaviour
 
     [Tooltip("Root object for whatever visually represents this item.")]
     public GameObject VisualRoot;
-    // public virtual string HoverTooltip { get; set; } = "";
     public string HoverTooltip = "";
-    // List<Outline> outlines = new();
 
     Outline outline = null;
+
+    public event Action<InteractionContext> OnInteract;
     void Awake()
     {
         SetLayer();
@@ -65,6 +66,14 @@ public abstract class InteractableBase : MonoBehaviour
 
     public virtual void OnHoverEnter() { }
     public virtual void OnHoverExit() { }
+    public void BaseInteract(InteractionContext context)
+    {
+        OnInteract?.Invoke(context);
+        Interact(context);
+    }
+
+
     public abstract void Interact(InteractionContext context);
+
 
 }

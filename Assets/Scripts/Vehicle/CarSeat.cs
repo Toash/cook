@@ -9,12 +9,12 @@ public class CarSeat : InteractableBase, IConstrainer
     [ReadOnly]
     public Player PlayerInSeat;
     // where the player should snap to.
-    public Transform Seat;
-    public Transform GetOut;
+    public Transform SeatPosition;
+    public Transform GetOutPosition;
     public override void Interact(InteractionContext context)
     {
         PlayerInSeat = context.Player;
-        PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, Seat, GetOut));
+        PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, SeatPosition, GetOutPosition));
 
     }
 
@@ -26,16 +26,16 @@ public class CarSeat : InteractableBase, IConstrainer
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        if (Seat != null)
+        if (SeatPosition != null)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawSphere(Seat.position, .2f);
+            Gizmos.DrawSphere(SeatPosition.position, .2f);
         }
 
-        if (GetOut != null)
+        if (GetOutPosition != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawSphere(GetOut.position, .2f);
+            Gizmos.DrawSphere(GetOutPosition.position, .2f);
         }
 
 

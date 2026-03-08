@@ -16,7 +16,6 @@ public class OrderReceipt : MonoBehaviour
     // TODO reference to text in world space ui
 
     public Snapper Snapper { get; private set; }
-    public PhysicsGrabbable Grabbable { get; private set; }
 
     void OnValidate()
     {
@@ -27,7 +26,6 @@ public class OrderReceipt : MonoBehaviour
     }
     void Awake()
     {
-        Grabbable = GetComponent<PhysicsGrabbable>();
         Snapper = GetComponent<Snapper>();
         Snapper.SetSnapType(SnapType.Receipt);
     }
@@ -39,7 +37,7 @@ public class OrderReceipt : MonoBehaviour
 
 
 #if UNITY_EDITOR
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Handles.Label(transform.position, "OrderReceipt with ID: " + OrderID);
     }

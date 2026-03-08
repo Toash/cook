@@ -104,7 +104,7 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         GUIStyle style = new GUIStyle();

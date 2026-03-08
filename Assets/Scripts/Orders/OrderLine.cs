@@ -83,17 +83,14 @@ public class OrderLine : MonoBehaviour
 
 
 #if UNITY_EDITOR
-    void OnDrawGizmos()
+
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, .3f);
         Gizmos.DrawLine(transform.position, transform.position + transform.forward);
 
         Handles.Label(transform.position, "OrderLine");
-    }
-
-    private void OnDrawGizmosSelected()
-    {
         foreach (var npc in Line)
         {
             var pos = GetLinePositionForNPC(npc);

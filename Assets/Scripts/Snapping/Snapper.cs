@@ -23,7 +23,6 @@ public class Snapper : MonoBehaviour
     [ShowInInspector]
     public SnapType SnapType { get; private set; }
 
-    [Sirenix.OdinInspector.ReadOnly]
     public List<SnapConnection> SnapConnections = new List<SnapConnection>();
 
 

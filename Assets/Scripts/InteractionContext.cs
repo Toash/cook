@@ -11,9 +11,7 @@ public class InteractionContext
 {
     public InteractType Type;
     public Player Player;
-    public PlayerController Controller;
-    public PlayerInteraction Interaction;
-    public PlayerPhysicsGrabber Grabber;
+
 
     public InteractionContext(InteractType type, Player player)
     {

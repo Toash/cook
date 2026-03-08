@@ -8,6 +8,7 @@ using UnityEngine;
 /// Represenets an actual ingredient in the world
 /// </summary>
 [RequireComponent(typeof(Snapper))]
+[RequireComponent(typeof(Holdable))]
 public class Ingredient : MonoBehaviour
 {
     public IngredientData Data;

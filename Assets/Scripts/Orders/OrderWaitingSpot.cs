@@ -5,7 +5,7 @@ public class OrderWaitingSpot : MonoBehaviour
 {
 
 #if UNITY_EDITOR
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Handles.Label(transform.position, "Order Waiting Spot");
 

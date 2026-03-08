@@ -32,7 +32,7 @@ public class OrderReceiptPrinter : MonoBehaviour
 
 
 #if UNITY_EDITOR
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Handles.Label(transform.position, "Receipt printer");
         if (SpawnLocation != null)

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
+    public int StartTimeSeconds = 18000;
     public float TimeSpeed;
     public float TimeScale;
 
@@ -36,6 +37,15 @@ public class TimeManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             I = this;
         }
+    }
+    void Start()
+    {
+        StartDay();
+    }
+
+    public void StartDay()
+    {
+        timeInSeconds = StartTimeSeconds;
     }
 
     public int GetHour()
@@ -94,13 +104,14 @@ public class TimeManager : MonoBehaviour
 
 #if UNITY_EDITOR
     GUIStyle style = new();
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         style.normal.textColor = Color.blue;
         style.fontStyle = FontStyle.Bold;
         style.fontSize = 24;
         string message = "Current Time: " + Get24HourTime() + "\n";
         message += "Time scale: " + TimeScale + "\n";
+        message += "Normalized time: " + GetNormalizedTime().ToString("F2");
         Handles.Label(transform.position, message, style);
 
 

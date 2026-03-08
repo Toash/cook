@@ -1,5 +1,7 @@
 ﻿using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace Assets.Scripts.World
@@ -24,13 +26,13 @@ namespace Assets.Scripts.World
             }
         }
 
-        [ShowInInspector]
-        public Dictionary<LocationData, Location> Locations;
+        [ShowInInspector, ReadOnly]
+        private Dictionary<LocationData, Location> locationRegistry;
 
 
         public Location GetLocation(LocationData data)
         {
-            if (Locations.TryGetValue(data, out var loc))
+            if (locationRegistry.TryGetValue(data, out Location loc))
             {
                 return loc;
             }
@@ -40,14 +42,34 @@ namespace Assets.Scripts.World
 
         void Start()
         {
-            foreach (var kv in Locations)
+
+            locationRegistry = new();
+            Location[] locations = FindObjectsByType<Location>(FindObjectsSortMode.None);
+            foreach (var location in locations)
             {
-                Location location = kv.Value;
-                LocationData locationData = kv.Key;
-                location.SO = locationData;
+                if (location.SO == null)
+                {
+                    Debug.LogError("[LocationManager]: Scriptable Object not found on a location.");
+                }
+
+                locationRegistry.Add(location.SO, location);
             }
         }
 
+#if UNITY_EDITOR
+        void OnDrawGizmosSelected()
+        {
+            if (locationRegistry == null) return;
+            foreach (var kv in locationRegistry)
+            {
+                var location = kv.Value;
+                if (location == null) continue;
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(location.transform.position, .5f);
+                Handles.Label(location.transform.position, "Location: " + location.SO.Name);
+            }
+        }
+#endif
 
     }
 }

@@ -20,6 +20,7 @@ namespace Assets.Scripts.World
 
         public override string ToString()
         {
+            if (LocationData == null) return "No location data";
             return LocationData.Name;
         }
 

@@ -12,6 +12,7 @@ using UnityEngine;
 /// <br/>
 /// </summary>
 [RequireComponent(typeof(Snapper))]
+[RequireComponent(typeof(Holdable))]
 public class OrderContainer : MonoBehaviour
 {
 
@@ -20,11 +21,9 @@ public class OrderContainer : MonoBehaviour
 
     public OrderReceipt Receipt;
     private Snapper snapper;
-    private PhysicsGrabbable grabbable;
 
     void Awake()
     {
-        grabbable = GetComponent<PhysicsGrabbable>();
         snapper = GetComponent<Snapper>();
         snapper.SetSnapType(SnapType.Container);
     }
