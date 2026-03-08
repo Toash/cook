@@ -116,7 +116,7 @@ public class PlayerInteraction : MonoBehaviour
         // based on raycast
         if (hoveredInteractable != null)
         {
-            hoveredInteractable.Interact(context);
+            hoveredInteractable.BaseInteract(context);
         }
 
     }

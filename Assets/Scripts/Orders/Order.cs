@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.InputSystem.Android;
+using Assets.Scripts.Ingredient.MenuItem;
 
 
 /// <summary>
@@ -17,7 +18,7 @@ using UnityEngine.InputSystem.Android;
 public class Order
 {
     public NPC Owner;
-    public List<MenuItem> MenuItems;
+    public List<Assets.Scripts.Ingredient.MenuItem.MenuItem> MenuItems;
     public int Payout;
 
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace Assets.Scripts.World
 {
@@ -7,7 +8,9 @@ namespace Assets.Scripts.World
     /// </summary>
     public class Location : MonoBehaviour
     {
-        [HideInInspector]
+        /// <summary>
+        /// The data object that describes this location. Used to query locations
+        /// </summary>
         public LocationData SO;
     }
 }

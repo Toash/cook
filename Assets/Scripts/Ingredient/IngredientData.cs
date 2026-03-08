@@ -21,5 +21,7 @@ public class IngredientData : ScriptableObject
     public string Name;
     public Texture2D Image;
 
+    public Ingredient Prefab;
+
 
 }

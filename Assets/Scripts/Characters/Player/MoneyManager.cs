@@ -1,4 +1,6 @@
 using System;
+using IngameDebugConsole;
+using Sirenix.OdinInspector;
 using UnityEngine;
 public class MoneyManager : MonoBehaviour
 {
@@ -14,10 +16,30 @@ public class MoneyManager : MonoBehaviour
         return money;
     }
 
+    [ConsoleMethod("AddMoney", "Add money.")]
+    public static void StaticAddMoney(float money)
+    {
+        if (I == null) return;
+        I.AddMoney(money);
+
+    }
     public void AddMoney(float money)
     {
-        this.money = Math.Max(this.money + money, 0);
+        I.money = Math.Max(I.money + money, 0);
     }
+
+
+    public bool TryTake(float amount)
+    {
+        if (amount > money) return false;
+
+        this.money -= amount;
+
+        return true;
+    }
+
+
+
 
 
     void Awake()
@@ -33,6 +55,9 @@ public class MoneyManager : MonoBehaviour
             I = this;
         }
     }
+
+
+
 
 
 }

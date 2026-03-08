@@ -24,6 +24,7 @@ public class WheelControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (wheelModel == null) return;
         // Get the Wheel collider's world pose values and
         // use them to set the wheel model's position and rotation
         WheelCollider.GetWorldPose(out position, out rotation);

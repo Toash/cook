@@ -33,6 +33,11 @@ public class SnapArea : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Gets the location that should be snapped to.
+    /// </summary>
+    /// <param name="placementInfo"></param>
+    /// <returns></returns>
     public Vector3 GetSnapPoint(PlacementInfo placementInfo)
     {
         if (SnapToCenter)
@@ -45,6 +50,11 @@ public class SnapArea : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gets the rotation that should be snapped to.
+    /// </summary>
+    /// <param name="placementInfo"></param>
+    /// <returns></returns>
     public Quaternion GetSnapRotation(PlacementInfo placementInfo)
     {
         if (SnapToCenter)

@@ -140,18 +140,24 @@ public class NPCBrain : MonoBehaviour
 
 #if UNITY_EDITOR
     GUIStyle style = new();
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         style.normal.textColor = Color.blue;
         style.fontStyle = FontStyle.Bold;
+        string message = "";
+        if (InitialState != null)
+        {
+            message += "Initial State: " + InitialState.StateName + "\n";
+        }
         if (CurrentState != null)
         {
-            Handles.Label(transform.position, "Current State: " + CurrentState.StateName, style);
+            message += "CurrentState: " + CurrentState.StateName + "\n";
         }
+        Handles.Label(transform.position, message, style);
 
         if (CurrentFoodTruck != null)
         {
-            Handles.Label(transform.position + (Vector3.up * .1f), "In food truck", style);
+            Handles.Label(transform.position + (Vector3.up * .3f), "In food truck", style);
         }
 
     }

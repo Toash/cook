@@ -47,13 +47,12 @@ public class Holdable : InteractableBase
     {
         OnHeld?.Invoke(context);
         // context.Player.ItemHolder.TryHold(GetHoldableRoot());
-        context.Player.ItemHolder.TryHold(this);
+        if (context.Type == InteractType.Primary)
+        {
+            context.Player.ItemHolder.TryHold(this);
+        }
 
         beingHeld = true;
-    }
-    public void SecondaryInteract(InteractionContext context)
-    {
-        OnSecondaryInteract.Invoke(context);
     }
 
 

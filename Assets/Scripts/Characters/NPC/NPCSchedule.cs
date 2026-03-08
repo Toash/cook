@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Assets.Scripts.Characters.NPC
 {
     /// <summary>
-    /// Invokes events when entering and exiting activities.
+    /// Invokes events when time to enter and exit activities.
     /// </summary>
     public class NPCSchedule : MonoBehaviour
     {
@@ -18,20 +18,33 @@ namespace Assets.Scripts.Characters.NPC
         public event Action<Activity> ActivityEnter;
         public event Action<Activity> ActivityExit;
 
-        private void OnValidate()
+        void Start()
         {
             if (Schedule.HasOverlaps())
             {
                 Debug.LogError("NPC Schedule has overlaps!");
             }
-        }
-        void OnEnable()
-        {
             TimeManager.I.MinuteChanged += OnMinuteChanged;
+            ActivityEnter += OnActivityEnter;
+            ActivityExit += OnActivityExit;
         }
-        void OnDisable()
+        void OnDestroy()
         {
             TimeManager.I.MinuteChanged -= OnMinuteChanged;
+            ActivityEnter -= OnActivityEnter;
+            ActivityExit -= OnActivityExit;
+        }
+
+
+        void OnActivityEnter(Activity activity)
+        {
+            Debug.Log("[NPCSchedule]: Entered activity " + activity);
+
+        }
+        void OnActivityExit(Activity activity)
+        {
+            Debug.Log("[NPCSchedule]: Exited activity " + activity);
+
         }
 
 

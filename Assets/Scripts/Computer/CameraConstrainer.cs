@@ -12,13 +12,13 @@ public class CameraConstrainer : InteractableBase
     public override void Interact(InteractionContext context)
     {
         // constrain the player camera
-        context.Controller.ConstrainCamera(camTarget.position, camTarget.rotation);
-        context.Controller.UnlockCursor();
+        context.Player.Controller.ConstrainCamera(camTarget.position, camTarget.rotation);
+        context.Player.Controller.UnlockCursor();
     }
 
 #if UNITY_EDITOR
     GUIStyle style = new GUIStyle();
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         if (camTarget == null) return;
         style.normal.textColor = Color.green;

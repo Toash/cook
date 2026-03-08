@@ -10,7 +10,8 @@ public class SnapConnection
     // public Snapper Other;
     // public bool IsOwner;
 
-    public Snapper Parent { get; private set; }
+    public Snapper Parent;
+
 
     public SnapConnection(Snapper parentSnapper)
     {
