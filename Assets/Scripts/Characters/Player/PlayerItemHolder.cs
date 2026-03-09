@@ -94,9 +94,9 @@ public class PlayerItemHolder : MonoBehaviour
                 }
             }
 
-            if (placementInfo.TryGetWorldPlacementPosAndRot(out var pos, out var rot))
+            if (placementInfo.TryGetWorldPlacementInfo(out Transform trans, out Vector3 pos, out Quaternion rot))
             {
-                TryPlaceOnSurface(pos, rot);
+                TryPlaceOnSurface(trans, pos, rot);
             }
         }
 
@@ -111,7 +111,7 @@ public class PlayerItemHolder : MonoBehaviour
             preview.Rotation = snapArea.GetSnapRotation(placementInfo);
         }
         // preview for place on world.
-        else if (placementInfo.TryGetWorldPlacementPosAndRot(out var worldPos, out var worldRot))
+        else if (placementInfo.TryGetWorldPlacementInfo(out var _, out Vector3 worldPos, out Quaternion worldRot))
         {
             preview.IsShowing = true;
             preview.Position = worldPos;
@@ -203,14 +203,14 @@ public class PlayerItemHolder : MonoBehaviour
     /// Tries to place the held item if it can.
     /// </summary>
     /// <param name="pos"></param>
-    public bool TryPlaceOnSurface(Vector3 pos, Quaternion rot)
+    public bool TryPlaceOnSurface(Transform surface, Vector3 pos, Quaternion rot)
     {
         if (!isHolding) return false;
         Debug.Log("[PlayerItemHolder]: Trying to place on surface.");
 
 
         //place
-        itemInHand.transform.SetParent(null);
+        itemInHand.transform.SetParent(surface);
         itemInHand.transform.position = pos;
         itemInHand.transform.rotation = rot;
 

@@ -94,15 +94,23 @@ public class PlayerInteraction : MonoBehaviour
         InteractionContext context = new InteractionContext(type, GetComponent<Player>());
 
         // based on some player subsystem
-        if (Controller.IsCameraContrained == true)
+        // if (Controller.IsCameraContrained == true)
+        // {
+        //     Controller.UnConstrainCamera();
+        //     return;
+        // }
+
+
+        if (Controller.CurrentControlMode == PlayerMode.InPopup)
         {
-            Controller.UnConstrainCamera();
+            Controller.CloseCurrentPopup();
             return;
         }
 
-        if (Controller.IsBodyContrained == true)
+        if (Controller.CurrentControlMode == PlayerMode.BodyConstrained)
         {
             Controller.UnconstrainBody();
+            // Controller.SetPlayerMode(PlayerMode.FullGameplay);
             return;
         }
 
@@ -111,6 +119,7 @@ public class PlayerInteraction : MonoBehaviour
             player.ItemHolder.OnInteractAndHolding(context);
             return;
         }
+
 
 
         // based on raycast

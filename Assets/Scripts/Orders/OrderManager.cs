@@ -134,7 +134,7 @@ public class OrderManager : MonoBehaviour
         //TODO payout calculation
         float payout = order.Payout;
 
-        MoneyManager.I.AddMoney(payout);
+        MoneyManager.I.ChangeMoney(payout);
         Debug.Log("[OrderManager]: Returning order information.");
 
 

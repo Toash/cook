@@ -1,14 +1,27 @@
-using NUnit.Framework;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
+/// <summary>
+/// The mode that the player is in. Determines what are currently active in the player controller
+/// </summary>
+public enum PlayerMode
+{
+    FullGameplay, // default gameplay mode
+    BodyConstrained, // when the player should be physically constrained. For example, whilst driving
+    InPopup // when the player is in a ui popup
+}
+
+/// <summary>
+/// Contains functionality for physically controlling the player, and managing ui.
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     [Header("Stats")]
     public float MouseSens = .35f;
     public float MoveSpeed = 7;
+    public float SprintSpeedMultiplier = 1.8f;
     public float Acceleration = 2f;
 
     private float speedMultiplier = 1;
@@ -28,6 +41,7 @@ public class PlayerController : MonoBehaviour
     public InputActionReference Look;
     public InputActionReference Jump;
     public InputActionReference RightClick;
+    public InputActionReference SprintKey;
 
     // events
     public event System.Action BodyConstrained;
@@ -35,6 +49,14 @@ public class PlayerController : MonoBehaviour
     public event System.Action CameraConstrained;
     public event System.Action CameraUnconstrained;
 
+    public event System.Action<PopupType> PopupShow;
+    public event System.Action<PopupType> PopupHide;
+
+    // the current popup that is being displayed, if the player is in a popup.
+    private PopupType currentPopupType;
+
+
+    public PlayerMode CurrentControlMode { get; private set; }
 
     Vector3 moveVelocity = Vector3.zero;
     Vector3 wishVelocity = Vector3.zero;
@@ -50,10 +72,11 @@ public class PlayerController : MonoBehaviour
     Quaternion constrainedCameraRot;
 
     ConstrainedContext constrainedContext;
+    bool sprinting;
 
 
-    public bool IsBodyContrained { get; private set; } = false;
-    public bool IsCameraContrained { get; private set; } = false;
+    // public bool IsBodyContrained { get; private set; } = false;
+    // public bool IsCameraContrained { get; private set; } = false;
 
     void Awake()
     {
@@ -66,19 +89,39 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        HandleCameraConstraint();
+        // HandleCameraConstraint();
+        switch (CurrentControlMode)
+        {
+            case PlayerMode.FullGameplay:
+                HandleGravity();
+                HandleJumping();
+                HandleWishVelocity();
+                HandleAcceleratingVelocity();
+                HandleLooking();
+                break;
+            case PlayerMode.BodyConstrained:
+                moveVelocity = Vector3.zero;
+                HandleGravity();
+                HandleLooking();
+                break;
+            case PlayerMode.InPopup:
+                moveVelocity = Vector3.zero;
+                // Cursor.lockState = CursorLockMode.None;
+                HandleGravity();
+                break;
+        }
 
-        HandleGravity();
-        if (!IsCameraContrained && !IsBodyContrained)
-        {
-            HandleJumping();
-            HandleWishVelocity();
-            HandleAcceleratingVelocity();
-        }
-        if (!IsCameraContrained)
-        {
-            HandleLooking();
-        }
+        // HandleGravity();
+        // if (!IsCameraContrained && !IsBodyContrained)
+        // {
+        //     HandleJumping();
+        //     HandleWishVelocity();
+        //     HandleAcceleratingVelocity();
+        // }
+        // if (!IsCameraContrained)
+        // {
+        //     HandleLooking();
+        // }
 
 
 
@@ -89,32 +132,49 @@ public class PlayerController : MonoBehaviour
         }
 
     }
-
-    void HandleCameraConstraint()
+    public void SetPlayerMode(PlayerMode mode)
     {
-
-        if (IsCameraContrained)
+        Debug.Log("[PlayerController]: Setting player mode to " + mode.ToString());
+        var from = CurrentControlMode;
+        switch (mode)
         {
-            CamRoot.position = Vector3.Lerp(CamRoot.position, constrainedCameraPos, Time.deltaTime * ConstrainSpeed);
-            CamRoot.rotation = Quaternion.Slerp(CamRoot.rotation, constrainedCameraRot, Time.deltaTime * ConstrainSpeed);
-        }
-        else
-        {
-            CamRoot.localPosition = Vector3.Lerp(CamRoot.localPosition, initialLocalCameraPos, Time.deltaTime * ConstrainSpeed);
-            // CamRoot.rotation = Quaternion.Slerp(CamRoot.rotation, constrainedCameraRot, Time.deltaTime * ConstrainSpeed);
+            case PlayerMode.FullGameplay:
+                Cursor.lockState = CursorLockMode.Locked;
+                break;
+
+            case PlayerMode.BodyConstrained:
+                break;
+
+            case PlayerMode.InPopup:
+                Cursor.lockState = CursorLockMode.None;
+                break;
 
         }
+        CurrentControlMode = mode;
 
 
     }
 
-    public void UnlockCursor()
+
+    public void ShowPopup(PopupType type)
     {
-        Cursor.lockState = CursorLockMode.None;
+        if (CurrentControlMode == PlayerMode.InPopup) return;
+        if (type == PopupType.None) return;
+
+        PopupShow?.Invoke(type);
+        currentPopupType = type;
+
+        SetPlayerMode(PlayerMode.InPopup);
     }
-    public void LockCursor()
+
+    public void CloseCurrentPopup()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        if (CurrentControlMode != PlayerMode.InPopup) return;
+
+        PopupHide?.Invoke(currentPopupType);
+        currentPopupType = PopupType.None;
+
+        SetPlayerMode(PlayerMode.FullGameplay);
     }
 
     /// <summary>
@@ -123,30 +183,34 @@ public class PlayerController : MonoBehaviour
     /// <param name="constraint"></param>
     public void ConstrainBody(ConstrainedContext constrainedContext)
     {
-        if (IsBodyContrained) return;
+        if (CurrentControlMode == PlayerMode.BodyConstrained) return;
         Debug.Log("[PlayerController]: Constrained Body");
-        IsBodyContrained = true;
+        // IsBodyContrained = true;
+        SetPlayerMode(PlayerMode.BodyConstrained);
         moveVelocity = Vector3.zero;
 
+        // character controller does not like teleporting. disable before doing so.
         CharController.enabled = false;
 
         this.constrainedContext = constrainedContext;
-
 
         transform.position = constrainedContext.Constraint.position;
         transform.rotation = constrainedContext.Constraint.rotation;
         transform.SetParent(constrainedContext.Constraint);
 
-
         BodyConstrained?.Invoke();
     }
     public void UnconstrainBody()
     {
-        if (!IsBodyContrained) return;
+        if (CurrentControlMode != PlayerMode.BodyConstrained) return;
+        if (constrainedContext == null)
+        {
+            Debug.LogError("[PlayerController]: Constrained context does not exist when trying to constrain.");
+            return;
+        }
         Debug.Log("[PlayerController]: UnConstrained Body");
-        IsBodyContrained = false;
+        SetPlayerMode(PlayerMode.FullGameplay);
         moveVelocity = Vector3.zero;
-
         constrainedContext.Constrainer.OnUnConstrained();
         transform.position = constrainedContext.UnConstraint.position;
         transform.rotation = constrainedContext.UnConstraint.rotation;
@@ -157,41 +221,6 @@ public class PlayerController : MonoBehaviour
 
 
         BodyUnconstrained?.Invoke();
-    }
-    /// <summary>
-    /// Lock camera at a position and rotation. Used for interacting with world screens.
-    /// </summary>
-    /// <param name="pos"></param>
-    /// <param name="rot"></param>
-    public void ConstrainCamera(Vector3 pos, Quaternion rot)
-    {
-        IsCameraContrained = true;
-        moveVelocity = Vector3.zero;
-        // CamRoot.position = pos;
-        // CamRoot.rotation = rot;
-        constrainedCameraPos = pos;
-        constrainedCameraRot = rot;
-
-        CameraConstrained?.Invoke();
-    }
-
-    public void UnConstrainCamera()
-    {
-        Debug.Log("UnConstrained");
-        IsCameraContrained = false;
-
-
-        // sync the yaw and pitch back.
-        yaw = transform.localEulerAngles.y;
-        float rawPitch = CamRoot.localEulerAngles.x;
-        if (rawPitch > 180f)
-            rawPitch -= 360f;
-
-        pitch = rawPitch;
-
-        // REMOVE ME ASAP!@@!@@!@!!@@!
-        LockCursor();
-        CameraUnconstrained?.Invoke();
     }
 
     void HandleGravity()
@@ -225,10 +254,14 @@ public class PlayerController : MonoBehaviour
     }
     void HandleWishVelocity()
     {
+        sprinting = SprintKey.action.IsPressed();
+
         Vector2 input = Move.action.ReadValue<Vector2>();
         input.Normalize();
         // moveVelocity = new Vector3(input.x, 0, input.y) * moveSpeed;
-        wishVelocity = ((transform.right * input.x) + (transform.forward * input.y)) * MoveSpeed * speedMultiplier;
+
+        float sprintMult = sprinting ? SprintSpeedMultiplier : 1;
+        wishVelocity = ((transform.right * input.x) + (transform.forward * input.y)) * MoveSpeed * sprintMult * speedMultiplier;
         // moveVelocity = ((transform.right * input.x) + (transform.forward * input.y)) * MoveSpeed * speedMultiplier;
 
     }

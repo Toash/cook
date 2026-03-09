@@ -42,21 +42,25 @@ public class PlacementInfo
     /// <param name="pos"></param>
     /// <param name="rot"></param>
     /// <returns></returns>
-    public bool TryGetWorldPlacementPosAndRot(out Vector3 pos, out Quaternion rot)
+    public bool TryGetWorldPlacementInfo(out Transform trans, out Vector3 pos, out Quaternion rot)
     {
         if (!WorldRaycastValid)
         {
+            trans = null;
             pos = Vector3.zero;
             rot = Quaternion.identity;
             return false;
         }
         else
         {
+            trans = WorldRaycastHit.transform;
             pos = WorldRaycastHit.point;
             rot = Quaternion.Euler(0, WorldPlacementYaw, 0);
             return true;
         }
 
     }
+
+
 
 }

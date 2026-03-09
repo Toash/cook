@@ -1,14 +1,18 @@
 using UnityEngine.Events;
 
-public class Button : InteractableBase
+namespace Assets.Scripts.Generic
 {
-
-    public UnityEvent Pressed;
-
-
-    public override void Interact(InteractionContext context)
+    public class Button : InteractableBase
     {
-        UnityEngine.Debug.Log("Pressed button");
-        Pressed?.Invoke();
+
+        public UnityEvent Pressed;
+
+
+        public override void Interact(InteractionContext context)
+        {
+            UnityEngine.Debug.Log("Pressed button");
+            Pressed?.Invoke();
+        }
     }
+
 }

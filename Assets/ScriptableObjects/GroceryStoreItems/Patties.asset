@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a751953b43f8894cad383c0c66b7bf6, type: 3}
+  m_Name: Patties
+  m_EditorClassIdentifier: Assembly-CSharp::GroceryStoreItem
+  Ingredient: {fileID: 11400000, guid: 0fd90f4aa75e00844845c8eff566dc64, type: 2}
+  Amount: 5
+  Price: 5

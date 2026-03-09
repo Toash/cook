@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -5,20 +6,23 @@ using UnityEngine;
 
 
 /// <summary>
-/// Place to buy ingredients
+/// Contains method to buy ingredients, and instantiate those in the world.
 /// </summary>
 public class GroceryStore : MonoBehaviour
 {
+    // prefab for spawning in containers
     public HoldableContainer Container;
-    public List<GroceryStoreItem> StoreItems;
+    public List<GroceryStoreItem> Inventory;
 
 
     public LoadingArea LoadingArea;
 
+    public event Action OnBuy;
+
     void OnValidate()
     {
         HashSet<GroceryStoreItem> visited = new();
-        foreach (var item in StoreItems)
+        foreach (var item in Inventory)
         {
             if (visited.Contains(item))
             {
@@ -48,6 +52,7 @@ public class GroceryStore : MonoBehaviour
             {
                 HoldableContainer container = Instantiate(Container, LoadingArea.transform.position, Quaternion.identity);
                 container.Init(holdable, item.Amount);
+                OnBuy?.Invoke();
             }
             else
             {

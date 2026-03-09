@@ -9,6 +9,7 @@ public class MoneyManager : MonoBehaviour
 
     private float money;
 
+    private event Action MoneyChanged;
 
 
     public float GetMoney()
@@ -17,15 +18,16 @@ public class MoneyManager : MonoBehaviour
     }
 
     [ConsoleMethod("AddMoney", "Add money.")]
-    public static void StaticAddMoney(float money)
+    public static void StaticChangeMoney(float money)
     {
         if (I == null) return;
-        I.AddMoney(money);
+        I.ChangeMoney(money);
 
     }
-    public void AddMoney(float money)
+    public void ChangeMoney(float money)
     {
         I.money = Math.Max(I.money + money, 0);
+        MoneyChanged?.Invoke();
     }
 
 
@@ -33,9 +35,14 @@ public class MoneyManager : MonoBehaviour
     {
         if (amount > money) return false;
 
-        this.money -= amount;
+        ChangeMoney(-amount);
 
         return true;
+    }
+
+    public bool HasMoney(float amount)
+    {
+        return amount <= money;
     }
 
 

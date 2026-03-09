@@ -3,6 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Handles the visual representation of a character
+/// 
 /// </summary>
 public class CharacterVisual : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class CharacterVisual : MonoBehaviour
     public Transform VisualRoot;
     public Moveable Moveable;
     public Animator Animator;
-    public string MovementBlendTreeParameter = "MovementBlend";
+    public string MovementBlendTreeParameter = "Vert";
 
     [ShowInInspector, ReadOnly]
     Transform lookAtTarget;
@@ -32,8 +33,15 @@ public class CharacterVisual : MonoBehaviour
     {
         if (Moveable != null)
         {
-            // todo update this
-            Animator.SetFloat(MovementBlendTreeParameter, Moveable.GetMoveSpeed());
+            // todo update this for any speed
+            if (Moveable.GetMoveSpeed() > .1f)
+            {
+                Animator.SetFloat(MovementBlendTreeParameter, 1);
+            }
+            else
+            {
+                Animator.SetFloat(MovementBlendTreeParameter, 0);
+            }
         }
 
         HandleLookDir();

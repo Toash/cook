@@ -1,4 +1,4 @@
-using Unity.Mathematics;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,9 +11,10 @@ public class CameraConstrainer : InteractableBase
     public Transform camTarget;
     public override void Interact(InteractionContext context)
     {
-        // constrain the player camera
-        context.Player.Controller.ConstrainCamera(camTarget.position, camTarget.rotation);
-        context.Player.Controller.UnlockCursor();
+        throw new NotImplementedException();
+        // // constrain the player camera
+        // context.Player.Controller.ConstrainCamera(camTarget.position, camTarget.rotation);
+        // context.Player.Controller.UnlockCursor();
     }
 
 #if UNITY_EDITOR

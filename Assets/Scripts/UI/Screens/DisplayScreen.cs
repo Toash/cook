@@ -9,7 +9,7 @@ using UnityEngine.Events;
 public class DisplayScreen : MonoBehaviour
 {
 
-    public bool HasToBeConstrainedToUse = true;
+    // public bool HasToBeConstrainedToUse = true;
     // screen raycast
     public LayerMask RaycastMask = ~0;
     public float MaxRaycastDistance = 5.0f;
@@ -28,7 +28,7 @@ public class DisplayScreen : MonoBehaviour
     // send normalized quad input to input relayer
     void Update()
     {
-        if (HasToBeConstrainedToUse && !player.Controller.IsCameraContrained) return;
+        // if (HasToBeConstrainedToUse && !player.Controller.IsCameraContrained) return;
 #if ENABLE_LEGACY_INPUT_MANAGER
         Vector3 mousePos = Input.mousePosition;
 #else

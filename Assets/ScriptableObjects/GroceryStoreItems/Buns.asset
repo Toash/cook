@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Buns
   m_EditorClassIdentifier: Assembly-CSharp::GroceryStoreItem
   Ingredient: {fileID: 11400000, guid: 741da3d437771584ca16a0d8652b63ba, type: 2}
+  Amount: 5
   Price: 5
