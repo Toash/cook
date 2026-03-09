@@ -13,7 +13,10 @@ public class InteractionHit
 [RequireComponent(typeof(Player))]
 public class PlayerInteraction : MonoBehaviour
 {
+    [Header("Stats")]
     public float InteractRange = 3;
+
+    [Header("References")]
     public PlayerController Controller;
     public Transform CamRoot;
     public InputActionReference PrimaryInteract;
@@ -85,7 +88,7 @@ public class PlayerInteraction : MonoBehaviour
         oldInteractable?.SetOutline(false);
         newInteractable?.SetOutline(true);
 
-        OnInteractableChanged.Invoke(newInteractable);
+        OnInteractableChanged?.Invoke(newInteractable);
 
     }
 

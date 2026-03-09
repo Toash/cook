@@ -75,10 +75,10 @@ public class Holdable : InteractableBase
         foreach (Holdable holdable in holdables)
         {
             GameObject holdableVisualRoot = Instantiate(holdable.VisualRoot, holdable.VisualRoot.transform.position, holdable.VisualRoot.transform.rotation);
-            holdableVisualRoot.layer = LayerMask.NameToLayer("Holding");
+            holdableVisualRoot.layer = LayerMask.NameToLayer("Overlay");
             foreach (var obj in holdableVisualRoot.GetComponentsInChildren<Transform>())
             {
-                obj.gameObject.layer = LayerMask.NameToLayer("Holding");
+                obj.gameObject.layer = LayerMask.NameToLayer("Overlay");
             }
             if (i == 0)
             {

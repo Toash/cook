@@ -35,7 +35,7 @@ public class Ingredient : MonoBehaviour
     {
         if (TryGetComponent<InteractableBase>(out var interactable))
         {
-            interactable.HoverTooltip = Data.Type.ToString();
+            interactable.HoverTooltipData = new HoverTooltipData(transform, Data.Name);
         }
     }
 

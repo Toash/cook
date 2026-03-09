@@ -10,7 +10,7 @@ namespace Assets.Scripts.Generic
 
         public override void Interact(InteractionContext context)
         {
-            UnityEngine.Debug.Log("Pressed button");
+            // UnityEngine.Debug.Log("Pressed button");
             Pressed?.Invoke();
         }
     }

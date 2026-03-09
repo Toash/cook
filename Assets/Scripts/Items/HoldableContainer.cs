@@ -77,7 +77,8 @@ public class HoldableContainer : MonoBehaviour
         }
         message += currentAmount + "/" + MaxAmount;
 
-        holdable.HoverTooltip = message;
+        var data = new HoverTooltipData(transform, message);
+        holdable.HoverTooltipData = data;
     }
 
 

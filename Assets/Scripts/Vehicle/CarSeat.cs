@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,16 +12,23 @@ public class CarSeat : InteractableBase, IConstrainer
     // where the player should snap to.
     public Transform SeatPosition;
     public Transform GetOutPosition;
+
+    public event Action GotInSeat;
+    public event Action GotOutSeat;
+
+
     public override void Interact(InteractionContext context)
     {
         PlayerInSeat = context.Player;
         PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, SeatPosition, GetOutPosition));
 
+        GotInSeat?.Invoke();
     }
 
     public void OnUnConstrained()
     {
         PlayerInSeat = null;
+        GotOutSeat?.Invoke();
     }
 
 #if UNITY_EDITOR
