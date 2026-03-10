@@ -199,6 +199,7 @@ public class PlayerController : MonoBehaviour
         transform.SetParent(constrainedContext.Constraint, true);
 
         BodyConstrained?.Invoke();
+
     }
     public void UnconstrainBody()
     {

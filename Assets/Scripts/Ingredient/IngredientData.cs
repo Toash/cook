@@ -14,14 +14,12 @@ public enum IngredientType
 /// <summary>
 /// Data for an ingredient
 /// </summary>
-[CreateAssetMenu(fileName = "IngredientData", menuName = "Food/IngredientData")]
-public class IngredientData : ScriptableObject
+[CreateAssetMenu(fileName = "IngredientData", menuName = "Items/IngredientData")]
+public class IngredientData : ItemData
 {
     public IngredientType Type;
-    public string Name;
     public Texture2D Image;
 
-    public Ingredient Prefab;
 
 
 }

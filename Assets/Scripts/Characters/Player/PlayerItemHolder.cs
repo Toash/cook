@@ -176,7 +176,10 @@ public class PlayerItemHolder : MonoBehaviour
             foreach (var connection in snapper.SnapConnections)
             {
                 connection.Parent.ChildDetached(snapper);
+
             }
+
+            snapper.Detach();
             snapper.SnapConnections.Clear();
             snapper.transform.SetParent(null, true);
         }

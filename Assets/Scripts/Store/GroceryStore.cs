@@ -47,17 +47,11 @@ public class GroceryStore : MonoBehaviour
 
 
 
-            // create holdable conatiner
-            if (item.Ingredient.Prefab.TryGetComponent<Holdable>(out var holdable))
-            {
-                HoldableContainer container = Instantiate(Container, LoadingArea.transform.position, Quaternion.identity);
-                container.Init(holdable, item.Amount);
-                OnBuy?.Invoke();
-            }
-            else
-            {
-                Debug.LogError("[GroceryStore]: holdable on ingredient is null.");
-            }
+            HoldableContainer container = Instantiate(Container, LoadingArea.transform.position, Quaternion.identity);
+            container.Init(item.Ingredient, item.Amount);
+            OnBuy?.Invoke();
+
+
 
         }
         else

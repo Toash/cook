@@ -59,6 +59,12 @@ public class Snapper : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Snap this snapper to another snapper from their snap area.
+    /// </summary>
+    /// <param name="placementRaycastInfo"></param>
+    /// <param name="parentSnapper"></param>
+    /// <param name="parentSnapArea"></param>
     public void SnapToArea(PlacementInfo placementRaycastInfo, Snapper parentSnapper, SnapArea parentSnapArea)
     {
         if (!CanSnap(parentSnapper))
@@ -67,15 +73,37 @@ public class Snapper : MonoBehaviour
             return;
         }
 
+        // create snap connection
         SnapConnection thisConnection = new SnapConnection(parentSnapper);
         SnapConnections.Add(thisConnection);
         parentSnapper.ChildSnapped(this);
+
+
+        //disable rigidbody if it exists
+        if (TryGetComponent<Rigidbody>(out var rb))
+        {
+            rb.isKinematic = true;
+        }
+
 
 
         // actually place
         transform.position = parentSnapArea.GetSnapPoint(placementRaycastInfo);
         transform.rotation = parentSnapArea.GetSnapRotation(placementRaycastInfo);
         transform.SetParent(parentSnapper.transform, worldPositionStays: true);
+    }
+
+
+    /// <summary>
+    /// Called when this is detached from a snapper.
+    /// </summary>
+    public void Detach()
+    {
+        if (TryGetComponent<Rigidbody>(out var rb))
+        {
+            rb.isKinematic = false;
+        }
+
     }
 
 

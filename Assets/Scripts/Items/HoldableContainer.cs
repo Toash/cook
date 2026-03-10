@@ -1,6 +1,8 @@
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.XR;
 /// <summary>
 /// Container that holds multiple holdables.
 /// </summary>
@@ -8,42 +10,53 @@ using UnityEngine;
 public class HoldableContainer : MonoBehaviour
 {
 
-    [ReadOnly]
-    public Holdable ContainedHoldablePrefab { get; private set; }
+    [Tooltip("What this container contains.")]
+    public ItemData ContainedItem;
     public int MaxAmount = 5;
+
     private int currentAmount;
-
-
-    private Holdable holdable;
-    private Snapper snapper;
+    private Holdable thisHoldable;
+    private Holdable containedHoldable;
+    private bool initialized = false;
 
     void Awake()
     {
-        holdable = GetComponent<Holdable>();
+        thisHoldable = GetComponent<Holdable>();
     }
     void Start()
     {
-        if (ContainedHoldablePrefab == null)
+        if (containedHoldable == null)
         {
             Debug.Log("[HoldableContainer]: contained holdable prefab is null!");
         }
+        Init(ContainedItem, MaxAmount);
         UpdateTooltip();
+
     }
 
     void OnEnable()
     {
-        holdable.OnInteract += OnInteract;
+        thisHoldable.OnInteract += OnInteract;
     }
     void OnDisable()
     {
-        holdable.OnInteract -= OnInteract;
+        thisHoldable.OnInteract -= OnInteract;
     }
 
-    public void Init(Holdable holdable, int startingAmount)
+    public void Init(ItemData itemData, int startingAmount)
     {
-        ContainedHoldablePrefab = holdable;
+        if (initialized) return;
+        if (itemData == null) return;
+
+        ContainedItem = itemData;
+        containedHoldable = itemData.HoldablePrefab;
+
+        MaxAmount = startingAmount;
         currentAmount = startingAmount;
+
+        initialized = true;
     }
+
 
 
     void OnInteract(InteractionContext context)
@@ -60,7 +73,7 @@ public class HoldableContainer : MonoBehaviour
     {
         if (currentAmount <= 0) return;
 
-        Holdable holdable = Instantiate(ContainedHoldablePrefab);
+        Holdable holdable = Instantiate(containedHoldable);
         context.Player.ItemHolder.TryHold(holdable);
 
         currentAmount--;
@@ -71,17 +84,27 @@ public class HoldableContainer : MonoBehaviour
     void UpdateTooltip()
     {
         string message = "";
-        if (ContainedHoldablePrefab.TryGetComponent<Ingredient>(out var ingredient))
+        if (containedHoldable.TryGetComponent<Ingredient>(out var ingredient))
         {
             message += ingredient.Data.Name + "s ";
         }
         message += currentAmount + "/" + MaxAmount;
 
         var data = new HoverTooltipData(transform, message);
-        holdable.HoverTooltipData = data;
+        thisHoldable.HoverTooltipData = data;
     }
 
 
+#if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        if (ContainedItem != null)
+        {
+            Handles.Label(transform.position, ContainedItem.Name);
+        }
+
+    }
+#endif
 
 
 

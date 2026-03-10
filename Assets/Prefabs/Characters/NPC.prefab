@@ -453,7 +453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522c4b26916232c45aa524276d9022d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
-  InitialState: {fileID: 342488477072559919}
+  InitialStateString: NPCDailySchedule
   CurrentState: {fileID: 0}
   Agent: {fileID: 375583950525526969}
   CurrentFoodTruck: {fileID: 0}

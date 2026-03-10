@@ -19,7 +19,7 @@ public class NPCBrain : MonoBehaviour
 {
 
     [Header("States")]
-    public NPCState InitialState;
+    public string InitialStateString;
     [ReadOnly]
     public NPCState CurrentState;
 
@@ -28,7 +28,7 @@ public class NPCBrain : MonoBehaviour
 
     [Header("References")]
     public NPC NPC { get; private set; }
-    public NavMeshAgent Agent;
+    public NavMeshAgent Agent { get; private set; }
 
     // ------- FOOD TRUCK-----------------    
 
@@ -48,7 +48,8 @@ public class NPCBrain : MonoBehaviour
     private Rigidbody rb;
     public SphereCollider TriggerCol;
 
-    void OnValidate()
+
+    void Awake()
     {
         if (Agent == null)
         {
@@ -69,10 +70,6 @@ public class NPCBrain : MonoBehaviour
             TriggerCol.isTrigger = true;
             TriggerCol.gameObject.layer = LayerMask.NameToLayer("NPCTrigger");
         }
-    }
-
-    void Awake()
-    {
         foreach (Transform child in transform)
         {
             if (child.TryGetComponent<NPCState>(out var state))
@@ -86,8 +83,8 @@ public class NPCBrain : MonoBehaviour
     }
     void Start()
     {
-        CurrentState = InitialState;
-        CurrentState.OnEnter(this);
+        // CurrentState.OnEnter(this);
+        ChangeState(InitialStateString);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -113,7 +110,11 @@ public class NPCBrain : MonoBehaviour
     {
         if (RegisteredStates.TryGetValue(stateName, out NPCState state))
         {
-            CurrentState.OnExit(this);
+            if (CurrentState != null)
+            {
+                CurrentState.OnExit(this);
+
+            }
             CurrentState = state;
             state.OnEnter(this);
         }
@@ -145,9 +146,9 @@ public class NPCBrain : MonoBehaviour
         style.normal.textColor = Color.blue;
         style.fontStyle = FontStyle.Bold;
         string message = "";
-        if (InitialState != null)
+        if (InitialStateString != null)
         {
-            message += "Initial State: " + InitialState.StateName + "\n";
+            message += "Initial State: " + InitialStateString + "\n";
         }
         if (CurrentState != null)
         {

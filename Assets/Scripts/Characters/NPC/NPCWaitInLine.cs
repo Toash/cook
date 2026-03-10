@@ -17,8 +17,13 @@ public class NPCWaitInLine : NPCState
     }
     public override void OnEnter(NPCBrain brain)
     {
+
+        if (Brain.CurrentFoodTruck == null)
+        {
+            Debug.LogError("[NPC]: Current food truck is null!");
+        }
         Brain.CurrentFoodTruck.OrderLine.AddNPCToLine(brain);
-        brain.NPC.Visuals.SetLookAtTarget(brain.CurrentFoodTruck.OrderLine.NPCLookAt);
+        NPC.Visuals.SetLookAtTarget(brain.CurrentFoodTruck.OrderLine.NPCLookAt);
 
 
         // go to line position
