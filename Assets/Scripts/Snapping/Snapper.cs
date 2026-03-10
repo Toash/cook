@@ -75,7 +75,7 @@ public class Snapper : MonoBehaviour
         // actually place
         transform.position = parentSnapArea.GetSnapPoint(placementRaycastInfo);
         transform.rotation = parentSnapArea.GetSnapRotation(placementRaycastInfo);
-        transform.SetParent(parentSnapper.transform);
+        transform.SetParent(parentSnapper.transform, worldPositionStays: true);
     }
 
 

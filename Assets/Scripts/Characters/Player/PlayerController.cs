@@ -196,7 +196,7 @@ public class PlayerController : MonoBehaviour
 
         transform.position = constrainedContext.Constraint.position;
         transform.rotation = constrainedContext.Constraint.rotation;
-        transform.SetParent(constrainedContext.Constraint);
+        transform.SetParent(constrainedContext.Constraint, true);
 
         BodyConstrained?.Invoke();
     }

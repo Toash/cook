@@ -11,6 +11,7 @@ public abstract class InteractableBase : MonoBehaviour
     [Tooltip("Root object for whatever visually represents this item.")]
     public GameObject VisualRoot;
     // public string HoverTooltip = "";
+    [HideInInspector]
     public HoverTooltipData HoverTooltipData;
 
     Outline outline = null;

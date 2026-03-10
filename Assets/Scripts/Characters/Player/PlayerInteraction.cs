@@ -24,6 +24,7 @@ public class PlayerInteraction : MonoBehaviour
     public LayerMask InteractionMask;
 
     public event Action<InteractableBase> OnInteractableChanged;
+    public event Action<InteractableBase> OnInteractableInteracted;
 
     private Player player;
     private InteractableBase hoveredInteractable;
@@ -129,6 +130,7 @@ public class PlayerInteraction : MonoBehaviour
         if (hoveredInteractable != null)
         {
             hoveredInteractable.BaseInteract(context);
+            OnInteractableInteracted?.Invoke(hoveredInteractable);
         }
 
     }

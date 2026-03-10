@@ -11,7 +11,7 @@ namespace Assets.Scripts.Characters.NPC
 
         public void Hold(GameObject item)
         {
-            item.transform.SetParent(HandRoot);
+            item.transform.SetParent(HandRoot, true);
             heldItem = item;
         }
 

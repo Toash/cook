@@ -33,10 +33,13 @@ public class WorldSpaceHoverTooltipUI : MonoBehaviour
     void OnEnable()
     {
         PlayerInteraction.OnInteractableChanged += OnInteractableChanged;
+        PlayerInteraction.OnInteractableInteracted += OnInteractableChanged;
+
     }
     void OnDisable()
     {
         PlayerInteraction.OnInteractableChanged -= OnInteractableChanged;
+        PlayerInteraction.OnInteractableInteracted -= OnInteractableChanged;
     }
 
     void Update()
@@ -51,14 +54,14 @@ public class WorldSpaceHoverTooltipUI : MonoBehaviour
         void Clear()
         {
             TooltipText.text = "";
-            transform.SetParent(null);
+            transform.SetParent(null, true);
             transform.position = Vector2.zero;
             Root.SetActive(false);
         }
         void Populate(HoverTooltipData data)
         {
             TooltipText.text = data.Text;
-            transform.SetParent(data.Parent);
+            transform.SetParent(data.Parent, true);
             transform.localPosition = Vector2.zero;
             Root.transform.localPosition = data.Offset;
             Root.SetActive(true);

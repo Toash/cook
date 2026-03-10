@@ -7,6 +7,11 @@ public class GroceryStoreClerk : InteractableBase
 {
 
 
+    void Start()
+    {
+        HoverTooltipData = new HoverTooltipData(transform, "Shop");
+    }
+
     public override void Interact(InteractionContext context)
     {
         // open store ui

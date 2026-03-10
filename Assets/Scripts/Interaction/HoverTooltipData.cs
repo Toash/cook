@@ -8,7 +8,7 @@ public class HoverTooltipData
 {
     public Transform Parent;
     public string Text;
-    public Vector2 Offset = new Vector2(0, -100);
+    public Vector2 Offset = new Vector2(0, 80);
 
     public HoverTooltipData(Transform parent, string text)
     {

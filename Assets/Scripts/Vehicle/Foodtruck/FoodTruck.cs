@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace Assets.Scripts.Vehicle
@@ -14,6 +15,8 @@ namespace Assets.Scripts.Vehicle
     {
         public CarSeat Seat;
         private Rigidbody rb;
+
+        public event Action<TruckState> EnteredState;
         void OnValidate()
         {
             if (rb == null)
@@ -38,7 +41,27 @@ namespace Assets.Scripts.Vehicle
         /// </summary>
         public SingleOrderSubmissionArea OrderSubmissionArea;
 
-        TruckState currentState;
+        public TruckState CurrentState
+        {
+            get => currentState;
+            set
+            {
+                switch (value)
+                {
+                    case TruckState.Stopped:
+                        break;
+                    case TruckState.Driving:
+                        break;
+                    case TruckState.Serving:
+                        break;
+
+                }
+                currentState = value;
+                EnteredState?.Invoke(value);
+
+            }
+        }
+        private TruckState currentState;
 
 
         void OnEnable()
@@ -53,6 +76,8 @@ namespace Assets.Scripts.Vehicle
             Seat.GotOutSeat -= OnGotOutSeat;
         }
 
+
+
         void OnGotInSeat()
         {
             StartDriving();
@@ -64,21 +89,22 @@ namespace Assets.Scripts.Vehicle
 
 
 
-        public void SetTruckState(TruckState state)
-        {
-            switch (state)
-            {
-                case TruckState.Stopped:
-                    break;
-                case TruckState.Driving:
-                    break;
-                case TruckState.Serving:
-                    break;
+        // public void SetTruckState(TruckState newState)
+        // {
+        //     switch (newState)
+        //     {
+        //         case TruckState.Stopped:
+        //             break;
+        //         case TruckState.Driving:
+        //             break;
+        //         case TruckState.Serving:
+        //             break;
 
-            }
-            currentState = state;
+        //     }
+        //     CurrentState = newState;
+        //     EnteredState?.Invoke(newState);
 
-        }
+        // }
 
         /// <summary>
         /// Start accepting customers
@@ -86,19 +112,27 @@ namespace Assets.Scripts.Vehicle
         /// <returns></returns>
         public bool TryStartServe()
         {
-            if (GetTruckSpeed() > .1f) return false;
-            if (currentState != TruckState.Stopped) return false;
-            currentState = TruckState.Serving;
+            if (CurrentState != TruckState.Stopped) return false;
+            if (IsMoving()) return false;
+
+            // TODO bounds checking
+
+            CurrentState = TruckState.Serving;
             return true;
+        }
+        public void StopServing()
+        {
+            CurrentState = TruckState.Stopped;
+
         }
 
         void StartDriving()
         {
-            currentState = TruckState.Driving;
+            CurrentState = TruckState.Driving;
         }
         void StopDriving()
         {
-            currentState = TruckState.Stopped;
+            CurrentState = TruckState.Stopped;
         }
 
         // public
@@ -106,11 +140,18 @@ namespace Assets.Scripts.Vehicle
         {
             return rb.linearVelocity.magnitude;
         }
+        public bool IsMoving()
+        {
+            if (GetTruckSpeed() > .1f) return true;
+            return false;
+        }
 
 #if UNITY_EDITOR
-        void OnDrawGizmosSelected()
+        void OnDrawGizmos()
         {
-            Handles.Label(transform.position, "Speed: " + GetTruckSpeed());
+            string message = "Truck Speed: " + GetTruckSpeed() + "\n";
+            message += "Truck State: " + CurrentState.ToString();
+            Handles.Label(transform.position, message);
 
         }
 #endif

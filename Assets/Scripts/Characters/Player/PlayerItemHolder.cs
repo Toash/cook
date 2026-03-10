@@ -178,7 +178,7 @@ public class PlayerItemHolder : MonoBehaviour
                 connection.Parent.ChildDetached(snapper);
             }
             snapper.SnapConnections.Clear();
-            snapper.transform.SetParent(null);
+            snapper.transform.SetParent(null, true);
         }
 
 
@@ -210,7 +210,7 @@ public class PlayerItemHolder : MonoBehaviour
 
 
         //place
-        itemInHand.transform.SetParent(surface);
+        itemInHand.transform.SetParent(surface, worldPositionStays: true);
         itemInHand.transform.position = pos;
         itemInHand.transform.rotation = rot;
 

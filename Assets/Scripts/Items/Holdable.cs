@@ -86,7 +86,7 @@ public class Holdable : InteractableBase
                 parent = holdableVisualRoot;
 
             }
-            holdableVisualRoot.transform.SetParent(parent.transform);
+            holdableVisualRoot.transform.SetParent(parent.transform, true);
             i++;
 
         }
