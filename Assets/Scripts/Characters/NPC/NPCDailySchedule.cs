@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.World;
+﻿using Assets.Scripts.Vehicle;
+using Assets.Scripts.World;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -11,8 +12,13 @@ namespace Assets.Scripts.Characters.NPC
     /// </summary>
     public class NPCDailySchedule : NPCState
     {
-        public override string StateName => "NPCDailySchedule";
+        public override string Name => "NPCDailySchedule";
 
+        void OnEnterFoodTruck(FoodTruck truck)
+        {
+            Brain.ChangeState("NPCWaitInLine");
+
+        }
         void OnActivityEnter(Activity activity)
         {
             Location loc = LocationManager.I.GetLocation(activity.LocationData);
@@ -34,6 +40,7 @@ namespace Assets.Scripts.Characters.NPC
         }
         public override void OnEnter(NPCBrain brain)
         {
+            Brain.EnteredFoodTruck += OnEnterFoodTruck;
             // if we enter here from another state but are in an activity already.
             if (NPC.Schedule.CurrentActivity != null)
             {
@@ -46,6 +53,7 @@ namespace Assets.Scripts.Characters.NPC
 
         public override void OnExit(NPCBrain brain)
         {
+            Brain.EnteredFoodTruck -= OnEnterFoodTruck;
             Brain.NPC.Schedule.ActivityEnter -= OnActivityEnter;
             Brain.NPC.Schedule.ActivityExit -= OnActivityExit;
         }

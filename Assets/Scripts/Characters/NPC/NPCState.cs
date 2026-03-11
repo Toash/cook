@@ -5,7 +5,7 @@ public abstract class NPCState : MonoBehaviour
 {
 
     [ShowInInspector]
-    public abstract string StateName { get; }
+    public abstract string Name { get; }
 
     [HideInInspector]
     public NPC NPC;

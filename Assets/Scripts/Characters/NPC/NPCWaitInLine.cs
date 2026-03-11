@@ -4,7 +4,7 @@ using UnityEngine;
 public class NPCWaitInLine : NPCState
 {
 
-    public override string StateName => "NPCWaitInLine";
+    public override string Name => "NPCWaitInLine";
 
     void OnNewFirstInLine(NPCBrain brain)
     {

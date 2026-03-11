@@ -1,6 +1,6 @@
 public class NPCOrdering : NPCState
 {
-    public override string StateName => "NPCOrdering";
+    public override string Name => "NPCOrdering";
 
 
     void OnProposedOrderAcknowledged(Order order)

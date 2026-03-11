@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Assets.Scripts.Ingredient.MenuItem;
+using Sirenix.OdinInspector;
 using UnityEngine;
 public class OrderManager : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class OrderManager : MonoBehaviour
     /// <summary>
     /// Order that the player has to acknowledge before it gets added to the active orders.
     /// </summary>
+    [ReadOnly]
     public OrderProposition ProposedOrder = null;
 
     // TODO: add way for player to reject order (out of stock), or counter offer.
@@ -70,6 +72,11 @@ public class OrderManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Generates a random order proposition from an npc
+    /// </summary>
+    /// <param name="proposer"></param>
+    /// <returns></returns>
     public OrderProposition GenerateRandomOrderProposition(NPC proposer)
     {
         List<MenuItem> menuItems = new List<MenuItem>();
@@ -91,11 +98,11 @@ public class OrderManager : MonoBehaviour
 
     public void ProposeOrder(OrderProposition prop)
     {
-        if (ProposedOrder != null)
-        {
-            Debug.LogWarning("[OrderManager]: Trying to propose Order but it already exists...");
-            return;
-        }
+        // if (ProposedOrder != null)
+        // {
+        //     Debug.LogWarning("[OrderManager]: Trying to propose Order but it already exists..." + ProposedOrder);
+        //     return;
+        // }
         Debug.Log("[OrderManager]: Proposed order");
         ProposedOrder = prop;
         ProposedOrderAdded?.Invoke(prop);

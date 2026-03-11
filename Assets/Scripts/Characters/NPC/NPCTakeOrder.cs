@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class NPCTakeOrder : NPCState
 {
-    public override string StateName => "NPCTakeOrder";
+    public override string Name => "NPCTakeOrder";
 
     /// <summary>
     /// Where order will go when picked up

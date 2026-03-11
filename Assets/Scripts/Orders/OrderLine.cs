@@ -15,7 +15,7 @@ public class OrderLine : MonoBehaviour
     /// The transform that npcs in this line will look at. <br/>
     /// </summary>
     public Transform NPCLookAt;
-    public float LineSpacing = 1f;
+    public float LineSpacing = 1.5f;
     /// <summary>
     ///  NPCS in line
     ///  TODO: generate positions based on line position.
@@ -96,6 +96,11 @@ public class OrderLine : MonoBehaviour
             var pos = GetLinePositionForNPC(npc);
 
             Gizmos.DrawSphere(pos, .2f);
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            Gizmos.DrawSphere(transform.position + transform.forward * LineSpacing * i, .1f);
         }
 
 

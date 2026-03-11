@@ -183,37 +183,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 503
---- !u!1 &2954740414623107787
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5987725611221070312}
-  m_Layer: 6
-  m_Name: CamPos
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5987725611221070312
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2954740414623107787}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.321}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8185800154164681021}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3378610916946907201
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,7 +659,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 0.675, z: 0.075}
+  m_LocalScale: {x: 0.95, y: 0.534375, z: 0.059375}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8185800154164681021}
@@ -786,7 +755,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b9c3e8811e562b4f86ecea54a47eae1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisplayScreen
-  HasToBeConstrainedToUse: 1
   RaycastMask:
     serializedVersion: 2
     m_Bits: 503
@@ -816,8 +784,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8185800154164681021}
   - component: {fileID: 3894154176482712921}
-  - component: {fileID: 6490772287387171407}
-  - component: {fileID: 1965702239486702625}
   m_Layer: 6
   m_Name: ProposedOrderDisplay
   m_TagString: Untagged
@@ -840,7 +806,6 @@ Transform:
   m_Children:
   - {fileID: 8462656296496561635}
   - {fileID: 4216823863008587200}
-  - {fileID: 5987725611221070312}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &3894154176482712921
@@ -864,33 +829,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.2, y: 0.7, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6490772287387171407
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7957287172292770118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38b915712794d7f4ca6cdc6032ec4824, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Highlightable
-  Width: 8
---- !u!114 &1965702239486702625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7957287172292770118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a7ed407b83610e47972248d5c13a366, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraConstrainer
-  HoverTooltip: 
-  camTarget: {fileID: 5987725611221070312}
 --- !u!1 &8922301695916689860
 GameObject:
   m_ObjectHideFlags: 0

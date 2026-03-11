@@ -6,20 +6,20 @@ using UnityEngine;
 /// </summary>
 public class DisplayMultipleOrdersUI : MonoBehaviour
 {
-    public OrderManager OrderManager;
     public Transform OrdersFlexContainer;
     public DisplaySingleOrderUI DisplaySingleOrderUI;
     private List<Order> orders;
 
-    void OnEnable()
+
+    void Start()
     {
-        OrderManager.ActiveOrderAdded += OnAddOrder;
-        OrderManager.ActiveOrderRemoved += OnRemoveOrder;
+        OrderManager.I.ActiveOrderAdded += OnAddOrder;
+        OrderManager.I.ActiveOrderRemoved += OnRemoveOrder;
     }
-    void OnDisable()
+    void OnDestroy()
     {
-        OrderManager.ActiveOrderAdded -= OnAddOrder;
-        OrderManager.ActiveOrderRemoved -= OnRemoveOrder;
+        OrderManager.I.ActiveOrderAdded -= OnAddOrder;
+        OrderManager.I.ActiveOrderRemoved -= OnRemoveOrder;
     }
 
 

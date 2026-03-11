@@ -5,7 +5,7 @@ namespace Assets.Scripts.Characters.NPC
 {
     public class NPCWanderWaypoints : NPCState
     {
-        public override string StateName => "NPCWanderWaypoints";
+        public override string Name => "NPCWanderWaypoints";
 
         public Transform[] Waypoints;
 
@@ -22,7 +22,6 @@ namespace Assets.Scripts.Characters.NPC
         }
         void OnFoodTruckEntered(FoodTruck truck)
         {
-            Brain.CurrentFoodTruck = truck;
             Brain.ChangeState("NPCWaitInLine");
 
         }

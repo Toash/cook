@@ -7,27 +7,23 @@ using UnityEngine;
 /// </summary>
 public class DisplayProposedOrder : MonoBehaviour
 {
-    public OrderManager OrderManager;
 
     public Transform MenuItemsFlexContainer;
     public DisplaySingleMenuItemUI DisplaySingleMenuItemUI;
 
     public TMP_Text Payout;
-    void OnEnable()
-    {
-        OrderManager.ProposedOrderAdded += OnAddProposedOrder;
-        OrderManager.ProposedOrderRemoved += OnRemoveProposedOrder;
-    }
-    void OnDisable()
-    {
-        OrderManager.ProposedOrderAdded -= OnAddProposedOrder;
-        OrderManager.ProposedOrderRemoved -= OnRemoveProposedOrder;
-    }
-
     void Start()
     {
+        OrderManager.I.ProposedOrderAdded += OnAddProposedOrder;
+        OrderManager.I.ProposedOrderRemoved += OnRemoveProposedOrder;
         Clear();
     }
+    void OnDestroy()
+    {
+        OrderManager.I.ProposedOrderAdded -= OnAddProposedOrder;
+        OrderManager.I.ProposedOrderRemoved -= OnRemoveProposedOrder;
+    }
+
 
 
     void OnAddProposedOrder(OrderProposition order)

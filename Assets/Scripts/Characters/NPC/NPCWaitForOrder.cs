@@ -1,6 +1,6 @@
 public class NPCWaitForOrder : NPCState
 {
-    public override string StateName => "NPCWaitForOrder";
+    public override string Name => "NPCWaitForOrder";
 
     void OnActiveOrderMade(Order order)
     {

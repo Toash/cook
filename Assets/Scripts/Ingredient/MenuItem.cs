@@ -19,7 +19,7 @@ namespace Assets.Scripts.Ingredient.MenuItem
         {
             MenuItem[] items = Resources.LoadAll<MenuItem>("ScriptableObjects/MenuItems");
             MenuItem item = items[Random.Range(0, items.Length)];
-            Debug.Log("Got random menu item: " + item.Name);
+            Debug.Log("[MenuItem]: Got random menu item: " + item.Name);
             return item;
         }
     }

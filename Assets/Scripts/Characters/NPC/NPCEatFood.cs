@@ -3,7 +3,7 @@
     public class NPCEatFood : NPCState
     {
 
-        public override string StateName => "NPCEatFood";
+        public override string Name => "NPCEatFood";
 
         public override void OnEnter(NPCBrain brain)
         {

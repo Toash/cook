@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Scripts.Ingredient.MenuItem;
 
+[System.Serializable]
 public class OrderProposition
 {
     public NPC Proposer;

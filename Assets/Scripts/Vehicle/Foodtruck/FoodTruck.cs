@@ -17,6 +17,7 @@ namespace Assets.Scripts.Vehicle
         private Rigidbody rb;
 
         public event Action<TruckState> EnteredState;
+        public event Action StoppedServing;
         void OnValidate()
         {
             if (rb == null)
@@ -24,7 +25,11 @@ namespace Assets.Scripts.Vehicle
                 rb = GetComponent<Rigidbody>();
             }
         }
-        public bool IsServing { get; private set; }
+        public bool IsServing
+        {
+            get => currentState == TruckState.Serving;
+        }
+
 
         public OrderLine OrderLine;
 
@@ -47,8 +52,11 @@ namespace Assets.Scripts.Vehicle
                         break;
 
                 }
+                if (currentState == TruckState.Serving && value != TruckState.Serving) StoppedServing?.Invoke();
+
                 currentState = value;
                 EnteredState?.Invoke(value);
+
 
             }
         }

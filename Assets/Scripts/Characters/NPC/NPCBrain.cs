@@ -1,3 +1,4 @@
+using Assets.Scripts.Characters.NPC;
 using Assets.Scripts.Vehicle;
 using Sirenix.OdinInspector;
 using System;
@@ -9,6 +10,7 @@ using UnityEngine.AI;
 /// <summary>
 /// State machine for NPCs. <br/>
 /// States should exist as children of this.
+/// States are referred to by just a string.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(NPC))]
@@ -20,6 +22,7 @@ public class NPCBrain : MonoBehaviour
 
     [Header("States")]
     public string InitialStateString;
+    public string DefaultStateString = "NPCDailySchedule";
     [ReadOnly]
     public NPCState CurrentState;
 
@@ -74,8 +77,8 @@ public class NPCBrain : MonoBehaviour
         {
             if (child.TryGetComponent<NPCState>(out var state))
             {
-                Debug.Log("[NPCBrain]: Adding state " + state.StateName + " to RegisteredStates.");
-                RegisteredStates.Add(state.StateName, state);
+                Debug.Log("[NPCBrain]: Adding state " + state.Name + " to RegisteredStates.");
+                RegisteredStates.Add(state.Name, state);
                 state.Brain = this;
                 state.NPC = NPC;
             }
@@ -90,11 +93,26 @@ public class NPCBrain : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("Entered trigger: " + other.name);
+
+    }
+    void OnTriggerStay(Collider other)
+    {
         if (other.attachedRigidbody.TryGetComponent<FoodTruck>(out var truck))
         {
-            //CurrentFoodTruck = truck;
-            //ChangeState("NPCWaitInLine");
-            EnteredFoodTruck?.Invoke(truck);
+            if (truck.IsServing && CurrentFoodTruck == null)
+            {
+                EnterTruck(truck);
+            }
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.attachedRigidbody.TryGetComponent<FoodTruck>(out var truck))
+        {
+            if (CurrentFoodTruck != null)
+            {
+                LeaveTruck();
+            }
         }
 
     }
@@ -112,11 +130,21 @@ public class NPCBrain : MonoBehaviour
         {
             if (CurrentState != null)
             {
+                Debug.Log("[NPCBrain]: Changing state from " + CurrentState.Name + "to " + state.Name);
                 CurrentState.OnExit(this);
+                CurrentState = state;
+                state.OnEnter(this);
 
             }
-            CurrentState = state;
-            state.OnEnter(this);
+            else
+            {
+                Debug.Log("[NPCBrain]: Changing state to " + state.Name);
+                CurrentState = state;
+                state.OnEnter(this);
+
+            }
+
+
         }
         else
         {
@@ -138,6 +166,20 @@ public class NPCBrain : MonoBehaviour
         BecameFirstInLine?.Invoke(brain);
     }
 
+    void EnterTruck(FoodTruck truck)
+    {
+        CurrentFoodTruck = truck;
+        truck.StoppedServing += LeaveTruck;
+        EnteredFoodTruck?.Invoke(truck);
+
+    }
+    void LeaveTruck()
+    {
+        CurrentFoodTruck.StoppedServing -= LeaveTruck;
+        CurrentFoodTruck = null;
+        ChangeState(DefaultStateString);
+    }
+
 
 #if UNITY_EDITOR
     GUIStyle style = new();
@@ -152,7 +194,7 @@ public class NPCBrain : MonoBehaviour
         }
         if (CurrentState != null)
         {
-            message += "CurrentState: " + CurrentState.StateName + "\n";
+            message += "CurrentState: " + CurrentState.Name + "\n";
         }
         Handles.Label(transform.position, message, style);
 
