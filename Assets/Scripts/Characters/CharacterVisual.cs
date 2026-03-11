@@ -34,7 +34,7 @@ public class CharacterVisual : MonoBehaviour
         if (Moveable != null)
         {
             // todo update this for any speed
-            if (Moveable.GetMoveSpeed() > .1f)
+            if (Moveable.GetMoveSpeed() > 0.3f)
             {
                 Animator.SetFloat(MovementBlendTreeParameter, 1);
             }

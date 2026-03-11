@@ -26,7 +26,7 @@ public class OrderManager : MonoBehaviour
     /// Orders that the player has to currently make.
     /// </summary>
     public List<Order> ActiveOrders = new List<Order>();
-    public event Action<Order> ActiveOrderMade;
+    public event Action<Order> ActiveOrderSuccessfullyMade;
     public event Action<Order> ActiveOrderAdded;
     public event Action<Order> ActiveOrderRemoved;
 
@@ -55,6 +55,8 @@ public class OrderManager : MonoBehaviour
         {
             order.TimeSinceOrdered += Time.deltaTime;
         }
+
+        Debug.Log(HasProposedOrder());
     }
 
     public Order GetActiveOrderFromID(int ID)
@@ -95,6 +97,11 @@ public class OrderManager : MonoBehaviour
         return order;
         // return AddToActiveOrders(order);
     }
+    public bool HasProposedOrder()
+    {
+        return ProposedOrder != null;
+
+    }
 
     public void ProposeOrder(OrderProposition prop)
     {
@@ -110,6 +117,11 @@ public class OrderManager : MonoBehaviour
 
     public void AcknowledgeProposedOrder()
     {
+        if (ProposedOrder == null)
+        {
+            Debug.LogError("[OrderManager]: No proposed order to acknowledge");
+
+        }
         Debug.Log("[OrderManager]: Acknowledged proposed order");
         ProposedOrderRemoved?.Invoke(ProposedOrder);
 
@@ -123,6 +135,12 @@ public class OrderManager : MonoBehaviour
         ProposedOrderAcknowledged?.Invoke(newOrder);
     }
 
+    /// <summary>
+    /// Tries to submit an order. Can be successful or not.
+    /// </summary>
+    /// <param name="order"></param>
+    /// <param name="preparedItems"></param>
+    /// <returns></returns>
     public OrderSubmissionResult TrySubmit(Order order, List<PreparedItem> preparedItems)
     {
         Debug.Log("[OrderManager]: Received Order...");
@@ -130,6 +148,12 @@ public class OrderManager : MonoBehaviour
         {
             Debug.Log("[OrderManager]: No order available");
             return new OrderSubmissionResult(OrderSubmissionStatus.NoOrder, null, null, 0);
+        }
+
+        if (preparedItems == null || preparedItems.Count == 0)
+        {
+            Debug.Log("[OrderManager]: No prepared items in order");
+            return new OrderSubmissionResult(OrderSubmissionStatus.NoPreparedItems, null, null, 0);
         }
 
         // evaluate order
@@ -147,7 +171,7 @@ public class OrderManager : MonoBehaviour
 
         // remove from active orders.
         RemoveActiveOrder(order);
-        ActiveOrderMade?.Invoke(order);
+        ActiveOrderSuccessfullyMade?.Invoke(order);
 
         return new OrderSubmissionResult(OrderSubmissionStatus.Success, order, eval, payout);
 

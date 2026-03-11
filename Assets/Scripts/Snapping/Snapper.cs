@@ -23,17 +23,21 @@ public class Snapper : MonoBehaviour
     [ShowInInspector]
     public SnapType SnapType { get; private set; }
 
-    public List<SnapConnection> SnapConnections = new List<SnapConnection>();
+    public List<SnapConnection> ParentSnapConnections = new List<SnapConnection>();
 
 
+    public event Action Detached;
     public event Action<Snapper> OnChildSnapped;
     public event Action<Snapper> OnChildDetached;
-    public bool CanSnap(Snapper other)
+    public bool CanSnap(SnapArea otherArea)
     {
         // if other is null, just ignore joint type checks.
-        if (other != null)
+        if (otherArea != null)
         {
-            if (!JointTypesCanSnap(other)) return false;
+            if (!JointTypesCanSnap(otherArea.ParentSnapper)) return false;
+
+            // already is occupied and only allows one snapper. 
+            if (otherArea.OccupiedSnappers.Count > 0 && otherArea.OnlyOneSnap) return false;
         }
         return true;
 
@@ -64,20 +68,28 @@ public class Snapper : MonoBehaviour
     /// </summary>
     /// <param name="placementRaycastInfo"></param>
     /// <param name="parentSnapper"></param>
-    /// <param name="parentSnapArea"></param>
-    public void SnapToArea(PlacementInfo placementRaycastInfo, Snapper parentSnapper, SnapArea parentSnapArea)
+    /// <param name="snapArea"></param>
+    public bool TrySnapToArea(PlacementInfo placementRaycastInfo, Snapper parentSnapper, SnapArea snapArea)
     {
-        if (!CanSnap(parentSnapper))
+        if (!CanSnap(snapArea))
         {
             Debug.Log("Cannot snap " + gameObject.name + " to " + parentSnapper.gameObject.name + " due to incompatible snap types.");
-            return;
+            return false;
         }
+
 
         // create snap connection
         SnapConnection thisConnection = new SnapConnection(parentSnapper);
-        SnapConnections.Add(thisConnection);
+        ParentSnapConnections.Add(thisConnection);
         parentSnapper.ChildSnapped(this);
 
+
+        // occupy snap area
+        // snapArea.OccupiedSnappers.Add(this);
+        if (!snapArea.TryAddSnapper(this))
+        {
+            return false;
+        }
 
         //disable rigidbody if it exists
         if (TryGetComponent<Rigidbody>(out var rb))
@@ -88,9 +100,11 @@ public class Snapper : MonoBehaviour
 
 
         // actually place
-        transform.position = parentSnapArea.GetSnapPoint(placementRaycastInfo);
-        transform.rotation = parentSnapArea.GetSnapRotation(placementRaycastInfo);
+        transform.position = snapArea.GetSnapPoint(placementRaycastInfo);
+        transform.rotation = snapArea.GetSnapRotation(placementRaycastInfo);
         transform.SetParent(parentSnapper.transform, worldPositionStays: true);
+
+        return true;
     }
 
 
@@ -99,11 +113,24 @@ public class Snapper : MonoBehaviour
     /// </summary>
     public void Detach()
     {
+        // detach from all parent snap connections
+        foreach (var connection in ParentSnapConnections)
+        {
+            connection.Parent.ChildDetached(this);
+
+        }
+        ParentSnapConnections.Clear();
+
+
+
+
         if (TryGetComponent<Rigidbody>(out var rb))
         {
             rb.isKinematic = false;
         }
+        transform.SetParent(null, true);
 
+        Detached?.Invoke();
     }
 
 
@@ -119,7 +146,7 @@ public class Snapper : MonoBehaviour
         {
             Snapper current = stack.Pop();
 
-            foreach (SnapConnection connection in current.SnapConnections)
+            foreach (SnapConnection connection in current.ParentSnapConnections)
             {
                 Snapper otherSnapper = connection.Parent;
                 if (otherSnapper == null) continue;

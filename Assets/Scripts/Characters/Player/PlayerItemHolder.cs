@@ -104,7 +104,7 @@ public class PlayerItemHolder : MonoBehaviour
     void HandlePlacementPreview(PlacementPreview preview, PlacementInfo placementInfo, Holdable heldHoldable)
     {
         // if we have a snapper and it can snap to the snap area. preview for place on snap area.
-        if (placementInfo.TryGetSnapArea(out SnapArea snapArea) && heldHoldable.TryGetComponent<Snapper>(out var snapper) && snapper.CanSnap(snapArea.ParentSnapper))
+        if (placementInfo.TryGetSnapArea(out SnapArea snapArea) && heldHoldable.TryGetComponent<Snapper>(out var snapper) && snapper.CanSnap(snapArea))
         {
             preview.IsShowing = true;
             preview.Position = snapArea.GetSnapPoint(placementInfo);
@@ -172,16 +172,7 @@ public class PlayerItemHolder : MonoBehaviour
 
         if (target.TryGetComponent<Snapper>(out var snapper))
         {
-            // detach from all parent snap connections
-            foreach (var connection in snapper.SnapConnections)
-            {
-                connection.Parent.ChildDetached(snapper);
-
-            }
-
             snapper.Detach();
-            snapper.SnapConnections.Clear();
-            snapper.transform.SetParent(null, true);
         }
 
 
@@ -233,13 +224,14 @@ public class PlayerItemHolder : MonoBehaviour
             {
                 Snapper otherSnapper = otherSnapPoint.ParentSnapper;
 
-                if (heldSnapper.CanSnap(otherSnapper))
+                //place
+                if (heldSnapper.TrySnapToArea(placementRaycastInfo, otherSnapper, otherSnapPoint))
                 {
-                    //place
-                    heldSnapper.SnapToArea(placementRaycastInfo, otherSnapper, otherSnapPoint);
+
                     OnAfterPlace();
                     return true;
                 }
+
             }
 
 

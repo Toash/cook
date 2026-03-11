@@ -77,7 +77,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab0a388cb57895f41a9d6eb3bdd75035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisplayProposedOrder
-  OrderManager: {fileID: 0}
   MenuItemsFlexContainer: {fileID: 8341791886292880042}
   DisplaySingleMenuItemUI: {fileID: 3154229825691022970, guid: 078efac470f941344847b3b47288252d, type: 3}
   Payout: {fileID: 9050467260354298506}
@@ -783,7 +782,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8185800154164681021}
-  - component: {fileID: 3894154176482712921}
+  - component: {fileID: 6276913419968524646}
+  - component: {fileID: 1401601758885097555}
   m_Layer: 6
   m_Name: ProposedOrderDisplay
   m_TagString: Untagged
@@ -808,7 +808,7 @@ Transform:
   - {fileID: 4216823863008587200}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &3894154176482712921
+--- !u!65 &6276913419968524646
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -823,12 +823,29 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.2, y: 0.7, z: 0.2}
+  m_Size: {x: 0.9, y: 0.63, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1401601758885097555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7957287172292770118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb45c7bbd393c6d4bb384d9529dac67e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrderAcknowledger
+  VisualRoot: {fileID: 7116945434321292607}
+  HoverTooltipData:
+    Parent: {fileID: 0}
+    Text: 
+    Offset: {x: 0, y: 0}
 --- !u!1 &8922301695916689860
 GameObject:
   m_ObjectHideFlags: 0

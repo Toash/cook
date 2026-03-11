@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -14,6 +15,7 @@ using UnityEngine;
 public class PreparedItem
 {
     public List<Ingredient> Ingredients = new List<Ingredient>();
+    public event Action IngredientsChanged;
     public override string ToString()
     {
         string ret = $"PreparedItem with {Ingredients.Count} ingredients.\n";
@@ -97,6 +99,7 @@ public class PreparedItem
         }
 
         Ingredients.Add(ingredient);
+        IngredientsChanged?.Invoke();
 
         ingredient.Snapper.OnChildSnapped += OnIngredientAttachedToIngredient;
         ingredient.Snapper.OnChildDetached += OnIngredientDetachedFromIngredient;
@@ -120,6 +123,7 @@ public class PreparedItem
     public void RemoveIngredient(Ingredient ingredient)
     {
         if (!Ingredients.Remove(ingredient)) return;
+        IngredientsChanged?.Invoke();
 
         ingredient.transform.SetParent(null);
         ingredient.PreparedItem = null;

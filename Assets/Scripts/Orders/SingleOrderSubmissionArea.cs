@@ -1,11 +1,12 @@
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// Auto submits when receciving an OrderContainer that is linked to an active order.  <br/>
-/// Is also the place where npc picks up an order.
+/// Place to submit an order
+/// 
 /// </summary>
 [RequireComponent(typeof(Snapper))]
 public class SingleOrderSubmissionArea : MonoBehaviour
@@ -41,16 +42,19 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     void OnEnable()
     {
         snapper.OnChildSnapped += OnSnap;
-
+    }
+    void OnDisable()
+    {
+        snapper.OnChildSnapped -= OnSnap;
     }
 
 
     void OnSnap(Snapper otherSnapper)
     {
-        var container = otherSnapper.GetComponent<OrderContainer>();
-        if (container != null)
+        if (otherSnapper.TryGetComponent<OrderContainer>(out var container))
         {
             OnContainerAdded(container);
+
         }
         else
         {
@@ -61,30 +65,39 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     void OnContainerAdded(OrderContainer container)
     {
         Debug.Log("[OrderSubmissionArea]: Container Entered Submission Area");
+
+        CurrentContainer = container;
+        TrySubmitCurrentContainer();
+        CurrentContainer.ReceiptSnapped += TrySubmitCurrentContainer;
+        CurrentContainer.PreparedItemUpdated += TrySubmitCurrentContainer;
         // check if can submit
-        if (container.CanSubmit())
-        {
-            CurrentContainer = container;
-            SubmitContainer(container);
-        }
+        // if (container.CanSubmit())
+        // {
+        //     SubmitContainer(container);
+        // }
     }
 
 
-    public void SubmitContainer(OrderContainer container)
+    public void TrySubmitCurrentContainer()
     {
-        Order order = container.GetLinkedOrder();
+        Debug.Log("[OrderSubmissionArea]: Trying to submit current container");
 
-        OrderSubmissionResult result = OrderManager.I.TrySubmit(order, container.PreparedItems);
+        CurrentContainer.TryGetLinkedOrder(out Order order);
+        CurrentContainer.TryGetPreparedItems(out List<PreparedItem> items);
 
-        if (result.Status != OrderSubmissionStatus.Success)
-        {
-            Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order. Status was not Success");
-        }
+        OrderSubmissionResult result = OrderManager.I.TrySubmit(order, items);
+
+        // if (result.Status != OrderSubmissionStatus.Success)
+        // {
+        //     Debug.Log("[OrderSubmissionArea]: Failed to submit PreparedItems for an Order. Status was not Success");
+        // }
     }
 
 
     /// <summary>
-    /// Gives a reference to the container if it is linked to the orderid.
+    /// Gives a reference to the container if it is linked to the orderid. <br/>
+    /// 
+    /// Sets current container reference to null. 
     /// </summary>
     /// <param name="orderId"></param>
     /// <param name="container"></param>
@@ -98,6 +111,9 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         }
 
         container = CurrentContainer;
+
+        CurrentContainer.ReceiptSnapped -= TrySubmitCurrentContainer;
+        CurrentContainer.PreparedItemUpdated -= TrySubmitCurrentContainer;
 
         CurrentContainer = null;
         return true;
@@ -113,6 +129,19 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         string message = "";
         message += "Submission Area";
         Handles.Label(transform.position, message);
+
+
+        if (CurrentContainer != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(transform.position, .2f);
+        }
+        else
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(transform.position, .2f);
+
+        }
 
     }
 

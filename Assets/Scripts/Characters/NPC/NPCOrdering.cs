@@ -8,6 +8,7 @@ public class NPCOrdering : NPCState
         if (order.Owner != Brain.NPC) return;
         Brain.CurrentOrderID = order.ID;
 
+        Brain.CurrentFoodTruck.OrderLine.RemoveNPCFromLineIfFirst(Brain);
         Brain.ChangeState("NPCWaitForOrder");
 
 

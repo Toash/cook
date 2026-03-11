@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mono.Cecil.Cil;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -17,10 +18,14 @@ public class OrderContainer : MonoBehaviour
 {
 
     // prepared items that are connected with this container
-    public List<PreparedItem> PreparedItems = new();
+    public List<PreparedItem> ContainedPreparedItems = new();
 
     public OrderReceipt Receipt;
     private Snapper snapper;
+
+    public event Action PreparedItemUpdated; // indicates that a prepared item was updated inside of this order container.
+    public event Action ReceiptSnapped;
+
 
     void Awake()
     {
@@ -39,35 +44,48 @@ public class OrderContainer : MonoBehaviour
     }
 
 
-    public bool CanSubmit()
+    // public bool CanSubmit()
+    // {
+    //     bool hasPreparedItems = PreparedItems.Count > 0;
+    //     bool hasReceipt = Receipt != null;
+
+    //     if (!hasReceipt)
+    //     {
+    //         Debug.Log("[OrderContainer]: Cannot submit, does not have receipt");
+    //     }
+
+    //     if (!hasPreparedItems)
+    //     {
+    //         Debug.Log("[OrderContainer]: Cannot submit, does not have atleast 1 prepared item.");
+    //     }
+
+
+    //     return hasReceipt && hasPreparedItems;
+    // }
+
+    public bool TryGetPreparedItems(out List<PreparedItem> items)
     {
-        bool hasPreparedItems = PreparedItems.Count > 0;
-        bool hasReceipt = Receipt != null;
-
-        if (!hasReceipt)
+        if (ContainedPreparedItems.Count > 0)
         {
-            Debug.LogError("[OrderContainer]: Cannot submit, does not have receipt");
+            items = ContainedPreparedItems;
+            return true;
         }
 
-        if (!hasPreparedItems)
-        {
-            Debug.LogError("[OrderContainer]: Cannot submit, does not have atleast 1 prepared item.");
-        }
+        items = null;
+        return false;
 
-
-        return hasReceipt && hasPreparedItems;
     }
-
-    public Order GetLinkedOrder()
+    public bool TryGetLinkedOrder(out Order order)
     {
         if (Receipt == null)
         {
-            Debug.LogError("[OrderContainer]: Could not get linked order. Receipt is null.");
-            return null;
+            Debug.Log("[OrderContainer]: Could not get linked order. Receipt is null.");
+            order = null;
+            return false;
         }
 
-        var order = OrderManager.I.GetActiveOrderFromID(Receipt.OrderID);
-        return order;
+        order = OrderManager.I.GetActiveOrderFromID(Receipt.OrderID);
+        return true;
     }
 
     public int GetOrderID()
@@ -81,7 +99,7 @@ public class OrderContainer : MonoBehaviour
         if (otherSnapper.TryGetComponent<Ingredient>(out var _))
         {
             // the other snapper is an ingredient, make a prepared item.
-            CreatePreparedItem(otherSnapper);
+            CreateContainedPreparedItem(otherSnapper);
         }
         else if (otherSnapper.TryGetComponent<OrderReceipt>(out var receipt))
         {
@@ -108,6 +126,7 @@ public class OrderContainer : MonoBehaviour
     void LinkOrder(OrderReceipt receipt)
     {
         this.Receipt = receipt;
+        ReceiptSnapped?.Invoke();
     }
     void UnlinkOrder(OrderReceipt receipt)
     {
@@ -123,7 +142,7 @@ public class OrderContainer : MonoBehaviour
     /// Create prepared item on order container.
     /// </summary>
     /// <param name="connection"></param>
-    void CreatePreparedItem(Snapper otherSnapper)
+    void CreateContainedPreparedItem(Snapper otherSnapper)
     {
 
         List<Ingredient> ingredients = new();
@@ -140,10 +159,11 @@ public class OrderContainer : MonoBehaviour
         }
 
         PreparedItem item = PreparedItem.Create(ingredients);
+        item.IngredientsChanged += PreparedItemUpdated;
         // item.transform.SetParent(gameObject.transform);
 
         Debug.Log("[OrderContainer]: Created prepared item on container");
-        PreparedItems.Add(item);
+        ContainedPreparedItems.Add(item);
     }
 
     /// <summary>
@@ -160,7 +180,8 @@ public class OrderContainer : MonoBehaviour
                 Debug.LogError("[OrderContainer]: PreparedItem was null when trying to detach ingredient");
             }
             // preparedItem.transform.SetParent(null);
-            PreparedItems.Remove(preparedItem);
+            preparedItem.IngredientsChanged -= PreparedItemUpdated;
+            ContainedPreparedItems.Remove(preparedItem);
 
             preparedItem.Disband();
 
@@ -183,6 +204,7 @@ public class OrderContainer : MonoBehaviour
     }
 
 
+
 #if UNITY_EDITOR
     GUIStyle style = new();
     void OnDrawGizmosSelected()
@@ -190,9 +212,9 @@ public class OrderContainer : MonoBehaviour
         style.normal.textColor = Color.blue;
         style.fontStyle = FontStyle.Bold;
         string message = "";
-        message += "Prepared Items Count: " + PreparedItems.Count + "\n";
+        message += "Prepared Items Count: " + ContainedPreparedItems.Count + "\n";
         Handles.Label(transform.position, message, style);
-        foreach (var item in PreparedItems)
+        foreach (var item in ContainedPreparedItems)
         {
             message += item.ToString() + "\n";
             Handles.Label(transform.position + (Vector3.up * .2f), message, style);

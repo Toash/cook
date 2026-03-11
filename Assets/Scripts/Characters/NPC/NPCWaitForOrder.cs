@@ -13,12 +13,12 @@ public class NPCWaitForOrder : NPCState
     public override void OnEnter(NPCBrain brain)
     {
         brain.Agent.SetDestination(Brain.CurrentFoodTruck.WaitingSpot.transform.position);
-        OrderManager.I.ActiveOrderMade += OnActiveOrderMade;
+        OrderManager.I.ActiveOrderSuccessfullyMade += OnActiveOrderMade;
     }
 
     public override void OnExit(NPCBrain brain)
     {
-        OrderManager.I.ActiveOrderMade -= OnActiveOrderMade;
+        OrderManager.I.ActiveOrderSuccessfullyMade -= OnActiveOrderMade;
     }
 
     public override void OnFixedUpdate(NPCBrain brain)

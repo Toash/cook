@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 /// <summary>
-/// Represesnts a snap the snapper that other snappers can snap to. <br/>
+/// Represesnts a snap the snapper that other snappers can snap to.  <br/>
+/// Snapping is done physically (transform hiearchy), as well as through bookkeeping.  <br/>
 /// 
 /// Each snapper can have multiple snap areas.
 /// 
@@ -10,11 +12,15 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))] // for snapping
 public class SnapArea : MonoBehaviour
 {
+    [Tooltip("Whether or not only one snapper can be snapped to this snap area.")]
+    public bool OnlyOneSnap = true;
     public bool SnapToCenter = true; // if true, the snapper will snap to the center of the snap area.  if false, it will snap to the exact position of the snap area.
     public Snapper ParentSnapper;
     public SnapType AcceptingTypes; // the types that can snap to this.
-    // public float MaxDistance = 1f;
-    // public float MaxAngle = 15f;
+                                    // public float MaxDistance = 1f;
+                                    // public float MaxAngle = 15f;
+
+    public List<Snapper> OccupiedSnappers;
 
     private Collider col;
     void OnValidate()
@@ -30,6 +36,26 @@ public class SnapArea : MonoBehaviour
     void Awake()
     {
         gameObject.layer = LayerMask.NameToLayer("Snapping");
+    }
+
+    /// <summary>
+    /// Add snapper to this state for bookkeeping
+    /// </summary>
+    /// <param name="snapper"></param>
+    /// <returns></returns>
+    public bool TryAddSnapper(Snapper snapper)
+    {
+        if (OnlyOneSnap && OccupiedSnappers.Count > 0) return false;
+
+        OccupiedSnappers.Add(snapper);
+        void OnDetached()
+        {
+            OccupiedSnappers.Remove(snapper);
+            snapper.Detached -= OnDetached;
+        }
+        snapper.Detached += OnDetached;
+        return true;
+
     }
 
 

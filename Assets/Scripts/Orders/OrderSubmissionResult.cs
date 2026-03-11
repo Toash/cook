@@ -1,7 +1,8 @@
 public enum OrderSubmissionStatus
 {
     Success,
-    NoOrder
+    NoOrder,
+    NoPreparedItems
 }
 
 /// <summary>

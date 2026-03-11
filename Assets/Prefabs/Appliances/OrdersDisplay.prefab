@@ -101,7 +101,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 32767
 --- !u!1 &751262503084336893
 GameObject:
   m_ObjectHideFlags: 0
@@ -384,7 +384,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.55, y: 1.4343749, z: 0.159375}
+  m_LocalScale: {x: 2.33, y: 1.310625, z: 0.145625}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3468184604250188476}
@@ -482,7 +482,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DisplayScreen
   RaycastMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 32767
   MaxRaycastDistance: 5
   OnCursorInput:
     m_PersistentCalls:
@@ -769,7 +769,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d742a14462b7cf48a9ad6396e43f95e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisplayMultipleOrdersUI
-  OrderManager: {fileID: 0}
   OrdersFlexContainer: {fileID: 6543556827304643802}
   DisplaySingleOrderUI: {fileID: 5352025397947436495, guid: c78cf95ca1fa7ca40bc6ef8310881ed6, type: 3}
 --- !u!114 &8319525766206849971
