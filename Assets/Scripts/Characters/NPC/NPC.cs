@@ -15,6 +15,7 @@ public class NPC : MonoBehaviour
 
     public NPCMovement Movement;
     public NPCHand Hand;
+    public NPCWorldDialogue Dialogue;
     public CharacterVisual Visuals;
 
     void Awake()

@@ -41,6 +41,8 @@ public class NPCBrain : MonoBehaviour
     //public OrderLine CurrentOrderLine;
     [ReadOnly]
     public int CurrentOrderID;
+    [ReadOnly]
+    public float TimeSinceLastAte;
     /// <summary>
     /// Invoked when the NPC becomes first in line.
     /// </summary>

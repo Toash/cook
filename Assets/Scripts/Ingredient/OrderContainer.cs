@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Mono.Cecil.Cil;
-using Unity.VisualScripting;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,12 +19,22 @@ public class OrderContainer : MonoBehaviour
     public List<PreparedItem> ContainedPreparedItems = new();
 
     public OrderReceipt Receipt;
+    [ReadOnly, Tooltip("Gets set when the container is submitted")]
+    public OrderSubmissionResult SubmissionResult;
     private Snapper snapper;
 
     public event Action PreparedItemUpdated; // indicates that a prepared item was updated inside of this order container.
     public event Action ReceiptSnapped;
 
 
+    void OnValidate()
+    {
+        if (TryGetComponent<Collider>(out var collider))
+        {
+            collider.isTrigger = true;
+        }
+
+    }
     void Awake()
     {
         snapper = GetComponent<Snapper>();

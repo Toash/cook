@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public PlayerItemHolder ItemHolder;
     // public PlayerPhysicsGrabber PhysicsGrabber;
     public PlayerInteraction Interaction;
+    // public PlayerCrosshair Crosshair;
 
     // void Awake()
     // {

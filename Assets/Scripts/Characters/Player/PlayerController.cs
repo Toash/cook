@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.ProBuilder;
 
 
 /// <summary>
@@ -33,6 +34,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("References")]
     public CharacterController CharController;
+    [Tooltip("What gets rotated by player mouse movement. Camera will get set at an offset from this for third person")]
+    public Transform CamPivotPoint;
     public Transform CamRoot;
     public LayerMask GroundMask;
 
@@ -42,12 +45,15 @@ public class PlayerController : MonoBehaviour
     public InputActionReference Jump;
     public InputActionReference RightClick;
     public InputActionReference SprintKey;
+    public InputActionReference ThirdPerson;
 
     // events
     public event System.Action BodyConstrained;
     public event System.Action BodyUnconstrained;
     public event System.Action CameraConstrained;
     public event System.Action CameraUnconstrained;
+
+
 
     public event System.Action<PopupType> PopupShow;
     public event System.Action<PopupType> PopupHide;
@@ -65,6 +71,7 @@ public class PlayerController : MonoBehaviour
 
     float yaw = 0;
     float pitch = 0;
+    bool thirdPerson = false;
 
 
     Vector3 initialLocalCameraPos;
@@ -156,10 +163,15 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Only allows one popup at a time
+    /// </summary>
+    /// <param name="type"></param>
     public void ShowPopup(PopupType type)
     {
         if (CurrentControlMode == PlayerMode.InPopup) return;
         if (type == PopupType.None) return;
+        if (currentPopupType != PopupType.None) CloseCurrentPopup();
 
         PopupShow?.Invoke(type);
         currentPopupType = type;
@@ -275,14 +287,53 @@ public class PlayerController : MonoBehaviour
     void HandleLooking()
     {
         if (RightClick.action.IsPressed()) return;
+        if (ThirdPerson.action.WasPressedThisFrame())
+        {
+            thirdPerson = !thirdPerson;
+            if (!thirdPerson)
+            {
+                OnFirstPerson();
+            }
+            else
+            {
+                OnThirdPerson();
+            }
+
+
+        }
         Vector2 delta = Look.action.ReadValue<Vector2>();
         yaw += delta.x * MouseSens;
         pitch -= delta.y * MouseSens;
 
         pitch = Mathf.Clamp(pitch, -89, 89);
 
+
         transform.localRotation = Quaternion.Euler(0, yaw, 0);
-        CamRoot.transform.localRotation = Quaternion.Euler(pitch, 0, 0);
+        // CamRoot.transform.localRotation = Quaternion.Euler(pitch, 0, 0);
+        CamPivotPoint.transform.localRotation = Quaternion.Euler(pitch, 0, 0);
+
+    }
+    public void ForceFirstPerson()
+    {
+        thirdPerson = false;
+        OnFirstPerson();
+    }
+    void OnFirstPerson()
+    {
+        CamRoot.localPosition = Vector3.zero;
+    }
+    void OnThirdPerson()
+    {
+        if (constrainedContext != null)
+        {
+            if (constrainedContext.Type == ConstrainType.Truck)
+            {
+                CamRoot.localPosition = Vector3.back * 9;
+                return;
+            }
+
+        }
+        CamRoot.localPosition = Vector3.back * 4;
 
     }
     public void SetSpeedMultiplier(float mult)

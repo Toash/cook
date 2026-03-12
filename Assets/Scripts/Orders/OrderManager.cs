@@ -26,7 +26,7 @@ public class OrderManager : MonoBehaviour
     /// Orders that the player has to currently make.
     /// </summary>
     public List<Order> ActiveOrders = new List<Order>();
-    public event Action<Order> ActiveOrderSuccessfullyMade;
+    public event Action<Order> ActiveOrderSuccessfullySubmitted;
     public event Action<Order> ActiveOrderAdded;
     public event Action<Order> ActiveOrderRemoved;
 
@@ -115,6 +115,9 @@ public class OrderManager : MonoBehaviour
         ProposedOrderAdded?.Invoke(prop);
     }
 
+    /// <summary>
+    /// Acknowledge a proposed order, turning it into an active order to be made
+    /// </summary>
     public void AcknowledgeProposedOrder()
     {
         if (ProposedOrder == null)
@@ -158,8 +161,8 @@ public class OrderManager : MonoBehaviour
 
         // evaluate order
         Debug.Log("[OrderManager]: Evaluating order...");
-        List<PreparedItemData> itemData = PreparedItemData.From(preparedItems);
-        OrderEvaluationResult eval = OrderEvaluator.Evaluate(order, itemData);
+        List<PreparedItemData> itemsData = PreparedItemData.From(preparedItems);
+        OrderEvaluationResult eval = OrderEvaluator.Evaluate(order, itemsData);
 
 
         //TODO payout calculation
@@ -171,7 +174,7 @@ public class OrderManager : MonoBehaviour
 
         // remove from active orders.
         RemoveActiveOrder(order);
-        ActiveOrderSuccessfullyMade?.Invoke(order);
+        ActiveOrderSuccessfullySubmitted?.Invoke(order);
 
         return new OrderSubmissionResult(OrderSubmissionStatus.Success, order, eval, payout);
 

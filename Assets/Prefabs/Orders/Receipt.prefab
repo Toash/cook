@@ -204,7 +204,6 @@ GameObject:
   - component: {fileID: 6552783051364243732}
   - component: {fileID: 4364911229386095459}
   - component: {fileID: 6686668352581369668}
-  - component: {fileID: 5223475688070515193}
   - component: {fileID: 1339551314847062171}
   m_Layer: 6
   m_Name: Receipt
@@ -241,7 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944b15392521cab4d906b33495de27ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Snapper
-  SnapConnections: []
+  ParentSnapConnections: []
 --- !u!114 &4364911229386095459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,19 +275,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.34438562, y: 0.47287244, z: 0.028108597}
   m_Center: {x: 0.001647234, y: 0.24050197, z: -0.008236408}
---- !u!114 &5223475688070515193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6787795614064383994}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38b915712794d7f4ca6cdc6032ec4824, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Highlightable
-  Width: 8
 --- !u!114 &1339551314847062171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,8 +287,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb56e004d3e89c043915a302ea89428f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Holdable
-  HoverTooltip: 
   VisualRoot: {fileID: 8331544024246473326}
+  HoverTooltipData:
+    Parent: {fileID: 0}
+    Text: 
+    Offset: {x: 0, y: 0}
   GizmoSize: 0.3
 --- !u!1 &8240576768914361659
 GameObject:

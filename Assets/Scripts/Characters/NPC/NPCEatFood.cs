@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Characters.NPC
+﻿using UnityEngine;
+
+namespace Assets.Scripts.Characters.NPC
 {
     public class NPCEatFood : NPCState
     {
@@ -9,6 +11,8 @@
         {
             brain.Agent.SetDestination(Brain.CurrentFoodTruck.WaitingSpot.transform.position);
             brain.NPC.Hand.DestroyHeldItem(5);
+            Brain.TimeSinceLastAte = Time.time;
+
 
         }
 

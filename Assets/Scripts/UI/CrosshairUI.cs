@@ -5,30 +5,31 @@ public class CrosshairUI : MonoBehaviour
 {
     public RawImage Crosshair;
 
-    public Player player;
-
-
+    public PlayerController playerController;
 
     void OnEnable()
     {
-        player.Controller.CameraConstrained += HideCrosshair;
-        player.Controller.CameraUnconstrained += ShowCrosshair;
+        playerController.PopupShow += OnPopupShow;
+        playerController.PopupHide += OnPopupHide;
     }
     void OnDisable()
     {
-        player.Controller.CameraConstrained -= HideCrosshair;
-        player.Controller.CameraUnconstrained -= ShowCrosshair;
+        playerController.PopupShow -= OnPopupShow;
+        playerController.PopupHide -= OnPopupHide;
+    }
+    void OnPopupShow(PopupType type)
+    {
+        Crosshair.transform.gameObject.SetActive(false);
+
+    }
+    void OnPopupHide(PopupType type)
+    {
+        Crosshair.transform.gameObject.SetActive(true);
+
     }
 
 
-    void ShowCrosshair()
-    {
-        Crosshair.enabled = true;
-    }
-    void HideCrosshair()
-    {
-        Crosshair.enabled = false;
-    }
+
 
 
 }

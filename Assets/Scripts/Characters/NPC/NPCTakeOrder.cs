@@ -30,12 +30,18 @@ public class NPCTakeOrder : NPCState
     {
         if (AgentUtils.HasAgentReachedDestination(Brain.Agent))
         {
-            if (submitArea.TryTakeContainer(Brain.CurrentOrderID, out var container))
+            if (submitArea.TryTakeContainer(Brain.CurrentOrderID, out OrderContainer container))
             {
 
                 Debug.Log("[NPC]: Picked up order");
                 //container.transform.SetParent(HandSocket, worldPositionStays: false);
                 Brain.NPC.Hand.Hold(container.gameObject);
+
+                OrderEvaluationResult eval = container.SubmissionResult.Evaluation;
+                OrderScoreCategories category = OrderEvaluator.GetScoreCategory(eval.Score01);
+                string message = NPCDialoguePresets.RandomEvaluationSaying(category);
+
+                NPC.Dialogue.Say(message);
 
                 Brain.ChangeState("NPCEatFood");
 

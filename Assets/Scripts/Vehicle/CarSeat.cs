@@ -20,7 +20,8 @@ public class CarSeat : InteractableBase, IConstrainer
     public override void Interact(InteractionContext context)
     {
         PlayerInSeat = context.Player;
-        PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, SeatPosition, GetOutPosition));
+        PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, ConstrainType.Truck, SeatPosition, GetOutPosition));
+        context.Player.Controller.ForceFirstPerson();
 
         GotInSeat?.Invoke();
     }

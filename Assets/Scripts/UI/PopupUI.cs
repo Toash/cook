@@ -1,4 +1,9 @@
+using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
+/// <summary>
+/// Subscribes to the playercontroller popup events to activate and deactivate a gameobject based on a popuptype
+/// </summary>
 public class PopupUI : MonoBehaviour
 {
     public PopupType Type;
@@ -20,14 +25,38 @@ public class PopupUI : MonoBehaviour
     void OnPopupShow(PopupType type)
     {
         if (this.Type != type) return;
+
+        BeforePopupShowActive();
         Popup.SetActive(true);
+        AfterPopupShowActive();
+
 
     }
     void OnPopupHide(PopupType type)
     {
         if (this.Type != type) return;
-        Popup.SetActive(false);
+        StartCoroutine(HideRoutine());
 
+    }
+    protected virtual void BeforePopupShowActive()
+    {
+
+    }
+    protected virtual void AfterPopupShowActive()
+    {
+
+    }
+
+    protected virtual IEnumerator BeforePopupHideActive()
+    {
+        yield break;
+
+    }
+
+    IEnumerator HideRoutine()
+    {
+        yield return StartCoroutine(BeforePopupHideActive());
+        Popup.SetActive(false);
     }
 
 }
