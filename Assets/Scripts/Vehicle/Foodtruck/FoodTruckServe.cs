@@ -8,7 +8,7 @@ public class FoodTruckServe : InteractableBase
     {
         if (Truck.CurrentState == TruckState.Stopped)
         {
-            Truck.TryStartServe();
+            Truck.TryServe();
         }
         else if (Truck.CurrentState == TruckState.Serving)
         {

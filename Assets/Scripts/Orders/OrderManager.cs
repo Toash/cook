@@ -26,7 +26,8 @@ public class OrderManager : MonoBehaviour
     /// Orders that the player has to currently make.
     /// </summary>
     public List<Order> ActiveOrders = new List<Order>();
-    public event Action<Order> ActiveOrderSuccessfullySubmitted;
+    public event Action<OrderSubmissionResult> PlayerSubmittedOrder; // player has submitted the order
+    public event Action<OrderSubmissionResult> NPCEvaluatedOrder; // npc has evaluted order
     public event Action<Order> ActiveOrderAdded;
     public event Action<Order> ActiveOrderRemoved;
 
@@ -56,7 +57,6 @@ public class OrderManager : MonoBehaviour
             order.TimeSinceOrdered += Time.deltaTime;
         }
 
-        Debug.Log(HasProposedOrder());
     }
 
     public Order GetActiveOrderFromID(int ID)
@@ -144,7 +144,7 @@ public class OrderManager : MonoBehaviour
     /// <param name="order"></param>
     /// <param name="preparedItems"></param>
     /// <returns></returns>
-    public OrderSubmissionResult TrySubmit(Order order, List<PreparedItem> preparedItems)
+    public OrderSubmissionResult PlayerTrySubmit(Order order, List<PreparedItem> preparedItems)
     {
         Debug.Log("[OrderManager]: Received Order...");
         if (order == null)
@@ -174,9 +174,21 @@ public class OrderManager : MonoBehaviour
 
         // remove from active orders.
         RemoveActiveOrder(order);
-        ActiveOrderSuccessfullySubmitted?.Invoke(order);
 
-        return new OrderSubmissionResult(OrderSubmissionStatus.Success, order, eval, payout);
+        var res = new OrderSubmissionResult(OrderSubmissionStatus.Success, order, eval, payout);
+        PlayerSubmittedOrder?.Invoke(res);
+
+        return res;
+
+    }
+
+    /// <summary>
+    /// Call this method to indiciate that an NPC has evaluated their order.
+    /// </summary>
+    /// <param name="result"></param>
+    public void NPCEvaluateOrder(OrderSubmissionResult result)
+    {
+        NPCEvaluatedOrder?.Invoke(result);
 
     }
 

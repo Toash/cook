@@ -11,7 +11,10 @@ namespace Assets.Scripts.Characters.NPC
 
         public void Hold(GameObject item)
         {
-            item.transform.SetParent(HandRoot, true);
+            item.transform.SetParent(HandRoot);
+            item.transform.localPosition = Vector3.zero;
+            item.transform.localRotation = Quaternion.identity;
+
             heldItem = item;
         }
 

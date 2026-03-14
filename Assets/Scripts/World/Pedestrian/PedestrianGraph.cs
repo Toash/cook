@@ -27,6 +27,8 @@ public class PedestrianGraph : MonoBehaviour
     {
         if (!nodes.Contains(node))
             nodes.Add(node);
+
+        // nodes.Add(node);
     }
 
     public void UnregisterNode(SidewalkNode node)

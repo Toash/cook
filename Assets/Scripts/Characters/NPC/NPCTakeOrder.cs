@@ -37,6 +37,9 @@ public class NPCTakeOrder : NPCState
                 //container.transform.SetParent(HandSocket, worldPositionStays: false);
                 Brain.NPC.Hand.Hold(container.gameObject);
 
+
+                OrderManager.I.NPCEvaluateOrder(container.SubmissionResult);
+
                 OrderEvaluationResult eval = container.SubmissionResult.Evaluation;
                 OrderScoreCategories category = OrderEvaluator.GetScoreCategory(eval.Score01);
                 string message = NPCDialoguePresets.RandomEvaluationSaying(category);

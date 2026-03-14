@@ -22,6 +22,10 @@ public class PopupUI : MonoBehaviour
         playerController.PopupShow -= OnPopupShow;
         playerController.PopupHide -= OnPopupHide;
     }
+    void Start()
+    {
+        Popup.SetActive(false);
+    }
     void OnPopupShow(PopupType type)
     {
         if (this.Type != type) return;

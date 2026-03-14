@@ -134,6 +134,10 @@ public class OrderContainer : MonoBehaviour
     void LinkOrder(OrderReceipt receipt)
     {
         this.Receipt = receipt;
+
+        OrderManager.I.PlayerSubmittedOrder += OnActiveOrderSubmitted;
+
+
         ReceiptSnapped?.Invoke();
     }
     void UnlinkOrder(OrderReceipt receipt)
@@ -142,7 +146,18 @@ public class OrderContainer : MonoBehaviour
         {
             Debug.LogError("[OrderContainer]: The same receipt is not set in the OrderContainer but it is trying to be detached.");
         }
+        OrderManager.I.PlayerSubmittedOrder -= OnActiveOrderSubmitted;
         this.Receipt = null;
+    }
+
+
+    void OnActiveOrderSubmitted(OrderSubmissionResult result)
+    {
+        if (Receipt == null) return;
+        if (result.Order.ID != Receipt.OrderID) return;
+
+        this.SubmissionResult = result;
+
     }
 
 

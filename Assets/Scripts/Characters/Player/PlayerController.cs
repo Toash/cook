@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -80,6 +81,11 @@ public class PlayerController : MonoBehaviour
 
     ConstrainedContext constrainedContext;
     bool sprinting;
+    [ReadOnly]
+    public IVelocityProvider CurrentVelocityProvider;
+
+    public IConstrainer CurrentConstrainer { get; private set; }// the constrainer that the player is currently in
+
 
 
     // public bool IsBodyContrained { get; private set; } = false;
@@ -134,11 +140,21 @@ public class PlayerController : MonoBehaviour
 
         if (CharController.enabled)
         {
+
             Vector3 totalVelocity = moveVelocity + gravityVelocity;
+            if (CurrentVelocityProvider != null)
+            {
+                totalVelocity += CurrentVelocityProvider.GetVelocity();
+            }
             CharController.Move(totalVelocity * Time.deltaTime);
         }
 
     }
+
+
+
+
+
     public void SetPlayerMode(PlayerMode mode)
     {
         Debug.Log("[PlayerController]: Setting player mode to " + mode.ToString());
@@ -207,8 +223,12 @@ public class PlayerController : MonoBehaviour
         this.constrainedContext = constrainedContext;
 
         transform.position = constrainedContext.Constraint.position;
-        transform.rotation = constrainedContext.Constraint.rotation;
-        transform.SetParent(constrainedContext.Constraint, true);
+        // transform.rotation = constrainedContext.Constraint.rotation;
+        SetYawPitchFromQuaternion(constrainedContext.Constraint.localRotation);
+        // transform.SetParent(constrainedContext.Constraint, true);
+        transform.SetParent(constrainedContext.Constraint);
+
+        CurrentConstrainer = constrainedContext.Constrainer;
 
         BodyConstrained?.Invoke();
 
@@ -231,6 +251,7 @@ public class PlayerController : MonoBehaviour
         CharController.enabled = true;
 
         this.constrainedContext = null;
+        CurrentConstrainer = null;
 
 
         BodyUnconstrained?.Invoke();
@@ -340,6 +361,25 @@ public class PlayerController : MonoBehaviour
     {
         speedMultiplier = mult;
 
+    }
+    public void SetVelocityProvider(IVelocityProvider provider)
+    {
+        CurrentVelocityProvider = provider;
+
+    }
+    public void ClearVelocityProvider()
+    {
+        Debug.Log("[PlayerController]: Cleared velocity provider");
+        CurrentVelocityProvider = null;
+
+    }
+
+    void SetYawPitchFromQuaternion(Quaternion rotation)
+    {
+        Vector3 euler = rotation.eulerAngles;
+
+        yaw = euler.y;
+        pitch = euler.x;
     }
 
 #if UNITY_EDITOR

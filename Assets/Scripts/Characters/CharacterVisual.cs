@@ -10,15 +10,18 @@ public class CharacterVisual : MonoBehaviour
 
     [Header("Properties")]
     public float HorizontalRootLookAtSpeed = 10f;
+    [Tooltip("The max walkspeed to base walking animations off of.")]
+    public float TargetMaxWalkSpeed = 1.8f;
 
     [Header("References")]
     public Transform VisualRoot;
     public Moveable Moveable;
     public Animator Animator;
-    public string MovementBlendTreeParameter = "Vert";
+    public string WalkBlendTreeParameter = "Vert";
 
     [ShowInInspector, ReadOnly]
     Transform lookAtTarget;
+
 
     /// <summary>
     /// Set target for character to look at horizontally.
@@ -34,14 +37,17 @@ public class CharacterVisual : MonoBehaviour
         if (Moveable != null)
         {
             // todo update this for any speed
-            if (Moveable.GetMoveSpeed() > 0.3f)
-            {
-                Animator.SetFloat(MovementBlendTreeParameter, 1);
-            }
-            else
-            {
-                Animator.SetFloat(MovementBlendTreeParameter, 0);
-            }
+
+            var normalizedSpeed = (float)Moveable.GetMoveSpeed() / TargetMaxWalkSpeed;
+            // if (Moveable.GetMoveSpeed() > 0.3f)
+            // {
+            //     Animator.SetFloat(MovementBlendTreeParameter, 1);
+            // }
+            // else
+            // {
+            //     Animator.SetFloat(MovementBlendTreeParameter, 0);
+            // }
+            Animator.SetFloat(WalkBlendTreeParameter, normalizedSpeed);
         }
 
         HandleLookDir();

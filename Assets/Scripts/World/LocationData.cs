@@ -3,7 +3,7 @@
 namespace Assets.Scripts.World
 {
     /// <summary>
-    /// Scriptable object for buildings. Can be used to get buildings
+    /// Data object for a physical location in the world
     /// </summary>
     [CreateAssetMenu(fileName = "Location", menuName = "World/Location")]
     public class LocationData : ScriptableObject

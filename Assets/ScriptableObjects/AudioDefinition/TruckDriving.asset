@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e9344ecea4280544844371e44711c0d, type: 3}
+  m_Name: TruckDriving
+  m_EditorClassIdentifier: Assembly-CSharp::AudioDefinition
+  Resource: {fileID: 8300000, guid: 60b7d33de4ca7724bbb16c4661826f66, type: 3}
+  Settings: {fileID: 11400000, guid: fa27a8c629ea7c344b85f6fc0405003f, type: 2}

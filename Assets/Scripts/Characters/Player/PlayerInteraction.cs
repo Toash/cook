@@ -113,8 +113,9 @@ public class PlayerInteraction : MonoBehaviour
 
         if (Controller.CurrentControlMode == PlayerMode.BodyConstrained)
         {
-            Controller.UnconstrainBody();
+            // Controller.UnconstrainBody();
             // Controller.SetPlayerMode(PlayerMode.FullGameplay);
+            Controller.CurrentConstrainer.ConstraintInteract(context);
             return;
         }
 

@@ -14,7 +14,7 @@ public class ImpactAudio : AudioSourcePlayer
         base.Awake();
         if (AudioDef == null)
         {
-            AudioDef = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/BreadHit");
+            AudioDef = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/DefaultHit");
         }
         Initialize(AudioDef);
     }

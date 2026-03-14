@@ -13,7 +13,7 @@ public class NPCWaitInLine : NPCState
     }
     void OnLineChanged()
     {
-        Brain.Agent.SetDestination(Brain.CurrentFoodTruck.OrderLine.GetLinePositionForNPC(Brain));
+        Brain.Agent.SetDestination(Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.GetLinePositionForNPC(Brain));
     }
     public override void OnEnter(NPCBrain brain)
     {
@@ -22,16 +22,16 @@ public class NPCWaitInLine : NPCState
         {
             Debug.LogError("[NPC]: Current food truck is null!");
         }
-        Brain.CurrentFoodTruck.OrderLine.AddNPCToLine(brain);
-        NPC.Visuals.SetLookAtTarget(brain.CurrentFoodTruck.OrderLine.NPCLookAt);
+        Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.AddNPCToLine(brain);
+        NPC.Visuals.SetLookAtTarget(brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.NPCLookAt);
 
 
         // go to line position
-        brain.Agent.SetDestination(brain.CurrentFoodTruck.OrderLine.GetLinePositionForNPC(brain));
+        brain.Agent.SetDestination(brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.GetLinePositionForNPC(brain));
         brain.LineChanged += OnLineChanged;
 
         // already first in line
-        if (brain.CurrentFoodTruck.OrderLine.GetFirstNPCInLine() == brain)
+        if (brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.GetFirstNPCInLine() == brain)
         {
             OnNewFirstInLine(brain);
             return;

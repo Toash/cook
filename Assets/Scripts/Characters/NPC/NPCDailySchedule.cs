@@ -8,10 +8,13 @@ namespace Assets.Scripts.Characters.NPC
 {
     /// <summary>
     /// Default state <br/>
-    /// State in which the NPC should respond to their daily schedule. <br
+    /// State in which the NPC should respond to their daily schedule. <br/>
+    /// Wanders if there is no activity
     /// </summary>
     public class NPCDailySchedule : NPCState
     {
+        [Tooltip("The stopping distance for the sidewalk nodes when the npc wanders on the sidewalks")]
+        public float SidewalkNodeStopDistance = 5;
         public override string Name => "NPCDailySchedule";
 
         void OnEnterFoodTruck(FoodTruck truck)
@@ -73,6 +76,7 @@ namespace Assets.Scripts.Characters.NPC
                 return;
 
             SidewalkNode end = start.Neighbors[Random.Range(0, start.Neighbors.Count)];
+            NPC.Movement.Agent.stoppingDistance = SidewalkNodeStopDistance;
             NPC.Movement.Agent.SetDestination(end.transform.position);
         }
 
@@ -89,22 +93,23 @@ namespace Assets.Scripts.Characters.NPC
         }
 
 
-        // #if UNITY_EDITOR
-        //         void OnDrawGizmosSelected()
-        //         {
-        //             if (StartNode != null)
-        //             {
-        //                 Handles.Label(StartNode.transform.position, "Start node");
+#if UNITY_EDITOR
+        void OnDrawGizmosSelected()
+        {
+            // if (StartNode != null)
+            // {
+            //     Handles.Label(StartNode.transform.position, "Start node");
 
-        //             }
-        //             if (EndNode != null)
-        //             {
-        //                 Handles.Label(EndNode.transform.position, "End node");
+            // }
+            // if (EndNode != null)
+            // {
+            //     Handles.Label(EndNode.transform.position, "End node");
 
-        //             }
+            // }
+            Handles.DrawWireDisc(transform.position, Vector3.up, SidewalkNodeStopDistance);
 
-        //         }
-        // #endif
+        }
+#endif
 
     }
 }

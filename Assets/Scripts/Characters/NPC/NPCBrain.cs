@@ -99,6 +99,7 @@ public class NPCBrain : MonoBehaviour
     }
     void OnTriggerStay(Collider other)
     {
+        if (other.attachedRigidbody == null) return;
         if (other.attachedRigidbody.TryGetComponent<FoodTruck>(out var truck))
         {
             if (truck.IsServing && CurrentFoodTruck == null)
@@ -109,6 +110,7 @@ public class NPCBrain : MonoBehaviour
     }
     void OnTriggerExit(Collider other)
     {
+        if (other.attachedRigidbody == null) return;
         if (other.attachedRigidbody.TryGetComponent<FoodTruck>(out var truck))
         {
             if (CurrentFoodTruck != null)

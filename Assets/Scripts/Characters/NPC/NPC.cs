@@ -11,7 +11,7 @@ public class NPC : MonoBehaviour
     //public string NPCName = "Timmy";
 
     public NPCBrain Brain;
-    public NPCSchedule Schedule;
+    public NPCScheduleController Schedule;
 
     public NPCMovement Movement;
     public NPCHand Hand;

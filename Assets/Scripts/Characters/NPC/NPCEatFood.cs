@@ -9,7 +9,7 @@ namespace Assets.Scripts.Characters.NPC
 
         public override void OnEnter(NPCBrain brain)
         {
-            brain.Agent.SetDestination(Brain.CurrentFoodTruck.WaitingSpot.transform.position);
+            brain.Agent.SetDestination(Brain.CurrentFoodTruck.CurrentParkingSpot.WaitingSpot.transform.position);
             brain.NPC.Hand.DestroyHeldItem(5);
             Brain.TimeSinceLastAte = Time.time;
 

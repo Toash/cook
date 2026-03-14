@@ -85,7 +85,7 @@ public class SingleOrderSubmissionArea : MonoBehaviour
         CurrentContainer.TryGetLinkedOrder(out Order order);
         CurrentContainer.TryGetPreparedItems(out List<PreparedItem> items);
 
-        OrderSubmissionResult result = OrderManager.I.TrySubmit(order, items);
+        OrderSubmissionResult result = OrderManager.I.PlayerTrySubmit(order, items);
 
         // if (result.Status != OrderSubmissionStatus.Success)
         // {

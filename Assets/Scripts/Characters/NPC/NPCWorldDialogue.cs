@@ -11,10 +11,6 @@ public class NPCWorldDialogue : MonoBehaviour
     public GameObject TextObject;
     public TMP_Text Text;
     float timeToHide = 0;
-    void Start()
-    {
-        Say("Hello!!");
-    }
     void Update()
     {
         transform.LookAt(Camera.main.transform);

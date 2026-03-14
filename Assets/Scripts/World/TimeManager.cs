@@ -25,6 +25,7 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     public event Action<int, int> MinuteChanged;
 
+
     void Awake()
     {
         if (I != null && I != this)

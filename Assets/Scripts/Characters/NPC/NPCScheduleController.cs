@@ -9,8 +9,9 @@ namespace Assets.Scripts.Characters.NPC
     /// <summary>
     /// Invokes events when time to enter and exit activities.
     /// </summary>
-    public class NPCSchedule : MonoBehaviour
+    public class NPCScheduleController : MonoBehaviour
     {
+        // the schedule that the npc has.
         public Schedule Schedule;
 
         [ShowInInspector, ReadOnly]
@@ -20,6 +21,7 @@ namespace Assets.Scripts.Characters.NPC
 
         void Start()
         {
+            if (Schedule == null) return;
             if (Schedule.HasOverlaps())
             {
                 Debug.LogError("NPC Schedule has overlaps!");
@@ -30,6 +32,7 @@ namespace Assets.Scripts.Characters.NPC
         }
         void OnDestroy()
         {
+            if (Schedule == null) return;
             TimeManager.I.MinuteChanged -= OnMinuteChanged;
             ActivityEnter -= OnActivityEnter;
             ActivityExit -= OnActivityExit;

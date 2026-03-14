@@ -1,4 +1,6 @@
 ﻿using System;
+using IngameDebugConsole;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,32 +12,69 @@ namespace Assets.Scripts.Vehicle
         Driving,
         Serving
     }
-    [RequireComponent(typeof(Rigidbody))] // used to check speed
-    public class FoodTruck : MonoBehaviour
+    [RequireComponent(typeof(Rigidbody))] // used to check speed 
+    public class FoodTruck : MonoBehaviour, IVelocityProvider
     {
+        public SingleOrderSubmissionArea OrderSubmissionArea;
         public CarSeat Seat;
         private Rigidbody rb;
+        public FoodTruckInfluence Influence;
+        public FoodTruckCollider TruckCollider;
+
+        public TruckParking CurrentParkingSpot { get; private set; }
+        [ShowInInspector, ReadOnly]
+        private TruckParking overlappedParkingSpot;
+
+        public event Action EnteredParkingSpot;
+        public event Action LeftParkingSpot;
 
         public event Action<TruckState> EnteredState;
         public event Action StoppedServing;
+        public bool IsServing
+        {
+            get => currentState == TruckState.Serving && CurrentParkingSpot != null;
+        }
         void OnValidate()
         {
             if (rb == null)
             {
                 rb = GetComponent<Rigidbody>();
             }
+
         }
-        public bool IsServing
+        void Start()
         {
-            get => currentState == TruckState.Serving;
+            Influence.gameObject.SetActive(false);
+            TruckCollider.EnteredParking += OnEnteredParking;
+            TruckCollider.ExitedParking += OnExitedParking;
+
+            Seat.PlayerInSeatSeconaryInteraction += TryServe;
+
+        }
+
+        void OnDestroy()
+        {
+            TruckCollider.EnteredParking -= OnEnteredParking;
+            TruckCollider.ExitedParking -= OnExitedParking;
+
         }
 
 
-        public OrderLine OrderLine;
+        void OnEnteredParking(TruckParking parking)
+        {
+            overlappedParkingSpot = parking;
 
-        public OrderWaitingSpot WaitingSpot;
+        }
+        void OnExitedParking(TruckParking parking)
+        {
+            overlappedParkingSpot = null;
+            if (CurrentParkingSpot != null)
+            {
+                CurrentParkingSpot = null;
+            }
 
-        public SingleOrderSubmissionArea OrderSubmissionArea;
+        }
+
 
         public TruckState CurrentState
         {
@@ -53,6 +92,7 @@ namespace Assets.Scripts.Vehicle
 
                 }
                 if (currentState == TruckState.Serving && value != TruckState.Serving) StoppedServing?.Invoke();
+                if (value == TruckState.Serving && CurrentParkingSpot == null) return;
 
                 currentState = value;
                 EnteredState?.Invoke(value);
@@ -77,8 +117,9 @@ namespace Assets.Scripts.Vehicle
 
 
 
-        void OnGotInSeat()
+        void OnGotInSeat(PlayerController playerController)
         {
+            playerController.CurrentVelocityProvider = this;
             StartDriving();
         }
         void OnGotOutSeat()
@@ -88,36 +129,34 @@ namespace Assets.Scripts.Vehicle
 
 
 
-        // public void SetTruckState(TruckState newState)
-        // {
-        //     switch (newState)
-        //     {
-        //         case TruckState.Stopped:
-        //             break;
-        //         case TruckState.Driving:
-        //             break;
-        //         case TruckState.Serving:
-        //             break;
-
-        //     }
-        //     CurrentState = newState;
-        //     EnteredState?.Invoke(newState);
-
-        // }
 
         /// <summary>
         /// Start accepting customers
         /// </summary>
         /// <returns></returns>
-        public bool TryStartServe()
+        [Button]
+        public void TryServe()
         {
-            if (CurrentState != TruckState.Stopped) return false;
-            if (IsMoving()) return false;
+            // if (CurrentState != TruckState.Stopped) return false;
+            // if (IsMoving()) return false;
 
-            // TODO bounds checking
+            if (overlappedParkingSpot == null) return;
+            if (Seat.PlayerInSeat == null) return;
 
+            Debug.Log("[FoodTruck]: Serving");
+
+
+            // parent the player to the truck so it moves with it.
+
+            // Seat.PlayerInSeat.transform.SetParent(transform);
+            rb.MovePosition(overlappedParkingSpot.transform.position);
+            rb.MoveRotation(overlappedParkingSpot.transform.rotation);
+            // Seat.PlayerInSeat.transform.SetParent(null);
+
+
+            CurrentParkingSpot = overlappedParkingSpot;
             CurrentState = TruckState.Serving;
-            return true;
+            return;
         }
         public void StopServing()
         {
@@ -152,6 +191,11 @@ namespace Assets.Scripts.Vehicle
             message += "Truck State: " + CurrentState.ToString();
             Handles.Label(transform.position, message);
 
+        }
+
+        public Vector3 GetVelocity()
+        {
+            return rb.linearVelocity;
         }
 #endif
 

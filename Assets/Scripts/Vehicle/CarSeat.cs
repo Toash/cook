@@ -1,5 +1,6 @@
 using System;
 using Sirenix.OdinInspector;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
 /// <summary>
@@ -13,9 +14,21 @@ public class CarSeat : InteractableBase, IConstrainer
     public Transform SeatPosition;
     public Transform GetOutPosition;
 
-    public event Action GotInSeat;
+    public event Action<PlayerController> GotInSeat;
+    public event Action PlayerInSeatSeconaryInteraction;
     public event Action GotOutSeat;
 
+    public void ConstraintInteract(InteractionContext context)
+    {
+        if (context.Type == InteractType.Primary)
+        {
+            context.Player.Controller.UnconstrainBody();
+        }
+        else if (context.Type == InteractType.Secondary)
+        {
+            PlayerInSeatSeconaryInteraction?.Invoke();
+        }
+    }
 
     public override void Interact(InteractionContext context)
     {
@@ -23,7 +36,7 @@ public class CarSeat : InteractableBase, IConstrainer
         PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, ConstrainType.Truck, SeatPosition, GetOutPosition));
         context.Player.Controller.ForceFirstPerson();
 
-        GotInSeat?.Invoke();
+        GotInSeat?.Invoke(context.Player.Controller);
     }
 
     public void OnUnConstrained()
