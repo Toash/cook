@@ -16,9 +16,8 @@ public class SnapArea : MonoBehaviour
     public bool OnlyOneSnap = true;
     public bool SnapToCenter = true; // if true, the snapper will snap to the center of the snap area.  if false, it will snap to the exact position of the snap area.
     public Snapper ParentSnapper;
-    public SnapType AcceptingTypes; // the types that can snap to this.
-                                    // public float MaxDistance = 1f;
-                                    // public float MaxAngle = 15f;
+    // public SnapType AcceptingTypes; // the types that can snap to this.
+    // public List<SnapType> AcceptingTypes; // the types that can snap to this.
 
     public List<Snapper> OccupiedSnappers;
 

@@ -1,3 +1,4 @@
+using Mono.Cecil.Cil;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using UnityEditor;
@@ -29,7 +30,7 @@ public class OrderLine : MonoBehaviour
     /// Invokves whenever the line changes, passes the first NPC in line first
     /// NPCs in this line should subscribe to this, to determine if they are first or not
     /// </summary>
-    public event System.Action<NPCBrain> NewFirstInLine;
+    public event System.Action<NPCBrain> LineChanged;
 
 
 
@@ -51,33 +52,37 @@ public class OrderLine : MonoBehaviour
         return transform.position + transform.forward * LineSpacing * index;
     }
 
-    /// <summary>
-    /// Adds an NPC to a line <br/>
-    /// Subscribes the NPC to NewFirstInLine event.
-    /// </summary>
-    /// <param name="npc"></param>
     public void AddNPCToLine(NPCBrain npc)
     {
         Line.Enqueue(npc);
-        NewFirstInLine += npc.OnFirstInLineChanged;
+        LineChanged += npc.OnLineChanged;
         // NewFirstInLine?.Invoke(Line.Peek());
+        LineChanged?.Invoke(Line.Peek());
     }
-
-
     /// <summary>
-    /// Removes an NPC from a line <br/>
-    /// Unsubscribes from the NewFirstInLine event. <br/>
-    /// Calling this method first the NewFirstInLine event for the next NPC.
+    /// Removes an npc from the line. Does not necessarily remove the first.
     /// </summary>
     /// <param name="npc"></param>
-    public bool RemoveNPCFromLineIfFirst(NPCBrain npc)
+    public void RemoveNPCFromLineIfFirst(NPCBrain npc)
     {
-        var firstNpcInLine = Line.Peek();
-        if (npc != firstNpcInLine) return false;
-        NewFirstInLine -= firstNpcInLine.OnFirstInLineChanged;
+        var firstNPC = Line.Peek();
+        if (firstNPC != npc) return;
+
         Line.Dequeue();
-        NewFirstInLine?.Invoke(Line.Peek());
-        return true;
+        LineChanged -= firstNPC.OnLineChanged;
+
+        LineChanged?.Invoke(firstNPC);
+    }
+
+    public void ClearLine()
+    {
+        NPCBrain npc;
+        while ((npc = Line.Peek()) != null)
+        {
+            RemoveNPCFromLineIfFirst(npc);
+
+        }
+
     }
 
 

@@ -105,12 +105,21 @@ public class PlayerInteraction : MonoBehaviour
         // }
 
 
+        // TODO get the name for all of these actinos to display in a tooltip
+
+        // interactinon based on the current context
         if (Controller.CurrentControlMode == PlayerMode.InPopup)
         {
             Controller.CloseCurrentPopup();
             return;
         }
 
+        // if (Controller.CurrentConstrainer != null)
+        // {
+        //     Controller.CurrentConstrainer.ConstraintInteract(context);
+        //     return;
+
+        // }
         if (Controller.CurrentControlMode == PlayerMode.BodyConstrained)
         {
             // Controller.UnconstrainBody();

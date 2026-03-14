@@ -21,34 +21,46 @@ public class OrderContainer : MonoBehaviour
     public OrderReceipt Receipt;
     [ReadOnly, Tooltip("Gets set when the container is submitted")]
     public OrderSubmissionResult SubmissionResult;
-    private Snapper snapper;
+    public Snapper Snapper { get; private set; }
 
     public event Action PreparedItemUpdated; // indicates that a prepared item was updated inside of this order container.
     public event Action ReceiptSnapped;
 
 
-    void OnValidate()
+    void InitRef()
     {
         if (TryGetComponent<Collider>(out var collider))
         {
             collider.isTrigger = true;
         }
 
+        if (Snapper == null)
+        {
+            Snapper = GetComponent<Snapper>();
+            Snapper.SetSnapType(SnapType.Container);
+        }
+        if (Snapper.AcceptingSnapTypes == null)
+        {
+            Snapper.AcceptingSnapTypes = new List<SnapType> { SnapType.Food, SnapType.Receipt };
+        }
+    }
+    void OnValidate()
+    {
+        InitRef();
     }
     void Awake()
     {
-        snapper = GetComponent<Snapper>();
-        snapper.SetSnapType(SnapType.Container);
+        InitRef();
     }
     void OnEnable()
     {
-        snapper.OnChildSnapped += OnSnap;
-        snapper.OnChildDetached += OnDetached;
+        Snapper.OnChildSnapped += OnSnap;
+        Snapper.OnChildDetached += OnDetached;
     }
     void OnDisable()
     {
-        snapper.OnChildSnapped -= OnSnap;
-        snapper.OnChildDetached -= OnDetached;
+        Snapper.OnChildSnapped -= OnSnap;
+        Snapper.OnChildDetached -= OnDetached;
     }
 
 

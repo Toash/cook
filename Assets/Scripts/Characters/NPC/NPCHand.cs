@@ -9,6 +9,10 @@ namespace Assets.Scripts.Characters.NPC
         private GameObject heldItem;
 
 
+        /// <summary>
+        /// Parents gameobject to hand
+        /// </summary>
+        /// <param name="item"></param>
         public void Hold(GameObject item)
         {
             item.transform.SetParent(HandRoot);

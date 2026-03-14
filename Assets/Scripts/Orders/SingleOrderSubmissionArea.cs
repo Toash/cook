@@ -112,6 +112,7 @@ public class SingleOrderSubmissionArea : MonoBehaviour
 
         container = CurrentContainer;
 
+        CurrentContainer.Snapper.Detach();
         CurrentContainer.ReceiptSnapped -= TrySubmitCurrentContainer;
         CurrentContainer.PreparedItemUpdated -= TrySubmitCurrentContainer;
 

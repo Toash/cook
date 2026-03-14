@@ -44,7 +44,6 @@ namespace Assets.Scripts.Vehicle
         }
         void Start()
         {
-            Influence.gameObject.SetActive(false);
             TruckCollider.EnteredParking += OnEnteredParking;
             TruckCollider.ExitedParking += OnExitedParking;
 
@@ -63,6 +62,7 @@ namespace Assets.Scripts.Vehicle
         void OnEnteredParking(TruckParking parking)
         {
             overlappedParkingSpot = parking;
+            EnteredParkingSpot?.Invoke();
 
         }
         void OnExitedParking(TruckParking parking)
@@ -72,6 +72,7 @@ namespace Assets.Scripts.Vehicle
             {
                 CurrentParkingSpot = null;
             }
+            LeftParkingSpot?.Invoke();
 
         }
 
@@ -91,7 +92,11 @@ namespace Assets.Scripts.Vehicle
                         break;
 
                 }
-                if (currentState == TruckState.Serving && value != TruckState.Serving) StoppedServing?.Invoke();
+                if (currentState == TruckState.Serving && value != TruckState.Serving)
+                {
+                    StopServing();
+
+                }
                 if (value == TruckState.Serving && CurrentParkingSpot == null) return;
 
                 currentState = value;
@@ -119,12 +124,10 @@ namespace Assets.Scripts.Vehicle
 
         void OnGotInSeat(PlayerController playerController)
         {
-            playerController.CurrentVelocityProvider = this;
             StartDriving();
         }
         void OnGotOutSeat()
         {
-            StopDriving();
         }
 
 
@@ -151,7 +154,9 @@ namespace Assets.Scripts.Vehicle
             // Seat.PlayerInSeat.transform.SetParent(transform);
             rb.MovePosition(overlappedParkingSpot.transform.position);
             rb.MoveRotation(overlappedParkingSpot.transform.rotation);
+            rb.linearVelocity = Vector3.zero;
             // Seat.PlayerInSeat.transform.SetParent(null);
+
 
 
             CurrentParkingSpot = overlappedParkingSpot;
@@ -160,17 +165,15 @@ namespace Assets.Scripts.Vehicle
         }
         public void StopServing()
         {
-            CurrentState = TruckState.Stopped;
+            StoppedServing?.Invoke();
+            OrderManager.I.RemoveProposedOrder();
+            OrderManager.I.RemoveAllActiveOrders();
 
         }
 
         void StartDriving()
         {
             CurrentState = TruckState.Driving;
-        }
-        void StopDriving()
-        {
-            CurrentState = TruckState.Stopped;
         }
 
         // public
@@ -185,11 +188,20 @@ namespace Assets.Scripts.Vehicle
         }
 
 #if UNITY_EDITOR
+        GUIStyle style = new();
         void OnDrawGizmos()
         {
+            style.normal.textColor = Color.blue;
+            style.fontSize = 24;
+
             string message = "Truck Speed: " + GetTruckSpeed() + "\n";
-            message += "Truck State: " + CurrentState.ToString();
-            Handles.Label(transform.position, message);
+            message += "Truck State: " + CurrentState.ToString() + "\n";
+            if (overlappedParkingSpot != null)
+            {
+                message += "In parking spot\n";
+
+            }
+            Handles.Label(transform.position, message, style);
 
         }
 

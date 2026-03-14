@@ -137,6 +137,11 @@ public class OrderManager : MonoBehaviour
 
         ProposedOrderAcknowledged?.Invoke(newOrder);
     }
+    public void RemoveProposedOrder()
+    {
+        ProposedOrderRemoved?.Invoke(ProposedOrder);
+        ProposedOrder = null;
+    }
 
     /// <summary>
     /// Tries to submit an order. Can be successful or not.
@@ -204,6 +209,15 @@ public class OrderManager : MonoBehaviour
     {
         if (!ActiveOrders.Remove(order)) return;
         ActiveOrderRemoved?.Invoke(order);
+    }
+
+
+    public void RemoveAllActiveOrders()
+    {
+        foreach (var order in ActiveOrders)
+        {
+            RemoveActiveOrder(order);
+        }
     }
 
 

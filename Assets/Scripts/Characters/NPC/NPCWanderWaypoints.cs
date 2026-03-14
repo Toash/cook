@@ -22,7 +22,7 @@ namespace Assets.Scripts.Characters.NPC
         }
         void OnFoodTruckEntered(FoodTruck truck)
         {
-            Brain.ChangeState("NPCWaitInLine");
+            Brain.ChangeState("NPCOrderLine");
 
         }
         public override void OnEnter(NPCBrain brain)

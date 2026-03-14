@@ -34,7 +34,7 @@ public class NPCManager : MonoBehaviour
 
         var npc = GameObject.Instantiate(I.NPC, spawnPoint, Quaternion.identity);
         npc.Brain.CurrentFoodTruck = I.Truck;
-        npc.Brain.InitialStateString = "NPCWaitInLine";
+        npc.Brain.InitialStateString = "NPCOrderLine";
 
 
 

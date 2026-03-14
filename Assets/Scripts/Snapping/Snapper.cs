@@ -22,7 +22,12 @@ public class Snapper : MonoBehaviour
     [Tooltip("Determines what type of snappers can snap to others.")]
     [ShowInInspector]
     public SnapType SnapType { get; private set; }
+    /// <summary>
+    /// Empty list means all
+    /// </summary>
+    public List<SnapType> AcceptingSnapTypes = new List<SnapType>();
 
+    [Sirenix.OdinInspector.ReadOnly]
     public List<SnapConnection> ParentSnapConnections = new List<SnapConnection>();
 
 
@@ -45,14 +50,19 @@ public class Snapper : MonoBehaviour
 
     bool JointTypesCanSnap(Snapper other)
     {
-        if (SnapType == SnapType.Receipt && other.SnapType == SnapType.Food)
-        {
-            return false;
-        }
-        if (SnapType == SnapType.Food && other.SnapType == SnapType.Receipt)
-        {
-            return false;
-        }
+        // if (SnapType == SnapType.Receipt && other.SnapType == SnapType.Food)
+        // {
+        //     return false;
+        // }
+        // if (SnapType == SnapType.Food && other.SnapType == SnapType.Receipt)
+        // {
+        //     return false;
+        // }
+
+        if (other.AcceptingSnapTypes.Count == 0) return true;
+        if (!other.AcceptingSnapTypes.Contains(SnapType)) return false;
+
+
 
         return true;
     }
@@ -67,26 +77,26 @@ public class Snapper : MonoBehaviour
     /// Snap this snapper to another snapper from their snap area.
     /// </summary>
     /// <param name="placementRaycastInfo"></param>
-    /// <param name="parentSnapper"></param>
-    /// <param name="snapArea"></param>
-    public bool TrySnapToArea(PlacementInfo placementRaycastInfo, Snapper parentSnapper, SnapArea snapArea)
+    /// <param name="otherSnapper"></param>
+    /// <param name="otherSnapArea"></param>
+    public bool TrySnapToArea(PlacementInfo placementRaycastInfo, Snapper otherSnapper, SnapArea otherSnapArea)
     {
-        if (!CanSnap(snapArea))
+        if (!CanSnap(otherSnapArea))
         {
-            Debug.Log("Cannot snap " + gameObject.name + " to " + parentSnapper.gameObject.name + " due to incompatible snap types.");
+            Debug.Log("Cannot snap " + gameObject.name + " to " + otherSnapper.gameObject.name + " due to incompatible snap types.");
             return false;
         }
 
 
         // create snap connection
-        SnapConnection thisConnection = new SnapConnection(parentSnapper);
+        SnapConnection thisConnection = new SnapConnection(otherSnapper);
         ParentSnapConnections.Add(thisConnection);
-        parentSnapper.ChildSnapped(this);
+        otherSnapper.ChildSnapped(this);
 
 
         // occupy snap area
         // snapArea.OccupiedSnappers.Add(this);
-        if (!snapArea.TryAddSnapper(this))
+        if (!otherSnapArea.TryAddSnapper(this))
         {
             return false;
         }
@@ -100,9 +110,9 @@ public class Snapper : MonoBehaviour
 
 
         // actually place
-        transform.position = snapArea.GetSnapPoint(placementRaycastInfo);
-        transform.rotation = snapArea.GetSnapRotation(placementRaycastInfo);
-        transform.SetParent(parentSnapper.transform, worldPositionStays: true);
+        transform.position = otherSnapArea.GetSnapPoint(placementRaycastInfo);
+        transform.rotation = otherSnapArea.GetSnapRotation(placementRaycastInfo);
+        transform.SetParent(otherSnapper.transform, worldPositionStays: true);
 
         return true;
     }

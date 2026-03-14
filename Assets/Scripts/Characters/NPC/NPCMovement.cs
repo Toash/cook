@@ -48,14 +48,31 @@ public class NPCMovement : Moveable
     {
         return Agent.velocity.magnitude;
     }
+    public System.Collections.IEnumerator MoveAndAwait(Vector3 pos)
+    {
+        Agent.SetDestination(pos);
+
+        // wait until the path is ready
+        yield return new WaitUntil(() => !Agent.pathPending);
+
+        // wait until the agent reaches the destination
+        while (!AgentUtils.HasAgentReachedDestination(Agent))
+        {
+            yield return null;
+        }
+
+    }
+
 
 
 #if UNITY_EDITOR
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         if (Agent != null)
         {
             Handles.Label(transform.position + Vector3.up * 2, $"Speed: {Agent.velocity.magnitude:F2}");
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(Agent.destination, .2f);
         }
 
         if (currentPath == null) return;

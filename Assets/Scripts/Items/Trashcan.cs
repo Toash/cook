@@ -1,22 +1,36 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Snapper))]
 public class Trashcan : MonoBehaviour
 {
-    private Snapper snapper;
+    public Snapper Snapper;
+    void InitRef()
+    {
+
+        if (Snapper == null)
+        {
+            Snapper = GetComponent<Snapper>();
+            Snapper.SetSnapType(SnapType.Container);
+        }
+    }
 
     void Awake()
     {
-        snapper = GetComponent<Snapper>();
+        InitRef();
+    }
+    void Start()
+    {
+        InitRef();
     }
 
     void OnEnable()
     {
-        snapper.OnChildSnapped += OnSnapped;
+        Snapper.OnChildSnapped += OnSnapped;
     }
     void OnDisable()
     {
-        snapper.OnChildSnapped -= OnSnapped;
+        Snapper.OnChildSnapped -= OnSnapped;
     }
 
 

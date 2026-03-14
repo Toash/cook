@@ -25,6 +25,12 @@ public class TruckParking : MonoBehaviour
         }
 
     }
+    void Awake()
+    {
+        if (OrderLine == null) Debug.LogError("[Parking]: OrderLine is null!");
+        if (WaitingSpot == null) Debug.LogError("[Parking]: WaitingSpot is null!");
+
+    }
 
 
 

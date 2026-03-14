@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using Assets.Scripts.Ingredient.MenuItem;
 
+/// <summary>
+/// Represents an order that an npc is proposing.
+/// </summary>
 [System.Serializable]
 public class OrderProposition
 {

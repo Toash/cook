@@ -19,17 +19,27 @@ public class Ingredient : MonoBehaviour
     public Snapper Snapper { get; private set; }
 
 
-
-    void OnValidate()
+    void InitRef()
     {
+
         if (TryGetComponent<Collider>(out var collider))
         {
             collider.isTrigger = true;
         }
+        if (Snapper == null)
+        {
+            Snapper = GetComponent<Snapper>();
+            Snapper.SetSnapType(SnapType.Container);
+        }
+    }
+
+    void OnValidate()
+    {
+        InitRef();
     }
     void Awake()
     {
-        Snapper = GetComponent<Snapper>();
+        InitRef();
     }
     void Start()
     {

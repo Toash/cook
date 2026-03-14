@@ -19,7 +19,7 @@ namespace Assets.Scripts.Characters.NPC
 
         void OnEnterFoodTruck(FoodTruck truck)
         {
-            Brain.ChangeState("NPCWaitInLine");
+            Brain.ChangeState("NPCOrderLine");
 
         }
         void OnActivityEnter(Activity activity)

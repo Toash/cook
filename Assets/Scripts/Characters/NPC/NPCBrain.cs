@@ -35,8 +35,30 @@ public class NPCBrain : MonoBehaviour
 
     // ------- FOOD TRUCK-----------------    
 
-    [ReadOnly]
+    [ShowInInspector, ReadOnly]
     public FoodTruck CurrentFoodTruck;
+    // {
+    //     get
+    //     {
+    //         if (_currentFoodTruck != null)
+    //         {
+    //             return _currentFoodTruck;
+    //         }
+    //         else
+    //         {
+    //             Debug.LogError("[NPCBrain]: current food truck is null!");
+    //             if (CurrentState.Name != DefaultStateString)
+    //             {
+    //                 ChangeState(DefaultStateString);
+
+    //             }
+    //             return null;
+    //         }
+    //     }
+    //     set => _currentFoodTruck = value;
+
+    // }
+    // private FoodTruck _currentFoodTruck;
     //[ReadOnly]
     //public OrderLine CurrentOrderLine;
     [ReadOnly]
@@ -46,9 +68,9 @@ public class NPCBrain : MonoBehaviour
     /// <summary>
     /// Invoked when the NPC becomes first in line.
     /// </summary>
-    public event Action<NPCBrain> BecameFirstInLine;
     public event Action LineChanged;
     public event Action<FoodTruck> EnteredFoodTruck;
+    public event Action<FoodTruck> ExitedFoodTruck;
 
     private Rigidbody rb;
     public SphereCollider TriggerCol;
@@ -99,26 +121,23 @@ public class NPCBrain : MonoBehaviour
     }
     void OnTriggerStay(Collider other)
     {
-        if (other.attachedRigidbody == null) return;
-        if (other.attachedRigidbody.TryGetComponent<FoodTruck>(out var truck))
+        if (other.TryGetComponent<FoodTruckInfluence>(out var influence))
         {
-            if (truck.IsServing && CurrentFoodTruck == null)
+            if (influence.FoodTruck.IsServing && CurrentFoodTruck == null)
             {
-                EnterTruck(truck);
+                EnterTruck(influence.FoodTruck);
             }
         }
     }
     void OnTriggerExit(Collider other)
     {
-        if (other.attachedRigidbody == null) return;
-        if (other.attachedRigidbody.TryGetComponent<FoodTruck>(out var truck))
+        if (other.TryGetComponent<FoodTruckInfluence>(out var influence))
         {
             if (CurrentFoodTruck != null)
             {
-                LeaveTruck();
+                LeaveCurrentTruck();
             }
         }
-
     }
     void Update()
     {
@@ -159,43 +178,52 @@ public class NPCBrain : MonoBehaviour
 
 
     /// <summary>
-    /// Pass this as callbakc when subscribing to an OrderLocation line.
+    /// Pass this as callback when subscribing to an OrderLocation line.
     /// </summary>
     /// <param name="brain"></param>
-    public void OnFirstInLineChanged(NPCBrain brain)
+    public void OnLineChanged(NPCBrain brain)
     {
         LineChanged?.Invoke();
         if (brain != this) return;
         Debug.Log("[NPCBrain]: Became first in line");
-        BecameFirstInLine?.Invoke(brain);
     }
 
     void EnterTruck(FoodTruck truck)
     {
+        Debug.Log("[NPCBrain]: Entered food truck");
         CurrentFoodTruck = truck;
-        truck.StoppedServing += LeaveTruck;
+        truck.StoppedServing += LeaveCurrentTruck;
+        truck.LeftParkingSpot += LeaveCurrentTruck;
         EnteredFoodTruck?.Invoke(truck);
 
     }
-    void LeaveTruck()
+    void LeaveCurrentTruck()
     {
-        CurrentFoodTruck.StoppedServing -= LeaveTruck;
-        CurrentFoodTruck = null;
+        if (CurrentFoodTruck == null) Debug.LogError("[NPCBrain]: No current truck");
+
+        Debug.Log("[NPCBrain]: Left food truck");
+        ExitedFoodTruck?.Invoke(CurrentFoodTruck);
+
+        CurrentFoodTruck.StoppedServing -= LeaveCurrentTruck;
+        CurrentFoodTruck.LeftParkingSpot -= LeaveCurrentTruck;
+
         ChangeState(DefaultStateString);
+
+        CurrentFoodTruck = null;// do afterwards so it is not null when states try to access it.
     }
 
 
 #if UNITY_EDITOR
     GUIStyle style = new();
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         style.normal.textColor = Color.blue;
         style.fontStyle = FontStyle.Bold;
         string message = "";
-        if (InitialStateString != null)
-        {
-            message += "Initial State: " + InitialStateString + "\n";
-        }
+        // if (InitialStateString != null)
+        // {
+        //     message += "Initial State: " + InitialStateString + "\n";
+        // }
         if (CurrentState != null)
         {
             message += "CurrentState: " + CurrentState.Name + "\n";

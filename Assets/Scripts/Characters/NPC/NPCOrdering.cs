@@ -15,6 +15,7 @@ public class NPCOrdering : NPCState
     }
     public override void OnEnter(NPCBrain brain)
     {
+        // NPC is still pathfinding wait until arrived at destination.
         OrderManager.I.ProposedOrderAcknowledged += OnProposedOrderAcknowledged;
         var prop = OrderManager.I.GenerateRandomOrderProposition(brain.NPC);
         OrderManager.I.ProposeOrder(prop);
@@ -24,14 +25,6 @@ public class NPCOrdering : NPCState
     {
         OrderManager.I.ProposedOrderAcknowledged -= OnProposedOrderAcknowledged;
         Brain.NPC.Visuals.SetLookAtTarget(null);
-        // if (brain.CurrentOrderLine.RemoveNPCFromLineIfFirst(brain))
-        // {
-        //     Destroy(brain.gameObject);
-        // }
-        // else
-        // {
-        //     Debug.LogError("[NPC]: Trying to leave line from Ordering but is not first in line.");
-        // }
     }
 
     public override void OnFixedUpdate(NPCBrain brain)

@@ -121,6 +121,9 @@ public class PlayerController : MonoBehaviour
                 moveVelocity = Vector3.zero;
                 // Cursor.lockState = CursorLockMode.None;
                 HandleGravity();
+                HandleJumping();
+                HandleWishVelocity();
+                HandleAcceleratingVelocity();
                 break;
         }
 
@@ -186,6 +189,9 @@ public class PlayerController : MonoBehaviour
     public void ShowPopup(PopupType type)
     {
         if (CurrentControlMode == PlayerMode.InPopup) return;
+
+        if (CurrentControlMode != PlayerMode.FullGameplay) return;
+
         if (type == PopupType.None) return;
         if (currentPopupType != PopupType.None) CloseCurrentPopup();
 
