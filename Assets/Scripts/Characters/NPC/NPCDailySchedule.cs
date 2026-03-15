@@ -59,6 +59,8 @@ namespace Assets.Scripts.Characters.NPC
             Brain.EnteredFoodTruck -= OnEnterFoodTruck;
             Brain.NPC.Schedule.ActivityEnter -= OnActivityEnter;
             Brain.NPC.Schedule.ActivityExit -= OnActivityExit;
+
+            NPC.Movement.Agent.stoppingDistance = NPC.Movement.DefaultStoppingDistance;
         }
 
         public override void OnFixedUpdate(NPCBrain brain)

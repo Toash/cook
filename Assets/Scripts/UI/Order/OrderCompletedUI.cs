@@ -7,6 +7,7 @@ public class OrderCompletedUI : MonoBehaviour
 {
     public float ShowTime = 6;
     public GameObject Root;
+    public TMP_Text Score;
     public TMP_Text Profit;
 
 
@@ -24,6 +25,7 @@ public class OrderCompletedUI : MonoBehaviour
     void Show(OrderSubmissionResult result)
     {
         Profit.text = result.Payout.ToString();
+        Score.text = "Score: " + result.Evaluation.Score01.ToString();
         StartCoroutine(ShowRoutine());
 
     }

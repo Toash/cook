@@ -172,7 +172,7 @@ public class PlayerItemHolder : MonoBehaviour
 
         if (target.TryGetComponent<Snapper>(out var snapper))
         {
-            snapper.Detach();
+            snapper.DetachFromParent();
         }
 
 

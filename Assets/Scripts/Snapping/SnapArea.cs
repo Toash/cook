@@ -37,11 +37,6 @@ public class SnapArea : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer("Snapping");
     }
 
-    /// <summary>
-    /// Add snapper to this state for bookkeeping
-    /// </summary>
-    /// <param name="snapper"></param>
-    /// <returns></returns>
     public bool TryAddSnapper(Snapper snapper)
     {
         if (OnlyOneSnap && OccupiedSnappers.Count > 0) return false;

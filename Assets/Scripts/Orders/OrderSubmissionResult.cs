@@ -12,10 +12,10 @@ public readonly struct OrderSubmissionResult
 {
     public readonly OrderSubmissionStatus Status;
     public readonly Order Order;
-    public readonly OrderEvaluationResult Evaluation;
+    public readonly FinalOrderEvaluationResult Evaluation;
     public readonly float Payout;
 
-    public OrderSubmissionResult(OrderSubmissionStatus status, Order order, OrderEvaluationResult evaluation, float Payout)
+    public OrderSubmissionResult(OrderSubmissionStatus status, Order order, FinalOrderEvaluationResult evaluation, float Payout)
     {
         this.Status = status;
         this.Order = order;

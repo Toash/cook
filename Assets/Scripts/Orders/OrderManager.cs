@@ -167,7 +167,7 @@ public class OrderManager : MonoBehaviour
         // evaluate order
         Debug.Log("[OrderManager]: Evaluating order...");
         List<PreparedItemData> itemsData = PreparedItemData.From(preparedItems);
-        OrderEvaluationResult eval = OrderEvaluator.Evaluate(order, itemsData);
+        FinalOrderEvaluationResult eval = OrderEvaluator.Evaluate(order, itemsData);
 
 
         //TODO payout calculation

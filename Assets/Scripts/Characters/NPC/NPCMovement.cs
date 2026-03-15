@@ -16,6 +16,13 @@ public class NPCMovement : Moveable
     }
     List<SidewalkNode> currentPath;
     int pathIndex;
+    public float DefaultStoppingDistance;
+    void Awake()
+    {
+        if (Agent == null)
+            Agent = GetComponent<NavMeshAgent>();
+        DefaultStoppingDistance = Agent.stoppingDistance;
+    }
     void Update()
     {
         if (currentPath == null || pathIndex >= currentPath.Count)

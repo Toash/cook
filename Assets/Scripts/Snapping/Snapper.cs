@@ -34,6 +34,11 @@ public class Snapper : MonoBehaviour
     public event Action Detached;
     public event Action<Snapper> OnChildSnapped;
     public event Action<Snapper> OnChildDetached;
+    void OnDestroy()
+    {
+        Detached?.Invoke();
+
+    }
     public bool CanSnap(SnapArea otherArea)
     {
         // if other is null, just ignore joint type checks.
@@ -121,7 +126,7 @@ public class Snapper : MonoBehaviour
     /// <summary>
     /// Called when this is detached from a snapper.
     /// </summary>
-    public void Detach()
+    public void DetachFromParent()
     {
         // detach from all parent snap connections
         foreach (var connection in ParentSnapConnections)

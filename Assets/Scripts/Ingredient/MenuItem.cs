@@ -22,5 +22,24 @@ namespace Assets.Scripts.Ingredient.MenuItem
             Debug.Log("[MenuItem]: Got random menu item: " + item.Name);
             return item;
         }
+        /// <summary>
+        /// Returns counts of ingredients in a menu item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static Dictionary<IngredientData, int> Consolidate(MenuItem item)
+        {
+            var map = new Dictionary<IngredientData, int>();
+
+            foreach (IngredientRequirement req in item.Requirements)
+            {
+                if (!map.ContainsKey(req.Data))
+                    map[req.Data] = 0;
+
+                map[req.Data] += req.Count;
+            }
+
+            return map;
+        }
     }
 }

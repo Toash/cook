@@ -22,8 +22,6 @@ namespace Assets.Scripts.Vehicle
         public FoodTruckCollider TruckCollider;
 
         public TruckParking CurrentParkingSpot { get; private set; }
-        [ShowInInspector, ReadOnly]
-        private TruckParking overlappedParkingSpot;
 
         public event Action EnteredParkingSpot;
         public event Action LeftParkingSpot;
@@ -34,6 +32,8 @@ namespace Assets.Scripts.Vehicle
         {
             get => currentState == TruckState.Serving && CurrentParkingSpot != null;
         }
+        [ShowInInspector, ReadOnly]
+        private TruckParking overlappedParkingSpot;
         void OnValidate()
         {
             if (rb == null)

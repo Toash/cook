@@ -40,8 +40,8 @@ public class NPCTakeOrder : NPCState
 
                 OrderManager.I.NPCEvaluateOrder(container.SubmissionResult);
 
-                OrderEvaluationResult eval = container.SubmissionResult.Evaluation;
-                OrderScoreCategories category = OrderEvaluator.GetScoreCategory(eval.Score01);
+                FinalOrderEvaluationResult eval = container.SubmissionResult.Evaluation;
+                FinalOrderScoreCategory category = eval.ScoreCategory;
                 string message = NPCDialoguePresets.RandomEvaluationSaying(category);
 
                 NPC.Dialogue.Say(message);

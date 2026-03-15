@@ -34,9 +34,11 @@ public class Trashcan : MonoBehaviour
     }
 
 
-    void OnSnapped(Snapper snapper)
+    void OnSnapped(Snapper child)
     {
-        Destroy(snapper.gameObject);
+        // child.DetachFromParent();
+
+        Destroy(child.gameObject);
 
     }
 
