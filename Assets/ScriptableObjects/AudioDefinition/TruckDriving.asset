@@ -13,4 +13,7 @@ MonoBehaviour:
   m_Name: TruckDriving
   m_EditorClassIdentifier: Assembly-CSharp::AudioDefinition
   Resource: {fileID: 8300000, guid: 60b7d33de4ca7724bbb16c4661826f66, type: 3}
-  Settings: {fileID: 11400000, guid: fa27a8c629ea7c344b85f6fc0405003f, type: 2}
+  Volume: 0.2
+  SpatialBlend: 1
+  MinDistance: 5
+  Looping: 1

@@ -15,7 +15,7 @@ public class CarControl : MonoBehaviour
 
     private Rigidbody rigidBody;
 
-    private CarInputActions carControls; // Reference to the new input system
+    private CarInputActions carControls;
 
     void OnValidate()
     {
@@ -75,8 +75,10 @@ public class CarControl : MonoBehaviour
         float currentMotorTorque = Mathf.Lerp(motorTorque, 0, speedFactor);
         float currentSteerRange = Mathf.Lerp(steeringRange, steeringRangeAtMaxSpeed, speedFactor);
 
-        // Determine if the player is accelerating or trying to reverse
-        bool isAccelerating = Mathf.Sign(vInput) == Mathf.Sign(forwardSpeed);
+
+        float inputDeadzone = 0.05f;
+        bool hasThrottleInput = Mathf.Abs(vInput) > inputDeadzone;
+        bool isAccelerating = hasThrottleInput && Mathf.Sign(vInput) == Mathf.Sign(forwardSpeed);
 
         foreach (WheelControl wheel in Wheels)
         {
@@ -86,7 +88,13 @@ public class CarControl : MonoBehaviour
                 wheel.WheelCollider.steerAngle = hInput * currentSteerRange;
             }
 
-            if (isAccelerating)
+            if (!hasThrottleInput)
+            {
+                // idle braking so the car does not roll forever
+                wheel.WheelCollider.motorTorque = 0f;
+                wheel.WheelCollider.brakeTorque = brakeTorque * 0.25f;
+            }
+            else if (isAccelerating || Mathf.Abs(forwardSpeed) < 0.5f)
             {
                 // Apply torque to motorized wheels
                 if (wheel.motorized)

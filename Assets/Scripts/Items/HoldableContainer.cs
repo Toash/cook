@@ -11,7 +11,7 @@ public class HoldableContainer : MonoBehaviour
 {
 
     [Tooltip("What this container contains.")]
-    public ItemData ContainedItem;
+    public HoldableData ContainedItem;
     public int MaxAmount = 5;
 
     private int currentAmount;
@@ -43,7 +43,7 @@ public class HoldableContainer : MonoBehaviour
         thisHoldable.OnInteract -= OnInteract;
     }
 
-    public void Init(ItemData itemData, int startingAmount)
+    public void Init(HoldableData itemData, int startingAmount)
     {
         if (initialized) return;
         if (itemData == null) return;
@@ -87,8 +87,12 @@ public class HoldableContainer : MonoBehaviour
         if (containedHoldable.TryGetComponent<Ingredient>(out var ingredient))
         {
             message += ingredient.Data.Name + "s ";
+            message += currentAmount + "/" + MaxAmount;
         }
-        message += currentAmount + "/" + MaxAmount;
+        else if (ContainedItem != null)
+        {
+            message += ContainedItem.Name + "s ";
+        }
 
         var data = new HoverTooltipData(transform, message);
         thisHoldable.HoverTooltipData = data;

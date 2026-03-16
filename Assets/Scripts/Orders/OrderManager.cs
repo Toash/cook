@@ -8,7 +8,7 @@ public class OrderManager : MonoBehaviour
     public static OrderManager I;
 
 
-
+    public AudioDefinition OrderCompleteSound;
 
     /// <summary>
     /// Order that the player has to acknowledge before it gets added to the active orders.
@@ -194,6 +194,7 @@ public class OrderManager : MonoBehaviour
     public void NPCEvaluateOrder(OrderSubmissionResult result)
     {
         NPCEvaluatedOrder?.Invoke(result);
+        AudioManager.I.PlayOneShot(OrderCompleteSound);
 
     }
 

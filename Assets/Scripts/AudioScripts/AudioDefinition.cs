@@ -10,6 +10,10 @@ public class AudioDefinition : ScriptableObject
 {
 
     public AudioResource Resource;
-    public AudioSourceSettings Settings;
+    // public AudioSourceSettings Settings;
+    public float Volume = 1f;
+    public float SpatialBlend = 1f;
+    public float MinDistance = 5f;
+    public bool Looping = false;
 
 }

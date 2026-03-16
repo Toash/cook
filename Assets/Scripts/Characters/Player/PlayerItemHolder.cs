@@ -101,6 +101,108 @@ public class PlayerItemHolder : MonoBehaviour
         }
 
     }
+    void OnAfterHeld()
+    {
+        itemInHand.OnAfterHeld();
+
+    }
+    void OnAfterPlace()
+    {
+        itemInHand.gameObject.SetActive(true);
+        itemInHand.SetNotHolding();
+        TryDeletePreview(placementPreview);
+        placementInfo.WorldPlacementYaw = 0;
+        if (handVisual != null)
+        {
+            Destroy(handVisual);
+            handVisual = null;
+        }
+        itemInHand.OnAfterPlace();
+
+        itemInHand = null;
+    }
+    public bool TryHold(Holdable target)
+    {
+        if (isHolding) return false;
+
+
+        if (target.TryGetComponent<Snapper>(out var snapper))
+        {
+            snapper.DetachFromParent();
+        }
+
+
+
+
+        // parent and position to hand. and disable it
+        target.transform.SetParent(HoldSpot, worldPositionStays: true);
+        target.transform.localPosition = Vector3.zero;
+        target.transform.rotation = HoldSpot.rotation;
+        target.gameObject.SetActive(false);
+
+        // generate a visual root clone and parent to hand
+        handVisual = target.GetParentChildLinkedVisualRootClone();
+        handVisual.transform.SetParent(HoldSpot, worldPositionStays: true);
+        handVisual.transform.rotation = HoldSpot.rotation;
+
+        itemInHand = target;
+
+        OnAfterHeld();
+        return true;
+
+    }
+
+
+    /// <summary>
+    /// Tries to place the held item if it can.
+    /// </summary>
+    /// <param name="pos"></param>
+    public bool TryPlaceOnSurface(Transform surface, Vector3 pos, Quaternion rot)
+    {
+        if (!isHolding) return false;
+        Debug.Log("[PlayerItemHolder]: Trying to place on surface.");
+
+
+        //place
+        itemInHand.transform.SetParent(surface, worldPositionStays: true);
+        itemInHand.transform.position = pos;
+        itemInHand.transform.rotation = rot;
+
+        OnAfterPlace();
+        return true;
+    }
+
+    /// <summary>
+    /// If the held item is a snapper
+    /// </summary>
+    /// <param name="placementRaycastInfo"></param>
+    /// <returns></returns>
+    public bool TryPlaceOnSnapper(PlacementInfo placementRaycastInfo)
+    {
+        if (!isHolding) return false;
+
+        Debug.Log("[PlayerItemHolder]: Trying to place on snap area.");
+
+        if (itemInHand.TryGetComponent<Snapper>(out Snapper heldSnapper))
+        {
+            if (placementRaycastInfo.TryGetSnapArea(out SnapArea otherSnapPoint))
+            {
+                Snapper otherSnapper = otherSnapPoint.ParentSnapper;
+
+                //place
+                if (heldSnapper.TrySnapToArea(placementRaycastInfo, otherSnapper, otherSnapPoint))
+                {
+
+                    OnAfterPlace();
+                    return true;
+                }
+
+            }
+
+
+        }
+        return false;
+    }
     void HandlePlacementPreview(PlacementPreview preview, PlacementInfo placementInfo, Holdable heldHoldable)
     {
         // if we have a snapper and it can snap to the snap area. preview for place on snap area.
@@ -149,95 +251,6 @@ public class PlayerItemHolder : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Callback for when a holdable is placed
-    /// </summary>
-    void OnAfterPlace()
-    {
-        itemInHand.gameObject.SetActive(true);
-        itemInHand.SetNotHolding();
-        itemInHand = null;
-        TryDeletePreview(placementPreview);
-        placementInfo.WorldPlacementYaw = 0;
-        if (handVisual != null)
-        {
-            Destroy(handVisual);
-            handVisual = null;
-        }
-    }
-    public void TryHold(Holdable target)
-    {
-        if (isHolding) return;
-
-
-        if (target.TryGetComponent<Snapper>(out var snapper))
-        {
-            snapper.DetachFromParent();
-        }
-
-
-
-
-        // parent and position to hand. and disable it
-        target.transform.SetParent(HoldSpot, worldPositionStays: true);
-        target.transform.localPosition = Vector3.zero;
-        target.transform.rotation = HoldSpot.rotation;
-        target.gameObject.SetActive(false);
-
-        // generate a visual root clone and parent to hand
-        handVisual = target.GetParentChildLinkedVisualRootClone();
-        handVisual.transform.SetParent(HoldSpot, worldPositionStays: true);
-        handVisual.transform.rotation = HoldSpot.rotation;
-
-        itemInHand = target;
-    }
-
-
-    /// <summary>
-    /// Tries to place the held item if it can.
-    /// </summary>
-    /// <param name="pos"></param>
-    public bool TryPlaceOnSurface(Transform surface, Vector3 pos, Quaternion rot)
-    {
-        if (!isHolding) return false;
-        Debug.Log("[PlayerItemHolder]: Trying to place on surface.");
-
-
-        //place
-        itemInHand.transform.SetParent(surface, worldPositionStays: true);
-        itemInHand.transform.position = pos;
-        itemInHand.transform.rotation = rot;
-
-        OnAfterPlace();
-        return true;
-    }
-
-    public bool TryPlaceOnSnapper(PlacementInfo placementRaycastInfo)
-    {
-        if (!isHolding) return false;
-
-        Debug.Log("[PlayerItemHolder]: Trying to place on snap area.");
-
-        if (itemInHand.TryGetComponent<Snapper>(out Snapper heldSnapper))
-        {
-            if (placementRaycastInfo.TryGetSnapArea(out SnapArea otherSnapPoint))
-            {
-                Snapper otherSnapper = otherSnapPoint.ParentSnapper;
-
-                //place
-                if (heldSnapper.TrySnapToArea(placementRaycastInfo, otherSnapper, otherSnapPoint))
-                {
-
-                    OnAfterPlace();
-                    return true;
-                }
-
-            }
-
-
-        }
-        return false;
-    }
 
 
     bool TryDeletePreview(PlacementPreview preview)

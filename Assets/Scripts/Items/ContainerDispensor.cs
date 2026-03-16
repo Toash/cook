@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public class ContainerDispensor : InteractableBase
 {
-    public ItemData ContainedItem;
+    public HoldableData ContainedItem;
     Holdable containedHoldable;
     void Start()
     {

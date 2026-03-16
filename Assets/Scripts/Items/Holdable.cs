@@ -1,13 +1,14 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// An item that can be held by the player.
+/// An item that can be held and placed down by the player.
 /// </summary>
 public class Holdable : InteractableBase
 {
-
+    public HoldableData ItemData;
     public event Action<InteractionContext> OnHeld;
     public event Action<InteractionContext> OnSecondaryInteract;
 
@@ -15,7 +16,38 @@ public class Holdable : InteractableBase
     private ConfigurableJoint joint;
     private bool beingHeld = false;
 
+    private AudioSourcePlayer audioSourcePlayer;
 
+    void InitRefs()
+    {
+        audioSourcePlayer = GetComponent<AudioSourcePlayer>();
+        if (audioSourcePlayer == null)
+        {
+            audioSourcePlayer = gameObject.AddComponent<AudioSourcePlayer>();
+        }
+        //         var comps = GetComponents<AudioSourcePlayer>();
+        //         if (comps.Length > 1)
+        //         {
+        //             for (int i = 1; i < comps.Length; i++)
+        //             {
+        // #if UNITY_EDITOR
+        //                 // Destroy(comps[i]);
+        //                 // DestroyImmediate(comps[i], true);
+        //                 Undo.DestroyObjectImmediate(comps[i]);
+        // #endif
+        //             }
+        //         }
+
+    }
+    void OnValidate()
+    {
+        InitRefs();
+
+    }
+    void Awake()
+    {
+        InitRefs();
+    }
     /// <summary>
     /// Returns the root of holdables.
     /// 
@@ -53,6 +85,21 @@ public class Holdable : InteractableBase
         }
 
         beingHeld = true;
+    }
+
+    public void OnAfterHeld()
+    {
+        if (ItemData == null) return;
+        audioSourcePlayer.SetAudioDef(ItemData.PickUpSound);
+        audioSourcePlayer.Play();
+
+    }
+    public void OnAfterPlace()
+    {
+        if (ItemData == null) return;
+        audioSourcePlayer.SetAudioDef(ItemData.PlaceSound);
+        audioSourcePlayer.Play();
+
     }
 
 

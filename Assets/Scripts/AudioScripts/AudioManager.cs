@@ -22,11 +22,11 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    public void PlayOneShot(AudioDefinition audio, Vector3 pos)
+    public void PlayOneShot(AudioDefinition audio, Vector3 pos = default)
     {
         GameObject audioObj = new GameObject("Audio Oneshot");
         AudioSourcePlayer player = audioObj.AddComponent<AudioSourcePlayer>();
-        player.Initialize(audio);
+        player.SetAudioDef(audio);
 
         audioObj.transform.position = pos;
         player.Play();
@@ -45,8 +45,10 @@ public class AudioManager : MonoBehaviour
         GameObject audioObject = new GameObject("Looping audio");
         AudioSource audioSource = audioObject.AddComponent<AudioSource>();
 
-        audioSource.volume = def.Settings.Volume;
-        audioSource.spatialBlend = def.Settings.SpatialBlend;
+        // audioSource.volume = def.Settings.Volume;
+        // audioSource.spatialBlend = def.Settings.SpatialBlend;
+        audioSource.volume = def.Volume;
+        audioSource.spatialBlend = def.SpatialBlend;
         audioSource.playOnAwake = false;
 
         audioSource.loop = true;

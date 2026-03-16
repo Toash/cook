@@ -12,7 +12,8 @@ public enum PlayerMode
 {
     FullGameplay, // default gameplay mode
     BodyConstrained, // when the player should be physically constrained. For example, whilst driving
-    InPopup // when the player is in a ui popup
+    InPopup, // when the player is in a ui popup
+
 }
 
 /// <summary>

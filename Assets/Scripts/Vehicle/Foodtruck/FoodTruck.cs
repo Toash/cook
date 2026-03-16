@@ -3,6 +3,7 @@ using IngameDebugConsole;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Assets.Scripts.Vehicle
 {
@@ -23,6 +24,8 @@ namespace Assets.Scripts.Vehicle
 
         public TruckParking CurrentParkingSpot { get; private set; }
 
+        public UnityEvent OnStartDriving;
+        public UnityEvent OnStopDriving;
         public event Action EnteredParkingSpot;
         public event Action LeftParkingSpot;
 
@@ -85,8 +88,10 @@ namespace Assets.Scripts.Vehicle
                 switch (value)
                 {
                     case TruckState.Stopped:
+                        OnStopDriving?.Invoke();
                         break;
                     case TruckState.Driving:
+                        OnStartDriving?.Invoke();
                         break;
                     case TruckState.Serving:
                         break;
@@ -128,6 +133,7 @@ namespace Assets.Scripts.Vehicle
         }
         void OnGotOutSeat()
         {
+            StopDriving();
         }
 
 
@@ -174,6 +180,14 @@ namespace Assets.Scripts.Vehicle
         void StartDriving()
         {
             CurrentState = TruckState.Driving;
+        }
+        void StopDriving()
+        {
+            if (CurrentState == TruckState.Driving)
+            {
+                CurrentState = TruckState.Stopped;
+
+            }
         }
 
         // public

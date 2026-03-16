@@ -1,5 +1,7 @@
 using TMPro;
+using UnityEditor.EditorTools;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
 /// <summary>
@@ -14,6 +16,12 @@ public class DeveloperConsoleBehaviour : MonoBehaviour
     [Header("UI")]
     [SerializeField] private GameObject uiCanvas = null;
     [SerializeField] private TMP_InputField inputField = null;
+    [Header("Input")]
+    [SerializeField] private InputActionAsset inputActionAsset;
+    [SerializeField] private InputActionReference toggleConsole;
+    [SerializeField, Tooltip("The name of the action map for player mode.")] private string playerModeActionMapName = "Player";
+
+
 
     private float pausedTimeScale;
 
@@ -47,22 +55,31 @@ public class DeveloperConsoleBehaviour : MonoBehaviour
             DeveloperConsole.ProcessCommand(prefix + command.CommandWord);
         }
     }
-
-
-    public void Toggle(CallbackContext context)
+    void Update()
     {
-        if (!context.action.triggered) { return; }
+        if (toggleConsole.action.WasPressedThisFrame()) { ToggleConsole(); }
+    }
+
+
+    public void ToggleConsole()
+    {
 
         if (uiCanvas.activeSelf)
         {
             Time.timeScale = pausedTimeScale;
+
+            inputActionAsset.FindActionMap(playerModeActionMapName).Enable();
+
             uiCanvas.SetActive(false);
         }
         else
         {
+            // pause
             pausedTimeScale = Time.timeScale;
             Time.timeScale = 0;
             uiCanvas.SetActive(true);
+
+            inputActionAsset.FindActionMap(playerModeActionMapName).Disable();
 
             // focus input field
             inputField.ActivateInputField();

@@ -16,7 +16,7 @@ public class ImpactAudio : AudioSourcePlayer
         {
             AudioDef = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/DefaultHit");
         }
-        Initialize(AudioDef);
+        SetAudioDef(AudioDef);
     }
     void OnCollisionEnter(Collision collision)
     {

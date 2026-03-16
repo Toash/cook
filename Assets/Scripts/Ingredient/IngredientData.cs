@@ -15,8 +15,9 @@ public enum IngredientType
 /// Data for an ingredient
 /// </summary>
 [CreateAssetMenu(fileName = "IngredientData", menuName = "Items/IngredientData")]
-public class IngredientData : ItemData
+public class IngredientData : HoldableData
 {
+    [Header("Ingredient Specific")]
     public IngredientType Type;
     public Texture2D Image;
 
