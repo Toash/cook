@@ -29,7 +29,7 @@ public class Ingredient : MonoBehaviour
         if (Snapper == null)
         {
             Snapper = GetComponent<Snapper>();
-            Snapper.SetSnapType(SnapType.Container);
+            Snapper.SetSnapType(SnapType.Food);
         }
     }
 

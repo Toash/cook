@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
 /// Represents an object that the player can interact with
 /// </summary>
 [RequireComponent(typeof(Collider))]
 // [RequireComponent(typeof(Highlightable))]
-public abstract class InteractableBase : MonoBehaviour
+public abstract class InteractableBase : MonoBehaviour, IInteractable
 {
 
+    public List<InteractInfo> HoverInteractInfo = new List<InteractInfo>();
     [Tooltip("Root object for whatever visually represents this item.")]
     public GameObject VisualRoot;
     // public string HoverTooltip = "";
@@ -26,30 +28,29 @@ public abstract class InteractableBase : MonoBehaviour
         SetLayer();
         if (VisualRoot != null)
         {
-            // foreach (var obj in VisualRoot.GetComponentsInChildren<Transform>())
-            // {
-            //     if (obj == VisualRoot.transform) continue;
-            //     var outline = obj.AddComponent<Outline>();
-            //     outline.OutlineWidth = 8f;
-            //     outlines.Add(outline);
-            // }
             outline = VisualRoot.AddComponent<Outline>();
             outline.OutlineWidth = 5f;
             SetOutline(false);
-
-
         }
-    }
-    public void SetOutline(bool boolean)
-    {
-        if (outline == null) return;
-
-        outline.enabled = boolean;
     }
 
     void OnValidate()
     {
         SetLayer();
+    }
+    public virtual void OnHoverEnter() { }
+    public virtual void OnHoverExit() { }
+    public void BaseInteract(InteractionContext context)
+    {
+        OnInteract?.Invoke(context);
+        Interact(context);
+    }
+
+
+    public abstract void Interact(InteractionContext context);
+    public virtual List<InteractInfo> GetInteractInfos()
+    {
+        return HoverInteractInfo;
     }
 
     void SetLayer()
@@ -65,16 +66,12 @@ public abstract class InteractableBase : MonoBehaviour
 
     }
 
-    public virtual void OnHoverEnter() { }
-    public virtual void OnHoverExit() { }
-    public void BaseInteract(InteractionContext context)
+
+    public void SetOutline(bool boolean)
     {
-        OnInteract?.Invoke(context);
-        Interact(context);
+        if (outline == null) return;
+
+        outline.enabled = boolean;
     }
-
-
-    public abstract void Interact(InteractionContext context);
-
 
 }

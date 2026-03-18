@@ -9,8 +9,8 @@ using UnityEngine;
 public class FoodTruckCollider : MonoBehaviour
 {
 
-    public event Action<TruckParking> EnteredParking;
-    public event Action<TruckParking> ExitedParking;
+    public event Action<FoodTruckParking> EnteredParking;
+    public event Action<FoodTruckParking> ExitedParking;
 
     BoxCollider col;
     void OnValidate()
@@ -24,7 +24,7 @@ public class FoodTruckCollider : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent<TruckParking>(out var parking))
+        if (other.TryGetComponent<FoodTruckParking>(out var parking))
         {
             Debug.Log("[FoodTruck]: Enter parking spot");
             EnteredParking?.Invoke(parking);
@@ -33,7 +33,7 @@ public class FoodTruckCollider : MonoBehaviour
     }
     void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent<TruckParking>(out var parking))
+        if (other.TryGetComponent<FoodTruckParking>(out var parking))
         {
             Debug.Log("[FoodTruck]: Exit parking spot");
             ExitedParking?.Invoke(parking);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
@@ -6,8 +7,9 @@ using UnityEngine;
 /// <summary>
 /// If player is in seat, input should drive the car.
 /// </summary>
-public class CarSeat : InteractableBase, IConstrainer
+public class CarSeat : InteractableBase
 {
+    public List<InteractInfo> SeatInfos = new List<InteractInfo>();
     [ReadOnly]
     public Player PlayerInSeat;
     // where the player should snap to.
@@ -32,11 +34,34 @@ public class CarSeat : InteractableBase, IConstrainer
 
     public override void Interact(InteractionContext context)
     {
-        PlayerInSeat = context.Player;
-        PlayerInSeat.Controller.ConstrainBody(new ConstrainedContext(this, ConstrainType.Truck, SeatPosition, GetOutPosition));
-        context.Player.Controller.ForceFirstPerson();
+        if (PlayerInSeat != null)
+        {
+            // PlayerInSeat.Controller.UnconstrainBody();
+            OnUnConstrained();
+            context.Player.Controller.UnconstrainBody();
+        }
+        else
+        {
+            PlayerInSeat = context.Player;
+            PlayerInSeat.Controller.ConstrainBody(new ConstrainedInfo(this, ConstrainType.Truck, SeatPosition, GetOutPosition));
+            context.Player.Controller.ForceFirstPerson();
 
-        GotInSeat?.Invoke(context.Player.Controller);
+            GotInSeat?.Invoke(context.Player.Controller);
+
+        }
+    }
+    public override List<InteractInfo> GetInteractInfos()
+    {
+
+        if (PlayerInSeat == null)
+        {
+            return HoverInteractInfo;
+        }
+        else
+        {
+            return SeatInfos;
+        }
+
     }
 
     public void OnUnConstrained()
@@ -62,6 +87,11 @@ public class CarSeat : InteractableBase, IConstrainer
 
 
 
+    }
+
+    public IInteractable GetInteractable()
+    {
+        throw new NotImplementedException();
     }
 #endif
 }

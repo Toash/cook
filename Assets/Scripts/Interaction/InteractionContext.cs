@@ -1,12 +1,6 @@
 using System.Numerics;
 using UnityEngine;
 
-public enum InteractType
-{
-    Primary,
-    Secondary
-
-}
 public class InteractionContext
 {
     public InteractType Type;

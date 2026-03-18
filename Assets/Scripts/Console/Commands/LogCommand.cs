@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Log Command", menuName = "Utilities/DeveloperConsole/Commands/Log Command")]
+[CreateAssetMenu(fileName = "New Log Command", menuName = "Console Commands/Log Command")]
 public class LogCommand : ConsoleCommand
 {
     [SerializeField] private string defaultLogText = "Log message";

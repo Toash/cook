@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEditor.EditorTools;
 using UnityEngine;
@@ -10,8 +11,8 @@ using static UnityEngine.InputSystem.InputAction;
 public class DeveloperConsoleBehaviour : MonoBehaviour
 {
     [SerializeField] private string prefix = string.Empty;
-    [SerializeField] private ConsoleCommand[] commands = new ConsoleCommand[0];
-    [SerializeField] private ConsoleCommand[] startCommands = new ConsoleCommand[0];
+    [SerializeField, InlineEditor] private ConsoleCommand[] commands = new ConsoleCommand[0];
+    [SerializeField, InlineEditor] private ConsoleCommand[] startCommands = new ConsoleCommand[0];
 
     [Header("UI")]
     [SerializeField] private GameObject uiCanvas = null;
@@ -66,24 +67,34 @@ public class DeveloperConsoleBehaviour : MonoBehaviour
 
         if (uiCanvas.activeSelf)
         {
-            Time.timeScale = pausedTimeScale;
-
-            inputActionAsset.FindActionMap(playerModeActionMapName).Enable();
-
-            uiCanvas.SetActive(false);
+            HideConsole();
         }
         else
         {
-            // pause
-            pausedTimeScale = Time.timeScale;
-            Time.timeScale = 0;
-            uiCanvas.SetActive(true);
-
-            inputActionAsset.FindActionMap(playerModeActionMapName).Disable();
-
-            // focus input field
-            inputField.ActivateInputField();
+            ShowConsole();
         }
+    }
+
+    private void HideConsole()
+    {
+        Time.timeScale = pausedTimeScale;
+
+        inputActionAsset.FindActionMap(playerModeActionMapName).Enable();
+
+        uiCanvas.SetActive(false);
+    }
+
+    private void ShowConsole()
+    {
+        // pause
+        pausedTimeScale = Time.timeScale;
+        Time.timeScale = 0;
+        uiCanvas.SetActive(true);
+
+        inputActionAsset.FindActionMap(playerModeActionMapName).Disable();
+
+        // focus input field
+        inputField.ActivateInputField();
     }
 
     public void ProcessCommand(string inputValue)
@@ -91,5 +102,8 @@ public class DeveloperConsoleBehaviour : MonoBehaviour
         DeveloperConsole.ProcessCommand(inputValue);
 
         inputField.text = string.Empty;
+
+        HideConsole();
     }
+
 }

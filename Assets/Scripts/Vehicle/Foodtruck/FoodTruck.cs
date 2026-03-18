@@ -18,11 +18,11 @@ namespace Assets.Scripts.Vehicle
     {
         public SingleOrderSubmissionArea OrderSubmissionArea;
         public CarSeat Seat;
-        private Rigidbody rb;
+        public Rigidbody Rigidbody { get; private set; }
         public FoodTruckInfluence Influence;
         public FoodTruckCollider TruckCollider;
 
-        public TruckParking CurrentParkingSpot { get; private set; }
+        public FoodTruckParking CurrentParkingSpot { get; private set; }
 
         public UnityEvent OnStartDriving;
         public UnityEvent OnStopDriving;
@@ -36,12 +36,12 @@ namespace Assets.Scripts.Vehicle
             get => currentState == TruckState.Serving && CurrentParkingSpot != null;
         }
         [ShowInInspector, ReadOnly]
-        private TruckParking overlappedParkingSpot;
+        private FoodTruckParking overlappedParkingSpot;
         void OnValidate()
         {
-            if (rb == null)
+            if (Rigidbody == null)
             {
-                rb = GetComponent<Rigidbody>();
+                Rigidbody = GetComponent<Rigidbody>();
             }
 
         }
@@ -62,13 +62,13 @@ namespace Assets.Scripts.Vehicle
         }
 
 
-        void OnEnteredParking(TruckParking parking)
+        void OnEnteredParking(FoodTruckParking parking)
         {
             overlappedParkingSpot = parking;
             EnteredParkingSpot?.Invoke();
 
         }
-        void OnExitedParking(TruckParking parking)
+        void OnExitedParking(FoodTruckParking parking)
         {
             overlappedParkingSpot = null;
             if (CurrentParkingSpot != null)
@@ -158,9 +158,9 @@ namespace Assets.Scripts.Vehicle
             // parent the player to the truck so it moves with it.
 
             // Seat.PlayerInSeat.transform.SetParent(transform);
-            rb.MovePosition(overlappedParkingSpot.transform.position);
-            rb.MoveRotation(overlappedParkingSpot.transform.rotation);
-            rb.linearVelocity = Vector3.zero;
+            Rigidbody.MovePosition(overlappedParkingSpot.transform.position);
+            Rigidbody.MoveRotation(overlappedParkingSpot.transform.rotation);
+            Rigidbody.linearVelocity = Vector3.zero;
             // Seat.PlayerInSeat.transform.SetParent(null);
 
 
@@ -193,7 +193,7 @@ namespace Assets.Scripts.Vehicle
         // public
         public float GetTruckSpeed()
         {
-            return rb.linearVelocity.magnitude;
+            return Rigidbody.linearVelocity.magnitude;
         }
         public bool IsMoving()
         {
@@ -221,7 +221,7 @@ namespace Assets.Scripts.Vehicle
 
         public Vector3 GetVelocity()
         {
-            return rb.linearVelocity;
+            return Rigidbody.linearVelocity;
         }
 #endif
 

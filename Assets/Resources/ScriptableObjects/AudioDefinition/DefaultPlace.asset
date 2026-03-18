@@ -13,4 +13,7 @@ MonoBehaviour:
   m_Name: DefaultPlace
   m_EditorClassIdentifier: Assembly-CSharp::AudioDefinition
   Resource: {fileID: 6418180475301049370, guid: 8f0aa4ec89029a24894e26be45886967, type: 2}
-  Settings: {fileID: 11400000, guid: 46927fe5b8f4fca40b55097d0dbc2f58, type: 2}
+  Volume: 0.3
+  SpatialBlend: 1
+  MinDistance: 1
+  Looping: 0

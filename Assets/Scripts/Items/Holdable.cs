@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -8,6 +9,8 @@ using UnityEngine;
 /// </summary>
 public class Holdable : InteractableBase
 {
+    [Tooltip("Information that is shown when the item is actually held.")]
+    public List<InteractInfo> HeldInfos = new List<InteractInfo>();
     public HoldableData ItemData;
     public event Action<InteractionContext> OnHeld;
     public event Action<InteractionContext> OnSecondaryInteract;
@@ -25,18 +28,11 @@ public class Holdable : InteractableBase
         {
             audioSourcePlayer = gameObject.AddComponent<AudioSourcePlayer>();
         }
-        //         var comps = GetComponents<AudioSourcePlayer>();
-        //         if (comps.Length > 1)
-        //         {
-        //             for (int i = 1; i < comps.Length; i++)
-        //             {
-        // #if UNITY_EDITOR
-        //                 // Destroy(comps[i]);
-        //                 // DestroyImmediate(comps[i], true);
-        //                 Undo.DestroyObjectImmediate(comps[i]);
-        // #endif
-        //             }
-        //         }
+
+        if (HoverInteractInfo.Count == 0)
+        {
+            HoverInteractInfo.Add(new InteractInfo(InteractType.Primary, "Pick up"));
+        }
 
     }
     void OnValidate()
@@ -87,6 +83,18 @@ public class Holdable : InteractableBase
         beingHeld = true;
     }
 
+    public override List<InteractInfo> GetInteractInfos()
+    {
+        // return base.GetInteractInfos();
+        if (beingHeld)
+        {
+            return HeldInfos;
+        }
+        else
+        {
+            return base.GetInteractInfos();
+        }
+    }
     public void OnAfterHeld()
     {
         if (ItemData == null) return;

@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: LogCommnad
   m_EditorClassIdentifier: Assembly-CSharp::LogCommand
   commandWord: log
+  defaultLogText: Log message

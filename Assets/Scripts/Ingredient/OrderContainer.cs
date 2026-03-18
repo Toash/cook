@@ -18,7 +18,8 @@ public class OrderContainer : MonoBehaviour
     // prepared items that are connected with this container
     public List<PreparedItem> ContainedPreparedItems = new();
 
-    public OrderReceipt Receipt;
+    [ReadOnly]
+    public OrderReceipt AttachedReceipt;
     [ReadOnly, Tooltip("Gets set when the container is submitted")]
     public OrderSubmissionResult SubmissionResult;
     public Snapper Snapper { get; private set; }
@@ -39,10 +40,10 @@ public class OrderContainer : MonoBehaviour
             Snapper = GetComponent<Snapper>();
             Snapper.SetSnapType(SnapType.Container);
         }
-        if (Snapper.AcceptingSnapTypes == null)
-        {
-            Snapper.AcceptingSnapTypes = new List<SnapType> { SnapType.Food, SnapType.Receipt };
-        }
+        // if (Snapper.AcceptingSnapTypes == null)
+        // {
+        //     Snapper.AcceptingSnapTypes = new List<SnapType> { SnapType.Food, SnapType.Receipt };
+        // }
     }
     void OnValidate()
     {
@@ -97,20 +98,20 @@ public class OrderContainer : MonoBehaviour
     }
     public bool TryGetLinkedOrder(out Order order)
     {
-        if (Receipt == null)
+        if (AttachedReceipt == null)
         {
             Debug.Log("[OrderContainer]: Could not get linked order. Receipt is null.");
             order = null;
             return false;
         }
 
-        order = OrderManager.I.GetActiveOrderFromID(Receipt.OrderID);
+        order = OrderManager.I.GetActiveOrderFromID(AttachedReceipt.OrderID);
         return true;
     }
 
     public int GetOrderID()
     {
-        return Receipt.OrderID;
+        return AttachedReceipt.OrderID;
     }
 
 
@@ -145,7 +146,7 @@ public class OrderContainer : MonoBehaviour
     /// <param name="receipt"></param>
     void LinkOrder(OrderReceipt receipt)
     {
-        this.Receipt = receipt;
+        this.AttachedReceipt = receipt;
 
         OrderManager.I.PlayerSubmittedOrder += OnActiveOrderSubmitted;
 
@@ -154,19 +155,19 @@ public class OrderContainer : MonoBehaviour
     }
     void UnlinkOrder(OrderReceipt receipt)
     {
-        if (receipt != this.Receipt)
+        if (receipt != this.AttachedReceipt)
         {
             Debug.LogError("[OrderContainer]: The same receipt is not set in the OrderContainer but it is trying to be detached.");
         }
         OrderManager.I.PlayerSubmittedOrder -= OnActiveOrderSubmitted;
-        this.Receipt = null;
+        this.AttachedReceipt = null;
     }
 
 
     void OnActiveOrderSubmitted(OrderSubmissionResult result)
     {
-        if (Receipt == null) return;
-        if (result.Order.ID != Receipt.OrderID) return;
+        if (AttachedReceipt == null) return;
+        if (result.Order.ID != AttachedReceipt.OrderID) return;
 
         this.SubmissionResult = result;
 
@@ -255,9 +256,9 @@ public class OrderContainer : MonoBehaviour
             Handles.Label(transform.position + (Vector3.up * .2f), message, style);
         }
 
-        if (Receipt != null)
+        if (AttachedReceipt != null)
         {
-            message += "Associated Order ID:" + Receipt.OrderID + "\n";
+            message += "Associated Order ID:" + AttachedReceipt.OrderID + "\n";
             Handles.Label(transform.position + (Vector3.up * .3f), message, style);
         }
 

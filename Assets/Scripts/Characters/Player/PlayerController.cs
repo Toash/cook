@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour
     public InputActionReference ThirdPerson;
 
     // events
-    public event System.Action BodyConstrained;
+    public event System.Action<IInteractable> BodyConstrained;
     public event System.Action BodyUnconstrained;
     public event System.Action CameraConstrained;
     public event System.Action CameraUnconstrained;
@@ -80,12 +80,12 @@ public class PlayerController : MonoBehaviour
     Vector3 constrainedCameraPos;
     Quaternion constrainedCameraRot;
 
-    ConstrainedContext constrainedContext;
+    ConstrainedInfo constraintInfo;
     bool sprinting;
     [ReadOnly]
     public IVelocityProvider CurrentVelocityProvider;
 
-    public IConstrainer CurrentConstrainer { get; private set; }// the constrainer that the player is currently in
+    public IInteractable CurrentConstrainerInteractable { get; private set; }// the constrainer that the player is currently in
 
 
 
@@ -216,7 +216,7 @@ public class PlayerController : MonoBehaviour
     /// Lock player pos onto transform. 
     /// </summary>
     /// <param name="constraint"></param>
-    public void ConstrainBody(ConstrainedContext constrainedContext)
+    public void ConstrainBody(ConstrainedInfo constrainedInfo)
     {
         if (CurrentControlMode == PlayerMode.BodyConstrained) return;
         Debug.Log("[PlayerController]: Constrained Body");
@@ -227,41 +227,44 @@ public class PlayerController : MonoBehaviour
         // character controller does not like teleporting. disable before doing so.
         CharController.enabled = false;
 
-        this.constrainedContext = constrainedContext;
+        this.constraintInfo = constrainedInfo;
 
-        transform.position = constrainedContext.Constraint.position;
-        // transform.rotation = constrainedContext.Constraint.rotation;
-        SetYawPitchFromQuaternion(constrainedContext.Constraint.localRotation);
-        // transform.SetParent(constrainedContext.Constraint, true);
-        transform.SetParent(constrainedContext.Constraint);
+        transform.position = constrainedInfo.Constraint.position;
+        SetYawPitchFromQuaternion(constrainedInfo.Constraint.localRotation);
+        transform.SetParent(constrainedInfo.Constraint);
 
-        CurrentConstrainer = constrainedContext.Constrainer;
+        CurrentConstrainerInteractable = constrainedInfo.Constrainer;
 
-        BodyConstrained?.Invoke();
+        BodyConstrained?.Invoke(CurrentConstrainerInteractable);
 
     }
     public void UnconstrainBody()
     {
         if (CurrentControlMode != PlayerMode.BodyConstrained) return;
-        if (constrainedContext == null)
+        if (constraintInfo == null)
         {
-            Debug.LogError("[PlayerController]: Constrained context does not exist when trying to constrain.");
+            Debug.LogError("[PlayerController]: Constrained context does not exist when trying to unconstrain.");
             return;
         }
         Debug.Log("[PlayerController]: UnConstrained Body");
         SetPlayerMode(PlayerMode.FullGameplay);
         moveVelocity = Vector3.zero;
-        constrainedContext.Constrainer.OnUnConstrained();
-        transform.position = constrainedContext.UnConstraint.position;
-        transform.rotation = constrainedContext.UnConstraint.rotation;
+        // constrainedContext.Constrainer.OnUnConstrained();
+        transform.position = constraintInfo.UnConstraint.position;
+        transform.rotation = constraintInfo.UnConstraint.rotation;
 
         CharController.enabled = true;
 
-        this.constrainedContext = null;
-        CurrentConstrainer = null;
+        this.constraintInfo = null;
+        CurrentConstrainerInteractable = null;
 
 
         BodyUnconstrained?.Invoke();
+    }
+    public void OnInteractAndConstraint(InteractionContext context)
+    {
+        CurrentConstrainerInteractable.Interact(context);
+        UnconstrainBody();
     }
 
     void HandleGravity()
@@ -352,9 +355,9 @@ public class PlayerController : MonoBehaviour
     }
     void OnThirdPerson()
     {
-        if (constrainedContext != null)
+        if (constraintInfo != null)
         {
-            if (constrainedContext.Type == ConstrainType.Truck)
+            if (constraintInfo.Type == ConstrainType.Truck)
             {
                 CamRoot.localPosition = Vector3.back * 9;
                 return;

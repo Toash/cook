@@ -32,14 +32,14 @@ public class WorldSpaceHoverTooltipUI : MonoBehaviour
     }
     void OnEnable()
     {
-        PlayerInteraction.OnInteractableChanged += OnInteractableChanged;
-        PlayerInteraction.OnInteractableInteracted += OnInteractableChanged;
+        PlayerInteraction.OnHoveredInteractableChanged += OnInteractableChanged;
+        PlayerInteraction.OnHoveredInteractableInteracted += OnInteractableChanged;
 
     }
     void OnDisable()
     {
-        PlayerInteraction.OnInteractableChanged -= OnInteractableChanged;
-        PlayerInteraction.OnInteractableInteracted -= OnInteractableChanged;
+        PlayerInteraction.OnHoveredInteractableChanged -= OnInteractableChanged;
+        PlayerInteraction.OnHoveredInteractableInteracted -= OnInteractableChanged;
     }
 
     void Update()

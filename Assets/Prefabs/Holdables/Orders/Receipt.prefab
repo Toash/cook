@@ -241,7 +241,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944b15392521cab4d906b33495de27ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Snapper
-  AcceptingSnapTypes: 
   ParentSnapConnections: []
 --- !u!114 &4364911229386095459
 MonoBehaviour:

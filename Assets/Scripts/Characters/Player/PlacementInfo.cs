@@ -1,4 +1,5 @@
 
+using System.Linq;
 using UnityEngine;
 /// <summary>
 /// Information for the placement of held items;
@@ -11,30 +12,66 @@ public class PlacementInfo
 
 
     public bool SnapRaycastValid;
-    public RaycastHit SnapRaycastHit;
+    public RaycastHit[] SnapRaycastHits;
 
+    public RaycastHit ValidRaycastHit;
 
-
-
-    public bool TryGetSnapArea(out SnapArea snapArea)
+    /// <summary>
+    /// Tries to get the first valid snap area for a given snap area, and interally sets the valid raycast hit.
+    /// </summary>
+    /// <param name="currentSnapper"></param>
+    /// <param name="snapArea"></param>
+    /// <returns></returns>
+    public bool TryGetFirstValidSnapArea(Snapper currentSnapper, out SnapArea snapArea, out RaycastHit validHit)
     {
         if (!SnapRaycastValid)
         {
             snapArea = null;
+            validHit = new RaycastHit();
             return false;
         }
 
-        if (SnapRaycastHit.collider.TryGetComponent<SnapArea>(out var point))
+        var match = SnapRaycastHits
+            .Select(hit => new
+            {
+                Hit = hit,
+                SnapArea = hit.collider.GetComponent<SnapArea>()
+            })
+            .FirstOrDefault(x => x.SnapArea != null && currentSnapper.CanSnapToSnapArea(x.SnapArea));
+
+        if (match != null)
         {
-            snapArea = point;
+            snapArea = match.SnapArea;
+            validHit = match.Hit;
+            ValidRaycastHit = validHit;
             return true;
         }
-        else
-        {
-            snapArea = null;
-            return false;
-        }
+
+        snapArea = null;
+        validHit = new RaycastHit();
+        return false;
+
     }
+    // public bool TryGetSnapArea(out SnapArea[] snapAreas)
+    // {
+    //     if (!SnapRaycastValid)
+    //     {
+    //         snapAreas = null;
+    //         return false;
+    //     }
+
+    //     // assumes that snap areas are on the same layer.
+    //     if (SnapRaycastHits.Any(h => h.collider.TryGetComponent<SnapArea>(out var snapArea)))
+    //     {
+    //         snapAreas = SnapRaycastHits.Select(h => h.collider.GetComponent<SnapArea>()).ToArray();
+    //         return true;
+    //     }
+    //     else
+    //     {
+    //         snapAreas = null;
+    //         return false;
+    //     }
+    // }
 
     /// <summary>
     /// tries to get the position and rotation of a world placement if it is valid

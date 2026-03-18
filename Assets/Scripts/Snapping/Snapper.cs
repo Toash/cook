@@ -22,10 +22,10 @@ public class Snapper : MonoBehaviour
     [Tooltip("Determines what type of snappers can snap to others.")]
     [ShowInInspector]
     public SnapType SnapType { get; private set; }
-    /// <summary>
-    /// Empty list means all
-    /// </summary>
-    public List<SnapType> AcceptingSnapTypes = new List<SnapType>();
+    // /// <summary>
+    // /// Empty list means all
+    // /// </summary>
+    // public List<SnapType> AcceptingSnapTypes = new List<SnapType>();
 
     [Sirenix.OdinInspector.ReadOnly]
     public List<SnapConnection> ParentSnapConnections = new List<SnapConnection>();
@@ -39,12 +39,18 @@ public class Snapper : MonoBehaviour
         Detached?.Invoke();
 
     }
-    public bool CanSnap(SnapArea otherArea)
+
+    /// <summary>
+    /// checks if this snapper can snap to its potential parent snap area.
+    /// </summary>
+    /// <param name="otherArea"></param>
+    /// <returns></returns>
+    public bool CanSnapToSnapArea(SnapArea otherArea)
     {
         // if other is null, just ignore joint type checks.
         if (otherArea != null)
         {
-            if (!JointTypesCanSnap(otherArea.ParentSnapper)) return false;
+            if (!JointTypesCanSnap(otherArea)) return false;
 
             // already is occupied and only allows one snapper. 
             if (otherArea.OccupiedSnappers.Count > 0 && otherArea.OnlyOneSnap) return false;
@@ -53,19 +59,11 @@ public class Snapper : MonoBehaviour
 
     }
 
-    bool JointTypesCanSnap(Snapper other)
+    bool JointTypesCanSnap(SnapArea other)
     {
-        // if (SnapType == SnapType.Receipt && other.SnapType == SnapType.Food)
-        // {
-        //     return false;
-        // }
-        // if (SnapType == SnapType.Food && other.SnapType == SnapType.Receipt)
-        // {
-        //     return false;
-        // }
 
         if (other.AcceptingSnapTypes.Count == 0) return true;
-        if (!other.AcceptingSnapTypes.Contains(SnapType)) return false;
+        if (!other.AcceptingSnapTypes.Contains(this.SnapType)) return false;
 
 
 
@@ -86,7 +84,7 @@ public class Snapper : MonoBehaviour
     /// <param name="otherSnapArea"></param>
     public bool TrySnapToArea(PlacementInfo placementRaycastInfo, Snapper otherSnapper, SnapArea otherSnapArea)
     {
-        if (!CanSnap(otherSnapArea))
+        if (!CanSnapToSnapArea(otherSnapArea))
         {
             Debug.Log("Cannot snap " + gameObject.name + " to " + otherSnapper.gameObject.name + " due to incompatible snap types.");
             return false;
@@ -118,6 +116,13 @@ public class Snapper : MonoBehaviour
         transform.position = otherSnapArea.GetSnapPoint(placementRaycastInfo);
         transform.rotation = otherSnapArea.GetSnapRotation(placementRaycastInfo);
         transform.SetParent(otherSnapper.transform, worldPositionStays: true);
+
+
+        if (otherSnapArea.DisappearSnappedObject)
+        {
+            //todo change this to just disable the visual root.
+            gameObject.SetActive(false);
+        }
 
         return true;
     }
@@ -191,7 +196,7 @@ public class Snapper : MonoBehaviour
     {
 
 
-        if (CanSnap(null))
+        if (CanSnapToSnapArea(null))
         {
 
             Gizmos.color = Color.green;

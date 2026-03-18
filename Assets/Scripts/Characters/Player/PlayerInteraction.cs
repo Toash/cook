@@ -17,14 +17,22 @@ public class PlayerInteraction : MonoBehaviour
     public float InteractRange = 3;
 
     [Header("References")]
+    public PlayerItemHolder ItemHolder;
     public PlayerController Controller;
     public Transform CamRoot;
     public InputActionReference PrimaryInteract;
     public InputActionReference SecondaryInteract;
     public LayerMask InteractionMask;
 
-    public event Action<InteractableBase> OnInteractableChanged;
-    public event Action<InteractableBase> OnInteractableInteracted;
+    /// <summary>
+    /// Called when an interactable gets changed. can be used for updating the ui. <br/>
+    /// doesnt necessarily correspond to the current interactable.
+    /// </summary>
+    public event Action<IInteractable> OnInteractableChanged;
+    public event Action<InteractableBase> OnHoveredInteractableChanged;
+
+    public event Action<InteractableBase> OnHoveredInteractableInteracted;
+
 
     private Player player;
     private InteractableBase hoveredInteractable;
@@ -38,6 +46,21 @@ public class PlayerInteraction : MonoBehaviour
         player = GetComponent<Player>();
     }
 
+    void OnEnable()
+    {
+        Controller.BodyConstrained += InteractableChanged;
+        ItemHolder.OnItemHeld += InteractableChanged;
+
+
+    }
+    void OnDisable()
+    {
+        Controller.BodyConstrained -= InteractableChanged;
+        ItemHolder.OnItemHeld -= InteractableChanged;
+
+    }
+
+
     void Update()
     {
         // bool hitValid;
@@ -46,14 +69,15 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (interactionHit.Hit.collider.TryGetComponent<InteractableBase>(out var currentInteractable))
             {
+                // hoveredInteractable = currentInteractable;
+
                 // TryHighlightHoverInteractable(false);
                 if (currentInteractable != hoveredInteractable)
                 {
 
-                    InteractableChanged(hoveredInteractable, currentInteractable);
+                    HoverInteractableChanged(hoveredInteractable, currentInteractable);
 
                 }
-                hoveredInteractable = currentInteractable;
                 // TryHighlightHoverInteractable(true);
 
             }
@@ -65,8 +89,8 @@ public class PlayerInteraction : MonoBehaviour
             TryHighlightHoverInteractable(false);
             if (hoveredInteractable != null)
             {
-                InteractableChanged(hoveredInteractable, null);
-                hoveredInteractable = null;
+                // hoveredInteractable = null;
+                HoverInteractableChanged(hoveredInteractable, null);
             }
         }
 
@@ -81,15 +105,54 @@ public class PlayerInteraction : MonoBehaviour
 
     }
 
-    void InteractableChanged(InteractableBase oldInteractable, InteractableBase newInteractable)
+    /// <summary>
+    /// The source of truth for whatever the player will interact with.
+    /// </summary>
+    /// <returns></returns>
+    public IInteractable GetCurrentInteractable()
     {
+
+        // return interactable from the constrainer.
+        if (Controller.CurrentControlMode == PlayerMode.BodyConstrained)
+        {
+            return Controller.CurrentConstrainerInteractable;
+
+        }
+
+        // return interactable from player hand
+        if (player.ItemHolder.isHolding)
+        {
+            return player.ItemHolder.ItemInHand;
+        }
+
+        //return hovered interactable
+        if (hoveredInteractable != null)
+        {
+            return hoveredInteractable;
+        }
+
+        return null;
+    }
+    void InteractableChanged(IInteractable newInteractable)
+    {
+        Debug.Log("[PlayerInteraction]: Interactable Changed: " + newInteractable);
+        OnInteractableChanged?.Invoke(newInteractable);
+    }
+
+    void HoverInteractableChanged(InteractableBase oldInteractable, InteractableBase newInteractable)
+    {
+
+        hoveredInteractable = newInteractable;
+
         oldInteractable?.OnHoverExit();
         newInteractable?.OnHoverEnter();
 
         oldInteractable?.SetOutline(false);
         newInteractable?.SetOutline(true);
 
-        OnInteractableChanged?.Invoke(newInteractable);
+        OnHoveredInteractableChanged?.Invoke(newInteractable);
+
+        InteractableChanged(newInteractable);
 
     }
 
@@ -97,15 +160,6 @@ public class PlayerInteraction : MonoBehaviour
     {
         InteractionContext context = new InteractionContext(type, GetComponent<Player>());
 
-        // based on some player subsystem
-        // if (Controller.IsCameraContrained == true)
-        // {
-        //     Controller.UnConstrainCamera();
-        //     return;
-        // }
-
-
-        // TODO get the name for all of these actinos to display in a tooltip
 
         // interactinon based on the current context
         if (Controller.CurrentControlMode == PlayerMode.InPopup)
@@ -113,18 +167,11 @@ public class PlayerInteraction : MonoBehaviour
             Controller.CloseCurrentPopup();
             return;
         }
-
-        // if (Controller.CurrentConstrainer != null)
-        // {
-        //     Controller.CurrentConstrainer.ConstraintInteract(context);
-        //     return;
-
-        // }
         if (Controller.CurrentControlMode == PlayerMode.BodyConstrained)
         {
+            Controller.OnInteractAndConstraint(context);
             // Controller.UnconstrainBody();
-            // Controller.SetPlayerMode(PlayerMode.FullGameplay);
-            Controller.CurrentConstrainer.ConstraintInteract(context);
+            // Controller.CurrentConstrainerInteractable.Interact(context);
             return;
         }
 
@@ -134,14 +181,22 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-
-
         // based on raycast
         if (hoveredInteractable != null)
         {
             hoveredInteractable.BaseInteract(context);
-            OnInteractableInteracted?.Invoke(hoveredInteractable);
+            OnHoveredInteractableInteracted?.Invoke(hoveredInteractable);
         }
+
+        // IInteractable CurrentInteractable = GetCurrentInteractable();
+        // if (CurrentInteractable != null)
+        // {
+        //     CurrentInteractable.Interact(context);
+        //     if (CurrentInteractable is InteractableBase interactableBase)
+        //     {
+        //         OnHoveredInteractableInteracted?.Invoke(interactableBase);
+        //     }
+        // }
 
     }
 
@@ -164,13 +219,6 @@ public class PlayerInteraction : MonoBehaviour
         Gizmos.DrawWireSphere(CamRoot.position, InteractRange);
         Handles.Label(CamRoot.position + CamRoot.forward * InteractRange, "Interact Range");
 
-        // if (hoveredInteractable != null)
-        // {
-        //     Handles.Label(hitPoint, "Interactable hit point");
-        //     Gizmos.DrawWireSphere(hitPoint, .2f);
-
-        //     Handles.Label(transform.position, "Current interactable: " + hoveredInteractable.transform.name);
-        // }
 
     }
 #endif

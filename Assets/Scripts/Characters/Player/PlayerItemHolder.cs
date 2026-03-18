@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -37,12 +38,17 @@ public class PlayerItemHolder : MonoBehaviour
     {
         get
         {
-            return itemInHand != null;
+            return ItemInHand != null;
         }
     }
 
     [ShowInInspector, ReadOnly]
-    private Holdable itemInHand;
+    public Holdable ItemInHand { get; private set; }
+
+
+    public event Action<IInteractable> OnItemHeld;
+
+
     [ShowInInspector, ReadOnly]
     private PlacementInfo placementInfo = new();
     [ShowInInspector, ReadOnly]
@@ -64,9 +70,11 @@ public class PlayerItemHolder : MonoBehaviour
         if (!isHolding) return;
 
         placementInfo.WorldRaycastValid = Physics.Raycast(CamRoot.position, CamRoot.forward, out placementInfo.WorldRaycastHit, PlacingRange, PlacingMask, QueryTriggerInteraction.Ignore);
-        placementInfo.SnapRaycastValid = Physics.Raycast(CamRoot.position, CamRoot.forward, out placementInfo.SnapRaycastHit, PlacingRange, SnapMask, QueryTriggerInteraction.Collide);
+        // placementInfo.SnapRaycastValid = Physics.RaycastAll(CamRoot.position, CamRoot.forward, out placementInfo.SnapRaycastHits, PlacingRange, SnapMask, QueryTriggerInteraction.Collide);
+        placementInfo.SnapRaycastHits = Physics.RaycastAll(CamRoot.position, CamRoot.forward, PlacingRange, SnapMask, QueryTriggerInteraction.Collide);
+        placementInfo.SnapRaycastValid = placementInfo.SnapRaycastHits.Length > 0;
 
-        HandlePlacementPreview(placementPreview, placementInfo, itemInHand);
+        HandlePlacementPreview(placementPreview, placementInfo, ItemInHand);
         if (isHolding)
         {
             if (RotatePlacementAction.action.IsPressed())
@@ -83,7 +91,7 @@ public class PlayerItemHolder : MonoBehaviour
         if (context.Type == InteractType.Primary)
         {
             // try place via snapping
-            if (itemInHand.TryGetComponent<Snapper>(out var _))
+            if (ItemInHand.TryGetComponent<Snapper>(out var _))
             {
                 if (placementInfo.SnapRaycastValid)
                 {
@@ -103,13 +111,14 @@ public class PlayerItemHolder : MonoBehaviour
     }
     void OnAfterHeld()
     {
-        itemInHand.OnAfterHeld();
+        ItemInHand.OnAfterHeld();
+        OnItemHeld?.Invoke(ItemInHand);
 
     }
     void OnAfterPlace()
     {
-        itemInHand.gameObject.SetActive(true);
-        itemInHand.SetNotHolding();
+        ItemInHand.gameObject.SetActive(true);
+        ItemInHand.SetNotHolding();
         TryDeletePreview(placementPreview);
         placementInfo.WorldPlacementYaw = 0;
         if (handVisual != null)
@@ -117,10 +126,15 @@ public class PlayerItemHolder : MonoBehaviour
             Destroy(handVisual);
             handVisual = null;
         }
-        itemInHand.OnAfterPlace();
+        ItemInHand.OnAfterPlace();
 
-        itemInHand = null;
+        ItemInHand = null;
     }
+    /// <summary>
+    /// Tries to hold the target holdable. returns true if successful.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
     public bool TryHold(Holdable target)
     {
         if (isHolding) return false;
@@ -145,7 +159,7 @@ public class PlayerItemHolder : MonoBehaviour
         handVisual.transform.SetParent(HoldSpot, worldPositionStays: true);
         handVisual.transform.rotation = HoldSpot.rotation;
 
-        itemInHand = target;
+        ItemInHand = target;
 
         OnAfterHeld();
         return true;
@@ -164,9 +178,9 @@ public class PlayerItemHolder : MonoBehaviour
 
 
         //place
-        itemInHand.transform.SetParent(surface, worldPositionStays: true);
-        itemInHand.transform.position = pos;
-        itemInHand.transform.rotation = rot;
+        ItemInHand.transform.SetParent(surface, worldPositionStays: true);
+        ItemInHand.transform.position = pos;
+        ItemInHand.transform.rotation = rot;
 
         OnAfterPlace();
         return true;
@@ -183,16 +197,15 @@ public class PlayerItemHolder : MonoBehaviour
 
         Debug.Log("[PlayerItemHolder]: Trying to place on snap area.");
 
-        if (itemInHand.TryGetComponent<Snapper>(out Snapper heldSnapper))
+        if (ItemInHand.TryGetComponent<Snapper>(out Snapper heldSnapper))
         {
-            if (placementRaycastInfo.TryGetSnapArea(out SnapArea otherSnapPoint))
+            if (placementRaycastInfo.TryGetFirstValidSnapArea(heldSnapper, out SnapArea otherSnapPoint, out RaycastHit validHit))
             {
                 Snapper otherSnapper = otherSnapPoint.ParentSnapper;
 
                 //place
                 if (heldSnapper.TrySnapToArea(placementRaycastInfo, otherSnapper, otherSnapPoint))
                 {
-
                     OnAfterPlace();
                     return true;
                 }
@@ -206,9 +219,10 @@ public class PlayerItemHolder : MonoBehaviour
     void HandlePlacementPreview(PlacementPreview preview, PlacementInfo placementInfo, Holdable heldHoldable)
     {
         // if we have a snapper and it can snap to the snap area. preview for place on snap area.
-        if (placementInfo.TryGetSnapArea(out SnapArea snapArea) && heldHoldable.TryGetComponent<Snapper>(out var snapper) && snapper.CanSnap(snapArea))
+        if (heldHoldable.TryGetComponent<Snapper>(out var snapper) && placementInfo.TryGetFirstValidSnapArea(snapper, out SnapArea snapArea, out RaycastHit validHit))
         {
             preview.IsShowing = true;
+
             preview.Position = snapArea.GetSnapPoint(placementInfo);
             preview.Rotation = snapArea.GetSnapRotation(placementInfo);
         }
@@ -297,13 +311,5 @@ public class PlayerItemHolder : MonoBehaviour
     }
 
 #endif
-
-
-
-
-
-
-
-
 
 }

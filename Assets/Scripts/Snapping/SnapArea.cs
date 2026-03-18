@@ -12,13 +12,19 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))] // for snapping
 public class SnapArea : MonoBehaviour
 {
+    /// <summary>
+    /// Empty list means all
+    /// </summary>
+    public List<SnapType> AcceptingSnapTypes = new List<SnapType>();
     [Tooltip("Whether or not only one snapper can be snapped to this snap area.")]
     public bool OnlyOneSnap = true;
     public bool SnapToCenter = true; // if true, the snapper will snap to the center of the snap area.  if false, it will snap to the exact position of the snap area.
+    public bool DisappearSnappedObject = false;
     public Snapper ParentSnapper;
     // public SnapType AcceptingTypes; // the types that can snap to this.
     // public List<SnapType> AcceptingTypes; // the types that can snap to this.
 
+    [Sirenix.OdinInspector.ReadOnly]
     public List<Snapper> OccupiedSnappers;
 
     private Collider col;
@@ -66,7 +72,7 @@ public class SnapArea : MonoBehaviour
         }
         else
         {
-            return placementInfo.SnapRaycastHit.point;
+            return placementInfo.ValidRaycastHit.point;
         }
     }
 
