@@ -10,9 +10,9 @@ public class DisplaySingleMenuItemUI : MonoBehaviour
     public Transform RequirementsFlexContainer;
     public DisplaySingleIngredientRequirement DisplaySingleIngredientRequirement;
 
-    private MenuItem displayedItem;
+    private TruckMenuItem displayedItem;
 
-    public void Populate(MenuItem item)
+    public void Populate(TruckMenuItem item)
     {
         this.displayedItem = item;
         ItemName.text = item.Name;

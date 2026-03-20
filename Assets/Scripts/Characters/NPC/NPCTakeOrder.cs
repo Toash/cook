@@ -38,7 +38,7 @@ public class NPCTakeOrder : NPCState
                 Brain.NPC.Hand.Hold(container.gameObject);
 
 
-                OrderManager.I.NPCEvaluateOrder(container.SubmissionResult);
+                OrderManager.I.OrderEvaluated(container.SubmissionResult);
 
                 FinalOrderEvaluationResult eval = container.SubmissionResult.Evaluation;
                 FinalOrderScoreCategory category = eval.ScoreCategory;

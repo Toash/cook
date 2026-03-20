@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Vehicle;
 using Sirenix.OdinInspector;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
@@ -9,7 +10,9 @@ using UnityEngine;
 /// </summary>
 public class CarSeat : InteractableBase
 {
-    public List<InteractInfo> SeatInfos = new List<InteractInfo>();
+    public FoodTruck Truck;
+    public List<InteractInfo> CantParkSeatInfos = new List<InteractInfo>();
+    public List<InteractInfo> CanParkSeatInfos = new List<InteractInfo>();
     [ReadOnly]
     public Player PlayerInSeat;
     // where the player should snap to.
@@ -20,6 +23,16 @@ public class CarSeat : InteractableBase
     public event Action PlayerInSeatSeconaryInteraction;
     public event Action GotOutSeat;
 
+    void OnEnable()
+    {
+        Truck.EnteredParkingSpot += OnEnteredParkingSpot;
+        Truck.LeftParkingSpot += OnLeftParkingSpot;
+    }
+    void OnDisable()
+    {
+        Truck.EnteredParkingSpot -= OnEnteredParkingSpot;
+        Truck.LeftParkingSpot -= OnLeftParkingSpot;
+    }
     public void ConstraintInteract(InteractionContext context)
     {
         if (context.Type == InteractType.Primary)
@@ -34,20 +47,29 @@ public class CarSeat : InteractableBase
 
     public override void Interact(InteractionContext context)
     {
-        if (PlayerInSeat != null)
+        if (context.Type == InteractType.Primary)
         {
-            // PlayerInSeat.Controller.UnconstrainBody();
-            OnUnConstrained();
-            context.Player.Controller.UnconstrainBody();
+            if (PlayerInSeat != null)
+            {
+                context.Player.Controller.UnconstrainBody();
+                context.Player.Controller.ForceFirstPerson();
+                GotOutSeat?.Invoke();
+
+                PlayerInSeat = null;
+            }
+            else
+            {
+                PlayerInSeat = context.Player;
+
+                PlayerInSeat.Controller.ConstrainBody(new ConstrainedInfo(this, ConstrainType.Truck, SeatPosition, GetOutPosition));
+                // context.Player.Controller.ForceThirdPerson();
+
+                GotInSeat?.Invoke(context.Player.Controller);
+            }
         }
-        else
+        else if (context.Type == InteractType.Secondary)
         {
-            PlayerInSeat = context.Player;
-            PlayerInSeat.Controller.ConstrainBody(new ConstrainedInfo(this, ConstrainType.Truck, SeatPosition, GetOutPosition));
-            context.Player.Controller.ForceFirstPerson();
-
-            GotInSeat?.Invoke(context.Player.Controller);
-
+            PlayerInSeatSeconaryInteraction?.Invoke();
         }
     }
     public override List<InteractInfo> GetInteractInfos()
@@ -59,15 +81,25 @@ public class CarSeat : InteractableBase
         }
         else
         {
-            return SeatInfos;
+            if (Truck.CanPark())
+            {
+                return CanParkSeatInfos;
+            }
+            return CantParkSeatInfos;
         }
 
     }
 
-    public void OnUnConstrained()
+
+    void OnEnteredParkingSpot()
     {
-        PlayerInSeat = null;
-        GotOutSeat?.Invoke();
+        if (PlayerInSeat == null) return;
+        PlayerInSeat.Interaction.InteractablePoll(this);
+    }
+    void OnLeftParkingSpot()
+    {
+        if (PlayerInSeat == null) return;
+        PlayerInSeat.Interaction.InteractablePoll(this);
     }
 
 #if UNITY_EDITOR

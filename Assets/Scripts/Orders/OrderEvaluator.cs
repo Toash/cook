@@ -43,6 +43,7 @@ public class OrderEvaluator : MonoBehaviour
             Debug.LogError("[OrderEvaluator]: is null");
             return null;
         }
+        Debug.Log("[OrderEvaluator]: Evaluating order...");
         AssemblyEvaluation assemblyEvaluation = AssemblyEvaluation.Evaluate(order, preparedItems);
 
 

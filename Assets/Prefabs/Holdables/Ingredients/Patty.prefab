@@ -66,8 +66,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bafc066a47b9eb44ba9aa7e6cc42354b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SnapPoint
+  AcceptingSnapTypes: 00000000
   OnlyOneSnap: 1
   SnapToCenter: 1
+  DisappearSnappedObject: 0
   ParentSnapper: {fileID: 1014017085148791620}
   OccupiedSnappers: []
 --- !u!1 &4105077589884490457
@@ -84,6 +86,8 @@ GameObject:
   - component: {fileID: 1014017085148791620}
   - component: {fileID: 6388126973158876817}
   - component: {fileID: 6477726968046460394}
+  - component: {fileID: 2949583702072324551}
+  - component: {fileID: 8462433425150726483}
   m_Layer: 6
   m_Name: Patty
   m_TagString: Untagged
@@ -141,13 +145,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb56e004d3e89c043915a302ea89428f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Holdable
+  HoverInteractInfo:
+  - Type: 0
+    Description: Pick up
   VisualRoot: {fileID: 9054525049034435805}
   HoverTooltipData:
     Parent: {fileID: 0}
     Text: 
     Offset: {x: 0, y: 0}
+  HeldInfos:
+  - Type: 0
+    Description: Place
   ItemData: {fileID: 11400000, guid: 0fd90f4aa75e00844845c8eff566dc64, type: 2}
-  audioSourcePlayer: {fileID: 0}
   GizmoSize: 0.3
 --- !u!114 &1014017085148791620
 MonoBehaviour:
@@ -161,8 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 944b15392521cab4d906b33495de27ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Snapper
-  AcceptingSnapTypes: 
   ParentSnapConnections: []
+  ChildSnapConnections: []
 --- !u!114 &6388126973158876817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,6 +198,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioSourcePlayer
   AudioDef: {fileID: 0}
+--- !u!114 &2949583702072324551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4105077589884490457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7466ec096aa23d1498d14160f1f1a69e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Cookable
+  CookType: 0
+  CookedThreshold: 50
+  BurntThreshold: 80
+  CookRate: 8
+--- !u!114 &8462433425150726483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4105077589884490457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 344431f319f340f42bc3bb97920f66cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CookableVisual
+  cookable: {fileID: 2949583702072324551}
+  targetRenderer: {fileID: 1318317411857141965}
 --- !u!1 &9054525049034435805
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,6 +308,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 41cc432fc950f9043b18925e9c689aa1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6c74ff90b7d38fc4c8a77e45e8d7c815, type: 2}
     - target: {fileID: 919132149155446097, guid: 41cc432fc950f9043b18925e9c689aa1, type: 3}
       propertyPath: m_Name
       value: Patty
@@ -281,5 +324,10 @@ PrefabInstance:
 --- !u!4 &144315776586410914 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 41cc432fc950f9043b18925e9c689aa1, type: 3}
+  m_PrefabInstance: {fileID: 399148088441670729}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1318317411857141965 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 41cc432fc950f9043b18925e9c689aa1, type: 3}
   m_PrefabInstance: {fileID: 399148088441670729}
   m_PrefabAsset: {fileID: 0}

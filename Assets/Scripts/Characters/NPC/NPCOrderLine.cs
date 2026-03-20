@@ -11,47 +11,63 @@ public class NPCOrderLine : NPCState
 {
 
     public override string Name => "NPCOrderLine";
-    bool FirstInLine()
-    {
-        return Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.GetFirstNPCInLine() == Brain;
 
+    private Coroutine moveRoutine;
+    private bool hasProposedOrder;
+    private bool awaitingAck;
+
+    void MoveToCurrentLinePos()
+    {
+        if (FirstInLine()) return;
+        if (moveRoutine != null)
+            StopCoroutine(moveRoutine);
+
+        moveRoutine = StartCoroutine(MoveToLinePosCoroutine());
+    }
+
+    IEnumerator MoveToLinePosCoroutine()
+    {
+        Vector3 currentLinePos = Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.GetLinePositionForNPC(Brain);
+        yield return NPC.Movement.MoveAndAwait(currentLinePos);
+
+        moveRoutine = null;
+
+        if (FirstInLine() && !hasProposedOrder && !awaitingAck)
+        {
+            ProposeOrder();
+        }
+    }
+
+    void ProposeOrder()
+    {
+        if (hasProposedOrder || awaitingAck) return;
+
+        Brain.Agent.SetDestination(Brain.CurrentFoodTruck.OrderSpot.position);
+
+        hasProposedOrder = true;
+        awaitingAck = true;
+
+        OrderManager.I.ProposedOrderAcknowledged += OnProposedOrderAcknowledged;
+        OrderProposition order = OrderManager.I.GenerateRandomOrderProposition(Brain.CurrentFoodTruck, Brain.NPC);
+        OrderManager.I.ProposeOrder(order);
     }
 
     void OnProposedOrderAcknowledged(Order order)
     {
         if (order.Owner != Brain.NPC) return;
+
+        hasProposedOrder = false;
+        awaitingAck = false;
+
         Brain.CurrentOrderID = order.ID;
 
-        Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.RemoveNPCFromLineIfFirst(Brain);
+        OrderManager.I.ProposedOrderAcknowledged -= OnProposedOrderAcknowledged;
+        Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.RemoveNPCFromLine(Brain);
         Brain.ChangeState("NPCWaitForOrder");
-
-
     }
-    void ProposeOrder()
+    bool FirstInLine()
     {
-        Debug.Log("[NPC]: First in line");
-        // Brain.ChangeState("NPCOrdering");
-
-        OrderManager.I.ProposedOrderAcknowledged += OnProposedOrderAcknowledged;
-        OrderProposition order = OrderManager.I.GenerateRandomOrderProposition(Brain.NPC);
-        OrderManager.I.ProposeOrder(order);
-    }
-    void MoveToCurrentLinePos()
-    {
-        StartCoroutine(MoveToLinePosCoroutine());
-
-    }
-
-    IEnumerator MoveToLinePosCoroutine()
-    {
-        // StopAllCoroutines();
-        Vector3 currentLinePos = Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.GetLinePositionForNPC(Brain);
-        yield return NPC.Movement.MoveAndAwait(currentLinePos);
-
-        if (FirstInLine())
-        {
-            ProposeOrder();
-        }
+        return Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.GetFirstNPCInLine() == Brain;
 
     }
     public override void OnEnter(NPCBrain brain)
@@ -69,15 +85,26 @@ public class NPCOrderLine : NPCState
 
     }
 
+    // public override void OnExit(NPCBrain brain)
+    // {
+    //     Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.RemoveNPCFromLineIfFirst(Brain);
+
+    //     brain.LineChanged -= MoveToCurrentLinePos;
+    //     OrderManager.I.ProposedOrderAcknowledged -= OnProposedOrderAcknowledged;
+    //     Brain.NPC.Visuals.SetLookAtTarget(null);
+    // }
+
     public override void OnExit(NPCBrain brain)
     {
-        Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.RemoveNPCFromLineIfFirst(Brain);
 
         brain.LineChanged -= MoveToCurrentLinePos;
         OrderManager.I.ProposedOrderAcknowledged -= OnProposedOrderAcknowledged;
+        Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.RemoveNPCFromLine(brain);
         Brain.NPC.Visuals.SetLookAtTarget(null);
-    }
 
+        hasProposedOrder = false;
+        awaitingAck = false;
+    }
     public override void OnFixedUpdate(NPCBrain brain)
     {
     }

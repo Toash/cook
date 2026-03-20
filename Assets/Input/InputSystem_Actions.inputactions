@@ -131,6 +131,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Flashlight",
+                    "type": "Button",
+                    "id": "468691b1-9022-49d9-b728-b2c5eb0680de",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -577,7 +586,7 @@
                 {
                     "name": "",
                     "id": "f9394ea0-06dc-4713-98d8-4fea16b36cd0",
-                    "path": "<Keyboard>/tab",
+                    "path": "<Keyboard>/h",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -588,11 +597,22 @@
                 {
                     "name": "",
                     "id": "873c6fd8-d42f-4503-bdba-cc5d576a7161",
-                    "path": "<Keyboard>/f",
+                    "path": "<Keyboard>/tab",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Phone",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ccf88a15-9d4d-4687-ac69-2b29b8169a84",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Flashlight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

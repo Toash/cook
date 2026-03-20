@@ -1,7 +1,9 @@
 
 using UnityEngine;
 /// <summary>
-/// Represents a connection between two snappers.
+/// Represents a parent child connection between two snappers.
+/// 
+/// 
 /// </summary>
 [System.Serializable]
 public class SnapConnection
@@ -11,11 +13,13 @@ public class SnapConnection
     // public bool IsOwner;
 
     public Snapper Parent;
+    public Snapper Child;
 
 
-    public SnapConnection(Snapper parentSnapper)
+    public SnapConnection(Snapper parentSnapper, Snapper childSnapper)
     {
         Parent = parentSnapper;
+        Child = childSnapper;
     }
     // public SnapConnection(Snapper thisSnapper, Snapper otherSnapper, bool isOwner)
     // {

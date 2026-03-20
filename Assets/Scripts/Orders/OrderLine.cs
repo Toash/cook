@@ -22,7 +22,8 @@ public class OrderLine : MonoBehaviour
     ///  TODO: generate positions based on line position.
     /// </summary>
     [ShowInInspector, ReadOnly]
-    public Queue<NPCBrain> Line = new();
+    // public Queue<NPCBrain> Line = new();
+    public List<NPCBrain> Line = new();
 
 
 
@@ -36,7 +37,7 @@ public class OrderLine : MonoBehaviour
 
     public NPCBrain GetFirstNPCInLine()
     {
-        return Line.Peek();
+        return Line.Count > 0 ? Line[0] : null;
     }
     public Vector3 GetLinePositionForNPC(NPCBrain npc)
     {
@@ -54,33 +55,46 @@ public class OrderLine : MonoBehaviour
 
     public void AddNPCToLine(NPCBrain npc)
     {
-        Line.Enqueue(npc);
+        Line.Add(npc);
         LineChanged += npc.OnLineChanged;
-        // NewFirstInLine?.Invoke(Line.Peek());
-        LineChanged?.Invoke(Line.Peek());
+
+        if (Line.Count > 0)
+            LineChanged?.Invoke(Line[0]);
+    }
+    public void RemoveNPCFromLine(NPCBrain npc)
+    {
+        bool wasFirst = Line.Count > 0 && Line[0] == npc;
+
+        if (!Line.Remove(npc)) return;
+
+        LineChanged -= npc.OnLineChanged;
+
+        if (Line.Count > 0)
+        {
+            LineChanged?.Invoke(Line[0]);
+        }
     }
     /// <summary>
     /// Removes an npc from the line. Does not necessarily remove the first.
     /// </summary>
     /// <param name="npc"></param>
-    public void RemoveNPCFromLineIfFirst(NPCBrain npc)
-    {
-        var firstNPC = Line.Peek();
-        if (firstNPC != npc) return;
+    // public void RemoveNPCFromLineIfFirst(NPCBrain npc)
+    // {
+    //     var firstNPC = GetFirstNPCInLine();
+    //     if (firstNPC != npc) return;
 
-        Line.Dequeue();
-        LineChanged -= firstNPC.OnLineChanged;
+    //     Line.RemoveAt(0);
+    //     LineChanged -= firstNPC.OnLineChanged;
 
-        LineChanged?.Invoke(firstNPC);
-    }
+    //     LineChanged?.Invoke(firstNPC);
+    // }
 
     public void ClearLine()
     {
-        NPCBrain npc;
-        while ((npc = Line.Peek()) != null)
-        {
-            RemoveNPCFromLineIfFirst(npc);
 
+        for (int i = Line.Count - 1; i >= 0; i--)
+        {
+            RemoveNPCFromLine(Line[i]);
         }
 
     }

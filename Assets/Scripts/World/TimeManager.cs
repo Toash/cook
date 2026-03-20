@@ -43,6 +43,18 @@ public class TimeManager : MonoBehaviour
     {
         StartDay();
     }
+    public void SetTime(int hour, int minute)
+    {
+        hour = Mathf.Clamp(hour, 0, 23);
+        minute = Mathf.Clamp(minute, 0, 59);
+
+        timeInSeconds = hour * 3600 + minute * 60;
+        timer = 0f;
+
+        Debug.Log($"[TimeManager]: Time set to {Get24HourTime()}");
+
+        MinuteChanged?.Invoke(GetHour(), GetMinuteHours());
+    }
 
     public void StartDay()
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Assets.Scripts.Ingredient.MenuItem;
+using Assets.Scripts.Vehicle;
 using Sirenix.OdinInspector;
 using UnityEngine;
 public class OrderManager : MonoBehaviour
@@ -79,16 +80,16 @@ public class OrderManager : MonoBehaviour
     /// </summary>
     /// <param name="proposer"></param>
     /// <returns></returns>
-    public OrderProposition GenerateRandomOrderProposition(NPC proposer)
+    public OrderProposition GenerateRandomOrderProposition(FoodTruck truck, NPC proposer)
     {
-        List<MenuItem> menuItems = new List<MenuItem>();
+        List<TruckMenuItem> menuItems = new List<TruckMenuItem>();
 
         // probably get this based on some difficulty thing
         int menuItemCount = 1;
 
         for (int i = 0; i < menuItemCount; i++)
         {
-            MenuItem item = MenuItem.GetRandomMenuItem();
+            TruckMenuItem item = truck.GetRandomMenuItem();
             menuItems.Add(item);
         }
 
@@ -144,7 +145,7 @@ public class OrderManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Tries to submit an order. Can be successful or not.
+    /// Tries to submit an order given a list of prepared items. Can be successful or not.
     /// </summary>
     /// <param name="order"></param>
     /// <param name="preparedItems"></param>
@@ -165,7 +166,6 @@ public class OrderManager : MonoBehaviour
         }
 
         // evaluate order
-        Debug.Log("[OrderManager]: Evaluating order...");
         List<PreparedItemData> itemsData = PreparedItemData.From(preparedItems);
         FinalOrderEvaluationResult eval = OrderEvaluator.Evaluate(order, itemsData);
 
@@ -191,7 +191,7 @@ public class OrderManager : MonoBehaviour
     /// Call this method to indiciate that an NPC has evaluated their order.
     /// </summary>
     /// <param name="result"></param>
-    public void NPCEvaluateOrder(OrderSubmissionResult result)
+    public void OrderEvaluated(OrderSubmissionResult result)
     {
         NPCEvaluatedOrder?.Invoke(result);
         AudioManager.I.PlayOneShot(OrderCompleteSound);
@@ -219,6 +219,49 @@ public class OrderManager : MonoBehaviour
         {
             RemoveActiveOrder(order);
         }
+    }
+
+
+    public OrderSubmissionResult TrySubmitFromPlayerHand(PlayerItemHolder itemHolder)
+    {
+        if (itemHolder == null)
+        {
+            Debug.Log("[OrderManager]: PlayerItemHolder is null");
+            return new OrderSubmissionResult(OrderSubmissionStatus.NoPreparedItems, null, null, 0);
+        }
+
+        if (!itemHolder.isHolding)
+        {
+            Debug.Log("[OrderManager]: Player is not holding anything");
+            return new OrderSubmissionResult(OrderSubmissionStatus.NoPreparedItems, null, null, 0);
+        }
+
+        Holdable heldItem = itemHolder.ItemInHand;
+        if (heldItem == null)
+        {
+            Debug.Log("[OrderManager]: ItemInHand was null");
+            return new OrderSubmissionResult(OrderSubmissionStatus.NoPreparedItems, null, null, 0);
+        }
+
+        if (!heldItem.TryGetComponent<OrderContainer>(out var orderContainer))
+        {
+            Debug.Log("[OrderManager]: Held item is not an OrderContainer");
+            return new OrderSubmissionResult(OrderSubmissionStatus.NoPreparedItems, null, null, 0);
+        }
+
+        if (!orderContainer.TryGetLinkedOrder(out Order order))
+        {
+            Debug.Log("[OrderManager]: OrderContainer does not have a linked order");
+            return new OrderSubmissionResult(OrderSubmissionStatus.NoOrder, null, null, 0);
+        }
+
+        if (!orderContainer.TryGetPreparedItems(out List<PreparedItem> preparedItems))
+        {
+            Debug.Log("[OrderManager]: OrderContainer does not contain prepared items");
+            return new OrderSubmissionResult(OrderSubmissionStatus.NoPreparedItems, order, null, 0);
+        }
+
+        return PlayerTrySubmit(order, preparedItems);
     }
 
 

@@ -18,7 +18,7 @@ using Assets.Scripts.Ingredient.MenuItem;
 public class Order
 {
     public NPC Owner;
-    public List<Assets.Scripts.Ingredient.MenuItem.MenuItem> MenuItems;
+    public List<Assets.Scripts.Ingredient.MenuItem.TruckMenuItem> MenuItems;
     public int Payout;
 
 

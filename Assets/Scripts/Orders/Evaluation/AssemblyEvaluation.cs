@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Assets.Scripts.Ingredient.MenuItem;
+using UnityEngine;
 
 /// <summary>
 /// Evaluates based off of how ingredients are actually laid out.
@@ -15,40 +16,43 @@ public class AssemblyEvaluation
         this.Discrepancies = discrepancies;
     }
 
+
     public static AssemblyEvaluation Evaluate(Order order, List<PreparedItemData> preparedItems)
     {
-        int maxScore = 0;
+        Debug.Log("[AssemblyEvaluation]: Evaluating assembly...");
+        int expectedPartCount = 0;
         foreach (var menuItem in order.MenuItems)
         {
-            foreach (var (data, count) in MenuItem.Consolidate(menuItem))
+            foreach (var (_, count) in TruckMenuItem.Consolidate(menuItem))
             {
-                maxScore += count;
+                expectedPartCount += count;
             }
         }
 
-
-
-        int totalDiscrepancies = 0;
-
-
-        foreach (var preparedItem in preparedItems)
+        if (expectedPartCount <= 0)
         {
-            PreparedItemAssemblyDiscrepancies assemblyDiscrepancies = PreparedItemAssemblyDiscrepancies.Evaluate(order.MenuItems, preparedItem);
-            totalDiscrepancies += assemblyDiscrepancies.Discrepancies;
-
-
+            return new AssemblyEvaluation(0f, 0);
         }
 
+        int totalDiscrepancies = 0;
+        foreach (PreparedItemData preparedItem in preparedItems)
+        {
+            PreparedItemAssemblyDiscrepancies discrepancies =
+                PreparedItemAssemblyDiscrepancies.EvaluateByMatchingClosestMenuItem(order.MenuItems, preparedItem);
 
-        float assemblyScore = (float)totalDiscrepancies / maxScore;
+            totalDiscrepancies += discrepancies.Discrepancies;
+        }
 
+        float assemblyScore = 1f - ((float)totalDiscrepancies / expectedPartCount);
+        assemblyScore = Mathf.Clamp01(assemblyScore);
+        Debug.Log("[AssemblyEvaluation]: Total discrepancies: " + totalDiscrepancies);
+        Debug.Log("[AssemblyEvaluation]: Assembly score: " + assemblyScore);
 
         if (totalDiscrepancies > 1)
         {
-            assemblyScore = 0;
+            assemblyScore = 0f;
         }
 
         return new AssemblyEvaluation(assemblyScore, totalDiscrepancies);
-
     }
 }

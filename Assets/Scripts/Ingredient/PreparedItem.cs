@@ -12,6 +12,7 @@ using UnityEngine;
 /// 
 /// Is made up of ingredients, position is the first ingredient.
 /// </summary>
+[System.Serializable]
 public class PreparedItem
 {
     public List<Ingredient> Ingredients = new List<Ingredient>();
@@ -125,7 +126,7 @@ public class PreparedItem
         if (!Ingredients.Remove(ingredient)) return;
         IngredientsChanged?.Invoke();
 
-        ingredient.transform.SetParent(null);
+        // ingredient.transform.SetParent(null);
         ingredient.PreparedItem = null;
 
         ingredient.Snapper.OnChildSnapped -= OnIngredientAttachedToIngredient;
@@ -146,9 +147,6 @@ public class PreparedItem
 
     }
 
-    /// <summary>
-    /// Removes all ingredients from the PreparedItem, deletes the PreparedItem
-    /// </summary>
     public void Disband()
     {
         for (int i = Ingredients.Count - 1; i >= 0; i--)

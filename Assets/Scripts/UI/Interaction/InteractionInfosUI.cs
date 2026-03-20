@@ -16,7 +16,7 @@ public class InteractionInfosUI : MonoBehaviour
         PlayerInteraction.OnInteractableChanged -= OnInteractableChanged;
     }
 
-    void OnInteractableChanged(IInteractable interactable)
+    void OnInteractableChanged(IInteractable _)
     {
         var currentInteractable = PlayerInteraction.GetCurrentInteractable();
         if (currentInteractable != null)

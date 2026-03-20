@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
     // events
     public event System.Action<IInteractable> BodyConstrained;
-    public event System.Action BodyUnconstrained;
+    public event System.Action<IInteractable> BodyUnconstrained;
     public event System.Action CameraConstrained;
     public event System.Action CameraUnconstrained;
 
@@ -259,12 +259,13 @@ public class PlayerController : MonoBehaviour
         CurrentConstrainerInteractable = null;
 
 
-        BodyUnconstrained?.Invoke();
+        BodyUnconstrained?.Invoke(CurrentConstrainerInteractable);
     }
     public void OnInteractAndConstraint(InteractionContext context)
     {
+        Debug.Log(context);
         CurrentConstrainerInteractable.Interact(context);
-        UnconstrainBody();
+        // UnconstrainBody();
     }
 
     void HandleGravity()
@@ -348,6 +349,11 @@ public class PlayerController : MonoBehaviour
     {
         thirdPerson = false;
         OnFirstPerson();
+    }
+    public void ForceThirdPerson()
+    {
+        thirdPerson = true;
+        OnThirdPerson();
     }
     void OnFirstPerson()
     {

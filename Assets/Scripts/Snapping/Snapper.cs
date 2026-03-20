@@ -29,6 +29,8 @@ public class Snapper : MonoBehaviour
 
     [Sirenix.OdinInspector.ReadOnly]
     public List<SnapConnection> ParentSnapConnections = new List<SnapConnection>();
+    [Sirenix.OdinInspector.ReadOnly]
+    public List<SnapConnection> ChildSnapConnections = new List<SnapConnection>();
 
 
     public event Action Detached;
@@ -80,26 +82,29 @@ public class Snapper : MonoBehaviour
     /// Snap this snapper to another snapper from their snap area.
     /// </summary>
     /// <param name="placementRaycastInfo"></param>
-    /// <param name="otherSnapper"></param>
-    /// <param name="otherSnapArea"></param>
-    public bool TrySnapToArea(PlacementInfo placementRaycastInfo, Snapper otherSnapper, SnapArea otherSnapArea)
+    /// <param name="parentSnapper"></param>
+    /// <param name="parentSnapArea"></param>
+    public bool TrySnapToArea(PlacementInfo placementRaycastInfo, Snapper parentSnapper, SnapArea parentSnapArea)
     {
-        if (!CanSnapToSnapArea(otherSnapArea))
+        if (!CanSnapToSnapArea(parentSnapArea))
         {
-            Debug.Log("Cannot snap " + gameObject.name + " to " + otherSnapper.gameObject.name + " due to incompatible snap types.");
+            Debug.Log("Cannot snap " + gameObject.name + " to " + parentSnapper.gameObject.name + " due to incompatible snap types.");
             return false;
         }
 
 
         // create snap connection
-        SnapConnection thisConnection = new SnapConnection(otherSnapper);
+        SnapConnection thisConnection = new SnapConnection(parentSnapper, this);
         ParentSnapConnections.Add(thisConnection);
-        otherSnapper.ChildSnapped(this);
+        parentSnapper.ChildSnapConnections.Add(thisConnection);
+
+
+        parentSnapper.ChildSnapped(this);
 
 
         // occupy snap area
         // snapArea.OccupiedSnappers.Add(this);
-        if (!otherSnapArea.TryAddSnapper(this))
+        if (!parentSnapArea.TryAddSnapper(this))
         {
             return false;
         }
@@ -113,12 +118,12 @@ public class Snapper : MonoBehaviour
 
 
         // actually place
-        transform.position = otherSnapArea.GetSnapPoint(placementRaycastInfo);
-        transform.rotation = otherSnapArea.GetSnapRotation(placementRaycastInfo);
-        transform.SetParent(otherSnapper.transform, worldPositionStays: true);
+        transform.position = parentSnapArea.GetSnapPoint(placementRaycastInfo);
+        transform.rotation = parentSnapArea.GetSnapRotation(placementRaycastInfo);
+        transform.SetParent(parentSnapper.transform, worldPositionStays: true);
 
 
-        if (otherSnapArea.DisappearSnappedObject)
+        if (parentSnapArea.DisappearSnappedObject)
         {
             //todo change this to just disable the visual root.
             gameObject.SetActive(false);
@@ -134,15 +139,13 @@ public class Snapper : MonoBehaviour
     public void DetachFromParent()
     {
         // detach from all parent snap connections
-        foreach (var connection in ParentSnapConnections)
+        foreach (SnapConnection connection in ParentSnapConnections)
         {
+            connection.Parent.ChildSnapConnections.Remove(connection);
             connection.Parent.ChildDetached(this);
-
         }
+
         ParentSnapConnections.Clear();
-
-
-
 
         if (TryGetComponent<Rigidbody>(out var rb))
         {
@@ -154,29 +157,55 @@ public class Snapper : MonoBehaviour
     }
 
 
+    // public List<Snapper> GetSnapperChildrenRecursive(bool includeSelf = true)
+    // {
+    //     var visited = new HashSet<Snapper>();
+    //     var stack = new Stack<Snapper>();
+
+    //     visited.Add(this);
+    //     stack.Push(this);
+
+    //     while (stack.Count > 0)
+    //     {
+    //         Snapper current = stack.Pop();
+
+    //         foreach (SnapConnection connection in current.ParentSnapConnections)
+    //         {
+    //             Snapper otherSnapper = connection.Parent;
+    //             if (otherSnapper == null) continue;
+
+    //             if (visited.Add(otherSnapper))
+    //                 stack.Push(otherSnapper);
+    //         }
+    //     }
+
+    //     if (!includeSelf) visited.Remove(this);
+    //     return visited.ToList();
+    // }
     public List<Snapper> GetSnapperChildrenRecursive(bool includeSelf = true)
     {
         var visited = new HashSet<Snapper>();
         var stack = new Stack<Snapper>();
 
-        visited.Add(this);
+        if (includeSelf)
+            visited.Add(this);
+
         stack.Push(this);
 
         while (stack.Count > 0)
         {
             Snapper current = stack.Pop();
 
-            foreach (SnapConnection connection in current.ParentSnapConnections)
+            foreach (SnapConnection connection in current.ChildSnapConnections)
             {
-                Snapper otherSnapper = connection.Parent;
-                if (otherSnapper == null) continue;
+                Snapper childSnapper = connection.Child;
+                if (childSnapper == null) continue;
 
-                if (visited.Add(otherSnapper))
-                    stack.Push(otherSnapper);
+                if (visited.Add(childSnapper))
+                    stack.Push(childSnapper);
             }
         }
 
-        if (!includeSelf) visited.Remove(this);
         return visited.ToList();
     }
 

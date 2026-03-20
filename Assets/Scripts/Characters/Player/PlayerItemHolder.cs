@@ -216,6 +216,42 @@ public class PlayerItemHolder : MonoBehaviour
         }
         return false;
     }
+
+    /// <summary>
+    /// Deletes the current held item if there was one.
+    /// </summary>
+    /// <returns></returns>
+    public bool TryDeleteHeldItem()
+    {
+        if (!isHolding) return false;
+
+        Debug.Log("[PlayerItemHolder]: Deleting held item.");
+
+        var item = ItemInHand;
+
+        // clean up preview and visuals
+        if (handVisual != null)
+        {
+            Destroy(handVisual);
+            handVisual = null;
+        }
+
+        TryDeletePreview(placementPreview);
+        placementInfo.WorldPlacementYaw = 0;
+
+        // detach from any systems first
+        // if (item.TryGetComponent<Snapper>(out var snapper))
+        // {
+        //     snapper.DetachFromParent();
+        // }
+
+        item.SetNotHolding();
+
+        Destroy(item.gameObject);
+        ItemInHand = null;
+
+        return true;
+    }
     void HandlePlacementPreview(PlacementPreview preview, PlacementInfo placementInfo, Holdable heldHoldable)
     {
         // if we have a snapper and it can snap to the snap area. preview for place on snap area.

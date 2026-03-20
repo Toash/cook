@@ -56,6 +56,7 @@ public class WorldSpaceHoverTooltipUI : MonoBehaviour
             TooltipText.text = "";
             transform.SetParent(null, true);
             transform.position = Vector2.zero;
+
             Root.SetActive(false);
         }
         void Populate(HoverTooltipData data)
@@ -64,6 +65,8 @@ public class WorldSpaceHoverTooltipUI : MonoBehaviour
             transform.SetParent(data.Parent, true);
             transform.localPosition = Vector2.zero;
             Root.transform.localPosition = data.Offset;
+
+            transform.LookAt(Camera.main.transform);
             Root.SetActive(true);
 
 

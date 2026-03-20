@@ -16,6 +16,7 @@ public class OrderContainer : MonoBehaviour
 {
 
     // prepared items that are connected with this container
+    [ReadOnly]
     public List<PreparedItem> ContainedPreparedItems = new();
 
     [ReadOnly]
@@ -106,7 +107,7 @@ public class OrderContainer : MonoBehaviour
         }
 
         order = OrderManager.I.GetActiveOrderFromID(AttachedReceipt.OrderID);
-        return true;
+        return order != null;
     }
 
     public int GetOrderID()
@@ -184,7 +185,7 @@ public class OrderContainer : MonoBehaviour
         List<Ingredient> ingredients = new();
 
         List<Snapper> connectedSnappers = otherSnapper.GetSnapperChildrenRecursive();
-        foreach (var snapper in connectedSnappers)
+        foreach (Snapper snapper in connectedSnappers)
         {
             if (snapper.TryGetComponent<Ingredient>(out var ingredient))
             {
@@ -214,6 +215,12 @@ public class OrderContainer : MonoBehaviour
             if (preparedItem == null)
             {
                 Debug.LogError("[OrderContainer]: PreparedItem was null when trying to detach ingredient");
+                return;
+            }
+            if (ContainedPreparedItems.Contains(preparedItem) == false)
+            {
+                Debug.LogError("[OrderContainer]: PreparedItem on detached ingredient was not found in the container's list of contained prepared items.");
+                return;
             }
             // preparedItem.transform.SetParent(null);
             preparedItem.IngredientsChanged -= PreparedItemUpdated;

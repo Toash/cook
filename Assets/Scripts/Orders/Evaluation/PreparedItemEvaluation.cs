@@ -1,7 +1,7 @@
 
+using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Assets.Scripts.Ingredient.MenuItem;
 
 /// <summary>
@@ -9,60 +9,61 @@ using Assets.Scripts.Ingredient.MenuItem;
 /// </summary>
 public class PreparedItemAssemblyDiscrepancies
 {
-    public MenuItem ClosestMenuItem;
+    public TruckMenuItem ClosestMenuItem;
 
     public int Discrepancies;
 
-    public PreparedItemAssemblyDiscrepancies(MenuItem ClosestMenuItem, int Discrepancies)
+    public PreparedItemAssemblyDiscrepancies(TruckMenuItem ClosestMenuItem, int Discrepancies)
     {
         this.ClosestMenuItem = ClosestMenuItem;
         this.Discrepancies = Discrepancies;
     }
-    /// <summary>
-    /// Evaluates prepared item by matching it to closest menu item
-    /// </summary>
-    /// <param name="menuItems"></param>
-    /// <param name="preparedItem"></param>
-    /// <returns></returns>
-    public static PreparedItemAssemblyDiscrepancies Evaluate(List<MenuItem> menuItems, PreparedItemData preparedItem)
+
+
+    public static PreparedItemAssemblyDiscrepancies EvaluateByMatchingClosestMenuItem(
+    List<TruckMenuItem> menuItems,
+    PreparedItemData preparedItem)
     {
-        UnityEngine.Debug.Log("Finding best match");
-        // compare counts.
-        Dictionary<MenuItem, int> discrepancyDict = new Dictionary<MenuItem, int>();
+        Debug.Log("[PreparedItemAssemblyDiscrepancies]: Finding best match");
 
-        foreach (MenuItem menuItem in menuItems)
+        if (menuItems == null || menuItems.Count == 0)
         {
+            return new PreparedItemAssemblyDiscrepancies(null, 0);
+        }
 
-            Dictionary<IngredientData, int> consolidatedMenuItem = MenuItem.Consolidate(menuItem);
-            int menuItemDiscrepancies = 0;
-            // subtract the difference for each counts of ingredients between the snapshot and menu item.
-            foreach (var (ingredientData, menuItemIngredientCount) in consolidatedMenuItem)
+        TruckMenuItem closestMenuItem = null;
+        int lowestDiscrepancies = int.MaxValue;
+
+        foreach (TruckMenuItem menuItem in menuItems)
+        {
+            Dictionary<IngredientData, int> consolidatedMenuItem = TruckMenuItem.Consolidate(menuItem);
+            int discrepancies = 0;
+
+            HashSet<IngredientData> allIngredients = new HashSet<IngredientData>();
+
+            foreach (var kv in consolidatedMenuItem)
+                allIngredients.Add(kv.Key);
+
+            foreach (var kv in preparedItem.ConsolidatedCounts)
+                allIngredients.Add(kv.Key);
+
+            foreach (IngredientData ingredient in allIngredients)
             {
-                if (preparedItem.Counts.TryGetValue(ingredientData, out var ingredientCount))
-                {
-                    int diff = Math.Abs(menuItemIngredientCount - ingredientCount);
-                    menuItemDiscrepancies += diff;
-                }
-                else
-                {
-                    menuItemDiscrepancies += menuItemIngredientCount;
-                }
+                int menuCount = consolidatedMenuItem.TryGetValue(ingredient, out var m) ? m : 0;
+                int preparedCount = preparedItem.ConsolidatedCounts.TryGetValue(ingredient, out var p) ? p : 0;
 
+                Debug.Log($"[PreparedItemAssemblyDiscrepancies]: Ingredient: {ingredient.Name}, Menu Count: {menuCount}, Prepared Count: {preparedCount}");
+                discrepancies += Math.Abs(menuCount - preparedCount);
             }
 
-
-
-            // update score for that menu item 
-            discrepancyDict.Add(menuItem, menuItemDiscrepancies);
-
+            // menu item with lowest discrepancies 
+            if (discrepancies < lowestDiscrepancies)
+            {
+                lowestDiscrepancies = discrepancies;
+                closestMenuItem = menuItem;
+            }
         }
-        UnityEngine.Debug.Log("Scores dictionary for finding best match: " + discrepancyDict.ToString());
 
-        // return menu item with the highest score.
-        MenuItem closestMenuItem = discrepancyDict.OrderBy(kv => kv.Value).First().Key;
-        int preparedItemDiscrepancies = discrepancyDict[closestMenuItem];
-
-        return new PreparedItemAssemblyDiscrepancies(closestMenuItem, preparedItemDiscrepancies);
-
+        return new PreparedItemAssemblyDiscrepancies(closestMenuItem, lowestDiscrepancies);
     }
 }

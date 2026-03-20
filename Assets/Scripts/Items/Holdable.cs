@@ -16,7 +16,6 @@ public class Holdable : InteractableBase
     public event Action<InteractionContext> OnSecondaryInteract;
 
 
-    private ConfigurableJoint joint;
     private bool beingHeld = false;
 
     private AudioSourcePlayer audioSourcePlayer;
@@ -32,6 +31,10 @@ public class Holdable : InteractableBase
         if (HoverInteractInfo.Count == 0)
         {
             HoverInteractInfo.Add(new InteractInfo(InteractType.Primary, "Pick up"));
+        }
+        if (HeldInfos.Count == 0)
+        {
+            HeldInfos.Add(new InteractInfo(InteractType.Primary, "Place"));
         }
 
     }
@@ -111,6 +114,9 @@ public class Holdable : InteractableBase
     }
 
 
+    /// <summary>
+    /// Set state in this holdable indicating that it is no longer being held
+    /// </summary>
     public void SetNotHolding()
     {
         beingHeld = false;

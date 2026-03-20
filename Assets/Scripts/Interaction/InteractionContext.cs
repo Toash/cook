@@ -13,4 +13,9 @@ public class InteractionContext
         this.Player = player;
     }
 
+    public override string ToString()
+    {
+        return $"[InteractionContext]: Type: {Type}, Player: {Player.name}";
+    }
+
 }

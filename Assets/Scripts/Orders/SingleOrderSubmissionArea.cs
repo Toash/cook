@@ -16,8 +16,8 @@ public class SingleOrderSubmissionArea : MonoBehaviour
     [Tooltip("Where NPC will go to pickup their order.")]
     public Transform PickupSpot;
 
-    public UnityEvent OnOrderSuccessful;
-    public UnityEvent OnOrderFailed;
+    // public UnityEvent OnOrderSuccessful;
+    // public UnityEvent OnOrderFailed;
 
 
     private Player player;

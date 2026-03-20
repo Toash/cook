@@ -48,15 +48,17 @@ public class PlayerInteraction : MonoBehaviour
 
     void OnEnable()
     {
-        Controller.BodyConstrained += InteractableChanged;
-        ItemHolder.OnItemHeld += InteractableChanged;
+        Controller.BodyConstrained += InteractablePoll;
+        Controller.BodyUnconstrained += InteractablePoll;
+        ItemHolder.OnItemHeld += InteractablePoll;
 
 
     }
     void OnDisable()
     {
-        Controller.BodyConstrained -= InteractableChanged;
-        ItemHolder.OnItemHeld -= InteractableChanged;
+        Controller.BodyConstrained -= InteractablePoll;
+        Controller.BodyUnconstrained -= InteractablePoll;
+        ItemHolder.OnItemHeld -= InteractablePoll;
 
     }
 
@@ -133,7 +135,8 @@ public class PlayerInteraction : MonoBehaviour
 
         return null;
     }
-    void InteractableChanged(IInteractable newInteractable)
+
+    public void InteractablePoll(IInteractable newInteractable)
     {
         Debug.Log("[PlayerInteraction]: Interactable Changed: " + newInteractable);
         OnInteractableChanged?.Invoke(newInteractable);
@@ -152,7 +155,7 @@ public class PlayerInteraction : MonoBehaviour
 
         OnHoveredInteractableChanged?.Invoke(newInteractable);
 
-        InteractableChanged(newInteractable);
+        InteractablePoll(newInteractable);
 
     }
 

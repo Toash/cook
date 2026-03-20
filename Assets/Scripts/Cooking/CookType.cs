@@ -1,4 +1,6 @@
+
 public enum CookType
 {
+    Meat
 
 }

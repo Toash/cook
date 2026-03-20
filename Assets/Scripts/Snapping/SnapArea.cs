@@ -37,6 +37,15 @@ public class SnapArea : MonoBehaviour
 
         if (col == null) col = GetComponent<Collider>();
         col.isTrigger = true;
+
+        if (ParentSnapper != null)
+        {
+            // only accept food snappers if ingredient
+            if (ParentSnapper.TryGetComponent<Ingredient>(out var ingredient))
+            {
+                AcceptingSnapTypes = new List<SnapType>() { SnapType.Food };
+            }
+        }
     }
     void Awake()
     {

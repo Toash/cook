@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,53 +10,41 @@ public enum CookState
     Burnt
 }
 
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Collider))]
-[RequireComponent(typeof(MeshRenderer))]
+/// <summary>
+/// Has state for cook level, and cook states.
+/// </summary>
+[RequireComponent(typeof(CookableVisual))]
 public class Cookable : MonoBehaviour
 {
     [Header("Stats")]
+    public CookType CookType;
     public float CookedThreshold = 50;
     public float BurntThreshold = 80;
     public float CookRate = 8;
-    [Header("Visuals")]
-    public Material CookedMaterial;
-    public Material BurntMaterial;
 
 
+
+    [ShowInInspector, ReadOnly]
     float cookLevel = 0;
     const float MAX_COOK_LEVEL = 100;
-    MeshRenderer renderer;
     CookState cookstate = CookState.Raw;
     bool enteredCookedState = false;
     bool enteredBurntState = false;
 
-    void Awake()
-    {
-        renderer = GetComponent<MeshRenderer>();
-        if (CookedMaterial == null)
-        {
-            CookedMaterial = Resources.Load<Material>("Materials/DefaultCooked");
-        }
-        if (BurntMaterial == null)
-        {
-            BurntMaterial = Resources.Load<Material>("Materials/DefaultBurnt");
-        }
-    }
+    public float CookNormalized => Mathf.Clamp01(cookLevel / MAX_COOK_LEVEL);
+    public CookState CookState => cookstate;
 
     void EnterCookedState()
     {
         cookstate = CookState.Cooked;
-        renderer.material = CookedMaterial;
     }
     void EnterBurntState()
     {
         cookstate = CookState.Burnt;
-        renderer.material = BurntMaterial;
     }
     public void Cook(float mult)
     {
-        cookLevel += CookRate * mult;
+        cookLevel = Mathf.Min(cookLevel + CookRate * mult, MAX_COOK_LEVEL);
 
         if ((cookLevel >= CookedThreshold) && !enteredCookedState)
         {
