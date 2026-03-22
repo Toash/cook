@@ -131,6 +131,32 @@ public class Snapper : MonoBehaviour
 
         return true;
     }
+    public bool TryGetPreviewPose(PlacementInfo info, out Vector3 pos, out Quaternion rot)
+    {
+        pos = default;
+        rot = default;
+
+        if (!TryGetBestSnapTarget(info, out SnapArea snapArea, out RaycastHit hit))
+            return false;
+
+        pos = snapArea.GetSnapPoint(info);
+        rot = snapArea.GetSnapRotation(info);
+        return true;
+    }
+
+    public bool TryPlaceFromPlacementInfo(PlacementInfo info)
+    {
+        if (!TryGetBestSnapTarget(info, out SnapArea snapArea, out RaycastHit hit))
+            return false;
+
+        Snapper otherSnapper = snapArea.ParentSnapper;
+        return TrySnapToArea(info, otherSnapper, snapArea);
+    }
+
+    private bool TryGetBestSnapTarget(PlacementInfo info, out SnapArea snapArea, out RaycastHit validHit)
+    {
+        return info.TryGetFirstValidSnapArea(this, out snapArea, out validHit);
+    }
 
 
     /// <summary>
@@ -157,31 +183,6 @@ public class Snapper : MonoBehaviour
     }
 
 
-    // public List<Snapper> GetSnapperChildrenRecursive(bool includeSelf = true)
-    // {
-    //     var visited = new HashSet<Snapper>();
-    //     var stack = new Stack<Snapper>();
-
-    //     visited.Add(this);
-    //     stack.Push(this);
-
-    //     while (stack.Count > 0)
-    //     {
-    //         Snapper current = stack.Pop();
-
-    //         foreach (SnapConnection connection in current.ParentSnapConnections)
-    //         {
-    //             Snapper otherSnapper = connection.Parent;
-    //             if (otherSnapper == null) continue;
-
-    //             if (visited.Add(otherSnapper))
-    //                 stack.Push(otherSnapper);
-    //         }
-    //     }
-
-    //     if (!includeSelf) visited.Remove(this);
-    //     return visited.ToList();
-    // }
     public List<Snapper> GetSnapperChildrenRecursive(bool includeSelf = true)
     {
         var visited = new HashSet<Snapper>();

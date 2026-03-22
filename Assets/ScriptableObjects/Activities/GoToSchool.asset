@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GoToSchool
   m_EditorClassIdentifier: Assembly-CSharp::Activity
   LocationData: {fileID: 11400000, guid: ec0871cb5f9fb0647a6016189817af58, type: 2}
-  StartHour: 0
+  StartHour: 7
   StartMinute: 0
-  EndHour: 0
+  EndHour: 14
   EndMinute: 0

@@ -24,6 +24,7 @@ public class CookableVisual : MonoBehaviour
         if (cookable == null || targetRenderer == null)
             return;
 
+        //update uniform
         targetRenderer.GetPropertyBlock(mpb);
         mpb.SetFloat(CookAmountId, cookable.CookNormalized);
         targetRenderer.SetPropertyBlock(mpb);

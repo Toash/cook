@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Assets.Scripts.World
@@ -13,6 +14,7 @@ namespace Assets.Scripts.World
     public class Schedule : ScriptableObject
     {
         // activity times should not overlap!
+        [InlineEditor]
         public List<Activity> Activities;
 
 

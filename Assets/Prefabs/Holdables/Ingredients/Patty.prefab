@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 6477726968046460394}
   - component: {fileID: 2949583702072324551}
   - component: {fileID: 8462433425150726483}
+  - component: {fileID: 3763729332570712826}
   m_Layer: 6
   m_Name: Patty
   m_TagString: Untagged
@@ -153,6 +154,8 @@ MonoBehaviour:
     Parent: {fileID: 0}
     Text: 
     Offset: {x: 0, y: 0}
+  HoldLocalPosition: {x: 0, y: 0, z: 0}
+  HoldLocalEuler: {x: 0, y: 0, z: 0}
   HeldInfos:
   - Type: 0
     Description: Place
@@ -228,6 +231,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CookableVisual
   cookable: {fileID: 2949583702072324551}
   targetRenderer: {fileID: 1318317411857141965}
+--- !u!114 &3763729332570712826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4105077589884490457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f64b5776de78f641ab27f9c81730aa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Flippable
+  visualRoot: {fileID: 4947501002645075608}
+  flipPivot: {fileID: 4947501002645075608}
+  flipDuration: 0.2
+  flipCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  isFrontSideUp: 1
 --- !u!1 &9054525049034435805
 GameObject:
   m_ObjectHideFlags: 0

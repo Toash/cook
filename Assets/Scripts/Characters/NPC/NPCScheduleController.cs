@@ -21,7 +21,14 @@ namespace Assets.Scripts.Characters.NPC
 
         void Start()
         {
-            if (Schedule == null) return;
+            // if (Schedule == null) return;
+
+            // load random schedule
+
+            Schedule schedule = Resources.LoadAll<Schedule>("ScriptableObjects/Schedules")[UnityEngine.Random.Range(0, Resources.LoadAll<Schedule>("ScriptableObjects/Schedules").Length)];
+            Schedule = schedule;
+
+
             if (Schedule.HasOverlaps())
             {
                 Debug.LogError("NPC Schedule has overlaps!");

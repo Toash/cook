@@ -1,4 +1,3 @@
-
 using TMPro;
 using UnityEngine;
 
@@ -7,35 +6,32 @@ using UnityEngine;
 /// </summary>
 public class WorldSpaceHoverTooltipUI : MonoBehaviour
 {
-    // needs to be child to make offsets work, as well as setting active and inactive.
     [Tooltip("What will be activated and deactivated, and offset. Should be a child of this object")]
     public GameObject Root;
     public TMP_Text TooltipText;
     public PlayerInteraction PlayerInteraction;
 
+    public HoverTooltipData CurrentHoverData { get; private set; }
+    public Transform CurrentTarget { get; private set; }
 
     void Awake()
     {
         if (Root == null)
-        {
             Debug.LogError("[WorldSpaceHoverTooltipUI]: root not set!");
-        }
-        if (TooltipText == null)
-        {
-            Debug.LogError("[WorldSpaceHoverTooltipUI]: TooltipText not set!");
-        }
-        if (PlayerInteraction == null)
-        {
-            Debug.LogError("[WorldSpaceHoverTooltipUI]: PlayerInteraction not set!");
-        }
 
+        if (TooltipText == null)
+            Debug.LogError("[WorldSpaceHoverTooltipUI]: TooltipText not set!");
+
+        if (PlayerInteraction == null)
+            Debug.LogError("[WorldSpaceHoverTooltipUI]: PlayerInteraction not set!");
     }
+
     void OnEnable()
     {
         PlayerInteraction.OnHoveredInteractableChanged += OnInteractableChanged;
         PlayerInteraction.OnHoveredInteractableInteracted += OnInteractableChanged;
-
     }
+
     void OnDisable()
     {
         PlayerInteraction.OnHoveredInteractableChanged -= OnInteractableChanged;
@@ -44,50 +40,61 @@ public class WorldSpaceHoverTooltipUI : MonoBehaviour
 
     void Update()
     {
-        //billboard
-        transform.LookAt(Camera.main.transform);
+        if (CurrentHoverData != null && CurrentTarget != null)
+        {
+            // transform.position = CurrentTarget.position + CurrentHoverData.Offset;
+            transform.position = CurrentTarget.position;
+            transform.LookAt(Camera.main.transform);
+        }
+        else if (CurrentHoverData != null && CurrentTarget == null)
+        {
+            Clear();
+        }
+    }
 
+    void LateUpdate()
+    {
+        if (CurrentHoverData != null)
+        {
+            TooltipText.text = CurrentHoverData.GetText;
+        }
     }
 
     void OnInteractableChanged(InteractableBase interactable)
     {
-        void Clear()
-        {
-            TooltipText.text = "";
-            transform.SetParent(null, true);
-            transform.position = Vector2.zero;
-
-            Root.SetActive(false);
-        }
-        void Populate(HoverTooltipData data)
-        {
-            TooltipText.text = data.Text;
-            transform.SetParent(data.Parent, true);
-            transform.localPosition = Vector2.zero;
-            Root.transform.localPosition = data.Offset;
-
-            transform.LookAt(Camera.main.transform);
-            Root.SetActive(true);
-
-
-        }
         if (interactable == null)
         {
             Clear();
+            return;
         }
-        else
+
+        var data = interactable.HoverTooltipData;
+        if (data == null || data.Parent == null)
         {
-            var data = interactable.HoverTooltipData;
-            if (data == null)
-            {
-                Clear();
-            }
-            else
-            {
-                Populate(data);
-            }
+            Clear();
+            return;
         }
 
+        Populate(data);
+    }
 
+    void Clear()
+    {
+        TooltipText.text = "";
+        CurrentHoverData = null;
+        CurrentTarget = null;
+        Root.SetActive(false);
+    }
+
+    void Populate(HoverTooltipData data)
+    {
+        CurrentHoverData = data;
+        CurrentTarget = data.Parent;
+
+        TooltipText.text = data.GetText;
+        transform.position = CurrentTarget.position + data.Offset;
+        transform.LookAt(Camera.main.transform);
+
+        Root.SetActive(true);
     }
 }

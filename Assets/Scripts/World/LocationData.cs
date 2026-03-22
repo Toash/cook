@@ -3,7 +3,7 @@
 namespace Assets.Scripts.World
 {
     /// <summary>
-    /// Data object for a physical location in the world
+    /// Location that NPCS can go to
     /// </summary>
     [CreateAssetMenu(fileName = "Location", menuName = "World/Location")]
     public class LocationData : ScriptableObject

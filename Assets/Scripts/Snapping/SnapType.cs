@@ -7,5 +7,7 @@ public enum SnapType
     Food,
     Container,
     Receipt, // receipts should ONLY be snapped to containers.
+    Utensil,
+    None,
 
 }

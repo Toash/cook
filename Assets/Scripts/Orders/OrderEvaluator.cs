@@ -44,16 +44,25 @@ public class OrderEvaluator : MonoBehaviour
             return null;
         }
         Debug.Log("[OrderEvaluator]: Evaluating order...");
+
+
         AssemblyEvaluation assemblyEvaluation = AssemblyEvaluation.Evaluate(order, preparedItems);
 
+        CookingEvaluation cookingEvaluation = CookingEvaluation.Evaluate(order, preparedItems);
 
-        float finalScore = assemblyEvaluation.Score01;
+        TimeEvaluation timeEvaluation = new TimeEvaluation(
+            completionTimeSeconds: order.TimeSinceOrdered,
+            timeLimitSeconds: 60,
+            fastThresholdRatio: .3f
+        );
+
+        float finalScore = assemblyEvaluation.Score01 * .5f + cookingEvaluation.Score01 * .5f;
         FinalOrderScoreCategory category = I.EvaluationData.Thresholds.GetCategoryFromScore(finalScore);
 
 
 
 
-        return new FinalOrderEvaluationResult(finalScore, category, assemblyEvaluation);
+        return new FinalOrderEvaluationResult(finalScore, category, assemblyEvaluation, cookingEvaluation, timeEvaluation);
 
     }
 

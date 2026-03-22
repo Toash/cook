@@ -42,6 +42,10 @@ public class Cookable : MonoBehaviour
     {
         cookstate = CookState.Burnt;
     }
+    /// <summary>
+    /// Increase cook state
+    /// </summary>
+    /// <param name="mult"></param>
     public void Cook(float mult)
     {
         cookLevel = Mathf.Min(cookLevel + CookRate * mult, MAX_COOK_LEVEL);
@@ -58,6 +62,37 @@ public class Cookable : MonoBehaviour
         }
     }
 
+
+    public void ForceCooked()
+    {
+        cookLevel = CookedThreshold;
+
+        cookstate = CookState.Cooked;
+
+        enteredCookedState = true;
+        enteredBurntState = false;
+    }
+
+
+    public void ForceBurnt()
+    {
+        cookLevel = BurntThreshold;
+
+        cookstate = CookState.Burnt;
+
+        enteredCookedState = true;
+        enteredBurntState = true;
+    }
+
+    public void ResetCook()
+    {
+        cookLevel = 0f;
+
+        cookstate = CookState.Raw;
+
+        enteredCookedState = false;
+        enteredBurntState = false;
+    }
 
 
 #if UNITY_EDITOR

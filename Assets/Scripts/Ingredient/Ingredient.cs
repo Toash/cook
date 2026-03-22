@@ -45,8 +45,23 @@ public class Ingredient : MonoBehaviour
     {
         if (TryGetComponent<InteractableBase>(out var interactable))
         {
-            interactable.HoverTooltipData = new HoverTooltipData(transform, Data.Name);
+            if (TryGetComponent<Cookable>(out var cookable))
+            {
+                interactable.HoverTooltipData = new HoverTooltipData(transform, () =>
+                {
+                    return cookable.CookState.ToString() + $" {Data.Name}";
+                });
+            }
+            else
+            {
+
+                interactable.HoverTooltipData = new HoverTooltipData(transform, Data.Name);
+            }
         }
+    }
+    public Cookable TryGetCookable(out Cookable cookable)
+    {
+        return TryGetComponent<Cookable>(out cookable) ? cookable : null;
     }
 
     public override string ToString()

@@ -14,13 +14,13 @@ public class NPCOrderLine : NPCState
 
     private Coroutine moveRoutine;
     private bool hasProposedOrder;
-    private bool awaitingAck;
 
     void MoveToCurrentLinePos()
     {
-        if (FirstInLine()) return;
         if (moveRoutine != null)
             StopCoroutine(moveRoutine);
+
+        if (hasProposedOrder) return;
 
         moveRoutine = StartCoroutine(MoveToLinePosCoroutine());
     }
@@ -32,7 +32,7 @@ public class NPCOrderLine : NPCState
 
         moveRoutine = null;
 
-        if (FirstInLine() && !hasProposedOrder && !awaitingAck)
+        if (FirstInLine() && !hasProposedOrder)
         {
             ProposeOrder();
         }
@@ -40,12 +40,11 @@ public class NPCOrderLine : NPCState
 
     void ProposeOrder()
     {
-        if (hasProposedOrder || awaitingAck) return;
+        if (hasProposedOrder) return;
 
         Brain.Agent.SetDestination(Brain.CurrentFoodTruck.OrderSpot.position);
 
         hasProposedOrder = true;
-        awaitingAck = true;
 
         OrderManager.I.ProposedOrderAcknowledged += OnProposedOrderAcknowledged;
         OrderProposition order = OrderManager.I.GenerateRandomOrderProposition(Brain.CurrentFoodTruck, Brain.NPC);
@@ -57,7 +56,6 @@ public class NPCOrderLine : NPCState
         if (order.Owner != Brain.NPC) return;
 
         hasProposedOrder = false;
-        awaitingAck = false;
 
         Brain.CurrentOrderID = order.ID;
 
@@ -85,15 +83,6 @@ public class NPCOrderLine : NPCState
 
     }
 
-    // public override void OnExit(NPCBrain brain)
-    // {
-    //     Brain.CurrentFoodTruck.CurrentParkingSpot.OrderLine.RemoveNPCFromLineIfFirst(Brain);
-
-    //     brain.LineChanged -= MoveToCurrentLinePos;
-    //     OrderManager.I.ProposedOrderAcknowledged -= OnProposedOrderAcknowledged;
-    //     Brain.NPC.Visuals.SetLookAtTarget(null);
-    // }
-
     public override void OnExit(NPCBrain brain)
     {
 
@@ -103,7 +92,6 @@ public class NPCOrderLine : NPCState
         Brain.NPC.Visuals.SetLookAtTarget(null);
 
         hasProposedOrder = false;
-        awaitingAck = false;
     }
     public override void OnFixedUpdate(NPCBrain brain)
     {

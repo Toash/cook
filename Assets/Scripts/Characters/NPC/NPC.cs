@@ -8,7 +8,6 @@ using UnityEngine;
 /// </summary>
 public class NPC : MonoBehaviour
 {
-    //public string NPCName = "Timmy";
 
     public NPCBrain Brain;
     public NPCScheduleController Schedule;

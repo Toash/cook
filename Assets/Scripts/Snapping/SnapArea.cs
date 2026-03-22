@@ -81,7 +81,7 @@ public class SnapArea : MonoBehaviour
         }
         else
         {
-            return placementInfo.ValidRaycastHit.point;
+            return placementInfo.ValidSnapRaycastHit.point;
         }
     }
 

@@ -19,6 +19,8 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
     Outline outline = null;
 
     public event Action<InteractionContext> OnInteract;
+
+    public bool IsHovered { get; private set; } = false;
     void Awake()
     {
         SetLayer();
@@ -38,8 +40,8 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
     {
         SetLayer();
     }
-    public virtual void OnHoverEnter() { }
-    public virtual void OnHoverExit() { }
+    public virtual void OnHoverEnter() { IsHovered = true; }
+    public virtual void OnHoverExit() { IsHovered = false; }
     public void BaseInteract(InteractionContext context)
     {
         OnInteract?.Invoke(context);

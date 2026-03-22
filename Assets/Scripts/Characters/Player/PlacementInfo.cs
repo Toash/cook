@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 /// <summary>
-/// Information for the placement of held items;
+/// Information for the placement of held items
 /// </summary>
 public class PlacementInfo
 {
@@ -14,10 +14,11 @@ public class PlacementInfo
     public bool SnapRaycastValid;
     public RaycastHit[] SnapRaycastHits;
 
-    public RaycastHit ValidRaycastHit;
+    // the raycast that is used to place for a snapper
+    public RaycastHit ValidSnapRaycastHit;
 
     /// <summary>
-    /// Tries to get the first valid snap area for a given snap area, and interally sets the valid raycast hit.
+    /// Tries to get the first valid snap area that the snapper can snap to, and interally sets the valid raycast hit.
     /// </summary>
     /// <param name="currentSnapper"></param>
     /// <param name="snapArea"></param>
@@ -31,6 +32,7 @@ public class PlacementInfo
             return false;
         }
 
+        // first first snap area that can be snapped to
         var match = SnapRaycastHits
             .Select(hit => new
             {
@@ -43,7 +45,7 @@ public class PlacementInfo
         {
             snapArea = match.SnapArea;
             validHit = match.Hit;
-            ValidRaycastHit = validHit;
+            ValidSnapRaycastHit = validHit;
             return true;
         }
 

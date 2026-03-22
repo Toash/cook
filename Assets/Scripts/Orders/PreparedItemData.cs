@@ -2,12 +2,10 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Search;
 
-/// <summary>
-/// Pure data representation of a PreparedItem.
-/// </summary>
 public class PreparedItemData
 {
     public Dictionary<IngredientData, int> ConsolidatedCounts = new();
+    public List<Ingredient> RuntimeIngredients = new();
 
 
     // returns data from a prepared item
@@ -19,6 +17,7 @@ public class PreparedItemData
             if (data.ConsolidatedCounts.TryGetValue(ing.Data, out var count))
             {
                 data.ConsolidatedCounts[ing.Data] = count + 1;
+
             }
             else
             {
@@ -26,6 +25,7 @@ public class PreparedItemData
             }
 
         }
+        data.RuntimeIngredients = item.Ingredients;
         return data;
     }
 

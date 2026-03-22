@@ -94,7 +94,8 @@ public class OrderManager : MonoBehaviour
         }
 
         // TODO calculate price based on menu items
-        OrderProposition order = new OrderProposition(proposer, menuItems, 100);
+        int payout = 100;
+        OrderProposition order = new OrderProposition(proposer, menuItems, payout);
         return order;
         // return AddToActiveOrders(order);
     }
@@ -172,6 +173,12 @@ public class OrderManager : MonoBehaviour
 
         //TODO payout calculation
         float payout = order.Payout;
+
+        if (eval.TimeEvaluation.EarnedFastDelivery)
+        {
+            payout *= 1.2f;
+        }
+
 
         MoneyManager.I.ChangeMoney(payout);
         Debug.Log("[OrderManager]: Returning order information.");

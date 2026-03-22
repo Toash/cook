@@ -30,7 +30,24 @@ public class HoldableContainer : MonoBehaviour
             Debug.Log("[HoldableContainer]: contained holdable prefab is null!");
         }
         Init(ContainedItem, MaxAmount);
-        UpdateTooltip();
+        // UpdateTooltip();
+        thisHoldable.HoverTooltipData = new HoverTooltipData(
+    transform,
+    () =>
+    {
+        if (containedHoldable != null && containedHoldable.TryGetComponent<Ingredient>(out var ingredient))
+        {
+            return $"{ingredient.Data.Name}s {currentAmount}/{MaxAmount}";
+        }
+
+        if (ContainedItem != null)
+        {
+            return $"{ContainedItem.Name}s {currentAmount}/{MaxAmount}";
+        }
+
+        return "";
+    }
+);
 
     }
 
@@ -78,25 +95,8 @@ public class HoldableContainer : MonoBehaviour
 
         currentAmount--;
 
-        UpdateTooltip();
     }
 
-    void UpdateTooltip()
-    {
-        string message = "";
-        if (containedHoldable.TryGetComponent<Ingredient>(out var ingredient))
-        {
-            message += ingredient.Data.Name + "s ";
-            message += currentAmount + "/" + MaxAmount;
-        }
-        else if (ContainedItem != null)
-        {
-            message += ContainedItem.Name + "s ";
-        }
-
-        var data = new HoverTooltipData(transform, message);
-        thisHoldable.HoverTooltipData = data;
-    }
 
 
 #if UNITY_EDITOR

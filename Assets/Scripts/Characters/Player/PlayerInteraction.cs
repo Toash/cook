@@ -35,7 +35,7 @@ public class PlayerInteraction : MonoBehaviour
 
 
     private Player player;
-    private InteractableBase hoveredInteractable;
+    public InteractableBase HoveredInteractable { get; private set; }
     private InteractionHit interactionHit = new InteractionHit();
 
 
@@ -74,10 +74,10 @@ public class PlayerInteraction : MonoBehaviour
                 // hoveredInteractable = currentInteractable;
 
                 // TryHighlightHoverInteractable(false);
-                if (currentInteractable != hoveredInteractable)
+                if (currentInteractable != HoveredInteractable)
                 {
 
-                    HoverInteractableChanged(hoveredInteractable, currentInteractable);
+                    HoverInteractableChanged(HoveredInteractable, currentInteractable);
 
                 }
                 // TryHighlightHoverInteractable(true);
@@ -89,10 +89,10 @@ public class PlayerInteraction : MonoBehaviour
         {
             // not looking at interactable 
             TryHighlightHoverInteractable(false);
-            if (hoveredInteractable != null)
+            if (HoveredInteractable != null)
             {
                 // hoveredInteractable = null;
-                HoverInteractableChanged(hoveredInteractable, null);
+                HoverInteractableChanged(HoveredInteractable, null);
             }
         }
 
@@ -128,9 +128,9 @@ public class PlayerInteraction : MonoBehaviour
         }
 
         //return hovered interactable
-        if (hoveredInteractable != null)
+        if (HoveredInteractable != null)
         {
-            return hoveredInteractable;
+            return HoveredInteractable;
         }
 
         return null;
@@ -145,7 +145,7 @@ public class PlayerInteraction : MonoBehaviour
     void HoverInteractableChanged(InteractableBase oldInteractable, InteractableBase newInteractable)
     {
 
-        hoveredInteractable = newInteractable;
+        HoveredInteractable = newInteractable;
 
         oldInteractable?.OnHoverExit();
         newInteractable?.OnHoverEnter();
@@ -185,10 +185,10 @@ public class PlayerInteraction : MonoBehaviour
         }
 
         // based on raycast
-        if (hoveredInteractable != null)
+        if (HoveredInteractable != null)
         {
-            hoveredInteractable.BaseInteract(context);
-            OnHoveredInteractableInteracted?.Invoke(hoveredInteractable);
+            HoveredInteractable.BaseInteract(context);
+            OnHoveredInteractableInteracted?.Invoke(HoveredInteractable);
         }
 
         // IInteractable CurrentInteractable = GetCurrentInteractable();
@@ -206,8 +206,8 @@ public class PlayerInteraction : MonoBehaviour
 
     void TryHighlightHoverInteractable(bool highlight)
     {
-        if (hoveredInteractable == null) return;
-        hoveredInteractable.SetOutline(highlight);
+        if (HoveredInteractable == null) return;
+        HoveredInteractable.SetOutline(highlight);
     }
 
 
