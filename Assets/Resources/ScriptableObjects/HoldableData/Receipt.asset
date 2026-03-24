@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Receipt
   m_EditorClassIdentifier: Assembly-CSharp::HoldableData
   Name: Receipt
-  HoldablePrefab: {fileID: 1339551314847062171, guid: 9949d823e054fd14a834a609833f6757, type: 3}
+  Prefab: {fileID: 1339551314847062171, guid: 9949d823e054fd14a834a609833f6757, type: 3}
   PlaceSound: {fileID: 11400000, guid: 9910fb30e7218fd438f3e078db7e9ba1, type: 2}
   PickUpSound: {fileID: 11400000, guid: 431fb7333f6e0a94bac436ebdb410c23, type: 2}

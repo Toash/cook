@@ -36,7 +36,7 @@ public class SpawnConsoleCommand : ConsoleCommand
             return false;
         }
 
-        if (data.HoldablePrefab == null)
+        if (data.Prefab == null)
         {
             Debug.LogWarning($"Spawn failed: HoldableData '{data.name}' has no prefab.");
             return false;
@@ -73,7 +73,7 @@ public class SpawnConsoleCommand : ConsoleCommand
         Vector3 pos = GetSpawnPosition(cam, mode);
         Quaternion rot = Quaternion.identity;
 
-        GameObject spawned = Instantiate(data.HoldablePrefab.gameObject, pos, rot);
+        GameObject spawned = Instantiate(data.Prefab.gameObject, pos, rot);
 
         if (mode == SpawnMode.Hand)
         {

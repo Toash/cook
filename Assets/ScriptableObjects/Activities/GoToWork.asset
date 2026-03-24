@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db613cbeb1b3de64bae176f805c5a1c4, type: 3}
+  m_Name: GoToWork
+  m_EditorClassIdentifier: Assembly-CSharp::Activity
+  LocationData: {fileID: 11400000, guid: 65341152cdc6ae441a1bdae6d57242a7, type: 2}
+  StartHour: 7
+  StartMinute: 0
+  EndHour: 14
+  EndMinute: 0

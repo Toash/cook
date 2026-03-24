@@ -11,6 +11,8 @@ public class OrderManager : MonoBehaviour
 
     public AudioDefinition OrderCompleteSound;
 
+
+
     /// <summary>
     /// Order that the player has to acknowledge before it gets added to the active orders.
     /// </summary>
@@ -80,24 +82,26 @@ public class OrderManager : MonoBehaviour
     /// </summary>
     /// <param name="proposer"></param>
     /// <returns></returns>
-    public OrderProposition GenerateRandomOrderProposition(FoodTruck truck, NPC proposer)
+    public OrderProposition GenerateRandomOrderProposition(OrderStation station, NPC owner)
     {
-        List<TruckMenuItem> menuItems = new List<TruckMenuItem>();
-
-        // probably get this based on some difficulty thing
-        int menuItemCount = 1;
-
-        for (int i = 0; i < menuItemCount; i++)
+        if (station == null)
         {
-            TruckMenuItem item = truck.GetRandomMenuItem();
-            menuItems.Add(item);
+            Debug.LogError("[OrderManager]: station is null.");
+            return null;
         }
 
-        // TODO calculate price based on menu items
+        if (station.AvailableMenuItems == null || station.AvailableMenuItems.Count == 0)
+        {
+            Debug.LogError("[OrderManager]: station has no available menu items.");
+            return null;
+        }
+
+        // pick from station.AvailableMenuItems
+        OrderMenuItem menuItem = station.AvailableMenuItems[UnityEngine.Random.Range(0, station.AvailableMenuItems.Count)];
         int payout = 100;
-        OrderProposition order = new OrderProposition(proposer, menuItems, payout);
+        List<OrderMenuItem> items = new List<OrderMenuItem>() { menuItem };
+        OrderProposition order = new OrderProposition(owner, items, payout);
         return order;
-        // return AddToActiveOrders(order);
     }
     public bool HasProposedOrder()
     {

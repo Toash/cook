@@ -31,7 +31,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7092826566749458655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1935392338593559038
+--- !u!1 &2435990840348460411
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39,22 +39,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3422544742759177774}
-  - component: {fileID: 399483480871457661}
+  - component: {fileID: 7947440019282179571}
+  - component: {fileID: 4977330435957373677}
   m_Layer: 0
-  m_Name: State_EatFood
+  m_Name: NPCWaitForOrder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3422544742759177774
+--- !u!4 &7947440019282179571
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1935392338593559038}
+  m_GameObject: {fileID: 2435990840348460411}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -63,18 +63,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1348562496413235146}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &399483480871457661
+--- !u!114 &4977330435957373677
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1935392338593559038}
+  m_GameObject: {fileID: 2435990840348460411}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f3ba3500f0654d4a9b0365204591f76, type: 3}
+  m_Script: {fileID: 11500000, guid: ca3ea7be31156b24590f65abc2930461, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCEatFood
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCWaitForOrder
   NPC: {fileID: 0}
   Brain: {fileID: 0}
 --- !u!1 &2493987667095310467
@@ -316,6 +316,52 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 32767
+--- !u!1 &3268879574970264274
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3085675758329167781}
+  - component: {fileID: 3278697740779900449}
+  m_Layer: 0
+  m_Name: NPCTakeOrder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3085675758329167781
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3268879574970264274}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1348562496413235146}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3278697740779900449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3268879574970264274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 042a43163d92c5f45b2ca0b8b0729c75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCTakeOrder
+  NPC: {fileID: 0}
+  Brain: {fileID: 0}
 --- !u!1 &3717195410337276628
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,7 +629,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCWorldDialogue
   TextObject: {fileID: 2825436678866970097}
   Text: {fileID: 5690544953653977632}
---- !u!1 &4841843319136678093
+--- !u!1 &5083905907633756293
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -591,22 +637,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7509430121266211660}
-  - component: {fileID: 342488477072559919}
+  - component: {fileID: 8870729659249801259}
+  - component: {fileID: 1582646786560836566}
   m_Layer: 0
-  m_Name: State_DailySchedule
+  m_Name: NPCEnterRestaurant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7509430121266211660
+--- !u!4 &8870729659249801259
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4841843319136678093}
+  m_GameObject: {fileID: 5083905907633756293}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -615,22 +661,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1348562496413235146}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &342488477072559919
+--- !u!114 &1582646786560836566
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4841843319136678093}
+  m_GameObject: {fileID: 5083905907633756293}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ebef5f78587c694b9c971e36b9f78f6, type: 3}
+  m_Script: {fileID: 11500000, guid: cbefe7ccb60ee2141850632939e322f2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCDailySchedule
+  m_EditorClassIdentifier: Assembly-CSharp::NPCEnterRestaurant
   NPC: {fileID: 0}
   Brain: {fileID: 0}
-  SidewalkNodeStopDistance: 2
---- !u!1 &7014186654436273406
+--- !u!1 &6857614322849714762
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -638,22 +683,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7982203891595949643}
-  - component: {fileID: 139887659714229641}
+  - component: {fileID: 1785305398799015152}
+  - component: {fileID: 1815699378958691673}
   m_Layer: 0
-  m_Name: State_TakeOrder
+  m_Name: NPCOrderline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7982203891595949643
+--- !u!4 &1785305398799015152
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7014186654436273406}
+  m_GameObject: {fileID: 6857614322849714762}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -662,112 +707,116 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1348562496413235146}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &139887659714229641
+--- !u!114 &1815699378958691673
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7014186654436273406}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c75b9ddcf61f8e440bb6960321833373, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCTakeOrder
-  NPC: {fileID: 0}
-  Brain: {fileID: 0}
---- !u!1 &7754067278454972157
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5879522471466468158}
-  - component: {fileID: 6690359013756431683}
-  m_Layer: 0
-  m_Name: State_WaitForOrder
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5879522471466468158
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754067278454972157}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1348562496413235146}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6690359013756431683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754067278454972157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca3ea7be31156b24590f65abc2930461, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCWaitForOrder
-  NPC: {fileID: 0}
-  Brain: {fileID: 0}
---- !u!1 &8878942809382534289
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6932652742809201315}
-  - component: {fileID: 8069884030894989343}
-  m_Layer: 0
-  m_Name: State_OrderLine
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6932652742809201315
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8878942809382534289}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1348562496413235146}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8069884030894989343
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8878942809382534289}
+  m_GameObject: {fileID: 6857614322849714762}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f76e203161fc7424c8410ed9438ef910, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCWaitInLine
+  m_EditorClassIdentifier: Assembly-CSharp::NPCOrderLine
   NPC: {fileID: 0}
   Brain: {fileID: 0}
+--- !u!1 &7732044793157923934
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6631574210917283581}
+  - component: {fileID: 8176459147832615155}
+  m_Layer: 0
+  m_Name: NPCLeaveRestaurant
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6631574210917283581
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7732044793157923934}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1348562496413235146}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8176459147832615155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7732044793157923934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c550ce974c7e02946b619a587065d052, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCLeaveRestaurant
+  NPC: {fileID: 0}
+  Brain: {fileID: 0}
+  returnToSidewalk: 1
+--- !u!1 &7874687342891767388
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8486500020234899359}
+  - component: {fileID: 4431758265664717747}
+  m_Layer: 0
+  m_Name: NPCSidewalkWander
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8486500020234899359
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874687342891767388}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1348562496413235146}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4431758265664717747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874687342891767388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f60a62d188c493c4d9138f2577fe79e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCSidewalkWander
+  NPC: {fileID: 0}
+  Brain: {fileID: 0}
+  sidewalkNodeStopDistance: 1.5
+  enterRestaurantChance: 1
+  decisionCooldown: 2
 --- !u!1 &8984296238825137311
 GameObject:
   m_ObjectHideFlags: 0
@@ -785,7 +834,6 @@ GameObject:
   - component: {fileID: 681720254803484829}
   - component: {fileID: 7161403267277774175}
   - component: {fileID: 2639083710166535590}
-  - component: {fileID: 6249997067289295144}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -806,14 +854,15 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7509430121266211660}
-  - {fileID: 6932652742809201315}
-  - {fileID: 5879522471466468158}
-  - {fileID: 7982203891595949643}
-  - {fileID: 3422544742759177774}
   - {fileID: 2108182729658426389}
   - {fileID: 7092826566749458655}
   - {fileID: 7407009717417748317}
+  - {fileID: 8486500020234899359}
+  - {fileID: 8870729659249801259}
+  - {fileID: 1785305398799015152}
+  - {fileID: 7947440019282179571}
+  - {fileID: 3085675758329167781}
+  - {fileID: 6631574210917283581}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6343099179267865205
@@ -828,10 +877,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 522c4b26916232c45aa524276d9022d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
-  InitialStateString: NPCDailySchedule
-  DefaultStateString: NPCDailySchedule
+  InitialStateString: NPCSidewalkWander
+  DefaultStateString: NPCSidewalkWander
   CurrentState: {fileID: 0}
-  CurrentFoodTruck: {fileID: 0}
   CurrentOrderID: 0
   TimeSinceLastAte: 0
   TriggerCol: {fileID: 5156730865897685090}
@@ -856,7 +904,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 0
+  m_ObstacleAvoidanceType: 4
 --- !u!33 &2082934842838044331
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -878,7 +926,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   Brain: {fileID: 6343099179267865205}
-  Schedule: {fileID: 6249997067289295144}
   Movement: {fileID: 681720254803484829}
   Hand: {fileID: 2639083710166535590}
   Dialogue: {fileID: 3197778324364596046}
@@ -914,6 +961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCMovement
   Agent: {fileID: 375583950525526969}
+  DefaultStoppingDistance: 0
 --- !u!54 &7161403267277774175
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -954,19 +1002,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCHand
   HandRoot: {fileID: 5791525744563834885}
---- !u!114 &6249997067289295144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8984296238825137311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d27a627c9810454eb4fa7a2d893bfc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCSchedule
-  Schedule: {fileID: 0}
 --- !u!1001 &4271057058913073752
 PrefabInstance:
   m_ObjectHideFlags: 0

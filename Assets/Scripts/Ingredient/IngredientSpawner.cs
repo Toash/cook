@@ -27,7 +27,7 @@ public class IngredientSpawner : MonoBehaviour
 
     public void SpawnIngredient(IngredientData data, Vector3 pos)
     {
-        GameObject.Instantiate(data.HoldablePrefab, pos, Quaternion.identity);
+        GameObject.Instantiate(data.Prefab, pos, Quaternion.identity);
 
     }
 

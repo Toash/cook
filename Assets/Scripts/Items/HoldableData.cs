@@ -9,7 +9,7 @@ using UnityEngine;
 public class HoldableData : ScriptableObject
 {
     public string Name;
-    public Holdable HoldablePrefab;
+    public Holdable Prefab;
 
     [Header("Audio")]
     public AudioDefinition PlaceSound;

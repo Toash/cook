@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Contains references to all HoldableData assets for lookup by name
+/// </summary>
 public class HoldableSpawnDatabase : MonoBehaviour
 {
     public static HoldableSpawnDatabase Instance { get; private set; }

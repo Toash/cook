@@ -8,7 +8,7 @@ namespace Assets.Scripts.Ingredient.MenuItem
 {
 
     [CreateAssetMenu(fileName = "MenuItem", menuName = "Food/MenuItem")]
-    public class TruckMenuItem : ScriptableObject
+    public class OrderMenuItem : ScriptableObject
     {
         public string Name;
         // what is in the order
@@ -20,7 +20,7 @@ namespace Assets.Scripts.Ingredient.MenuItem
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public static Dictionary<IngredientData, int> Consolidate(TruckMenuItem item)
+        public static Dictionary<IngredientData, int> Consolidate(OrderMenuItem item)
         {
             var map = new Dictionary<IngredientData, int>();
 

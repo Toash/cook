@@ -4,19 +4,11 @@ using UnityEngine;
 
 namespace Assets.Scripts.World
 {
-
-
-    /// <summary>
-    /// Represents a list of activites
-    /// </summary>
-    // [System.Serializable]
     [CreateAssetMenu(fileName = "Schedule", menuName = "NPC/Schedule")]
     public class Schedule : ScriptableObject
     {
-        // activity times should not overlap!
         [InlineEditor]
         public List<Activity> Activities;
-
 
         public bool HasOverlaps()
         {
@@ -43,6 +35,19 @@ namespace Assets.Scripts.World
             }
 
             return false;
+        }
+
+        public Activity GetCurrentActivity(int hour, int minute)
+        {
+            if (Activities == null) return null;
+
+            foreach (var activity in Activities)
+            {
+                if (activity != null && activity.InTime(hour, minute))
+                    return activity;
+            }
+
+            return null;
         }
     }
 }

@@ -9,11 +9,11 @@ using Assets.Scripts.Ingredient.MenuItem;
 /// </summary>
 public class PreparedItemAssemblyDiscrepancies
 {
-    public TruckMenuItem ClosestMenuItem;
+    public OrderMenuItem ClosestMenuItem;
 
     public int Discrepancies;
 
-    public PreparedItemAssemblyDiscrepancies(TruckMenuItem ClosestMenuItem, int Discrepancies)
+    public PreparedItemAssemblyDiscrepancies(OrderMenuItem ClosestMenuItem, int Discrepancies)
     {
         this.ClosestMenuItem = ClosestMenuItem;
         this.Discrepancies = Discrepancies;
@@ -21,7 +21,7 @@ public class PreparedItemAssemblyDiscrepancies
 
 
     public static PreparedItemAssemblyDiscrepancies EvaluateByMatchingClosestMenuItem(
-    List<TruckMenuItem> menuItems,
+    List<OrderMenuItem> menuItems,
     PreparedItemData preparedItem)
     {
         Debug.Log("[PreparedItemAssemblyDiscrepancies]: Finding best match");
@@ -31,12 +31,12 @@ public class PreparedItemAssemblyDiscrepancies
             return new PreparedItemAssemblyDiscrepancies(null, 0);
         }
 
-        TruckMenuItem closestMenuItem = null;
+        OrderMenuItem closestMenuItem = null;
         int lowestDiscrepancies = int.MaxValue;
 
-        foreach (TruckMenuItem menuItem in menuItems)
+        foreach (OrderMenuItem menuItem in menuItems)
         {
-            Dictionary<IngredientData, int> consolidatedMenuItem = TruckMenuItem.Consolidate(menuItem);
+            Dictionary<IngredientData, int> consolidatedMenuItem = OrderMenuItem.Consolidate(menuItem);
             int discrepancies = 0;
 
             HashSet<IngredientData> allIngredients = new HashSet<IngredientData>();

@@ -15,6 +15,7 @@ public class Holdable : InteractableBase
 
     [Tooltip("Information that is shown when the item is actually held.")]
     public List<InteractInfo> HeldInfos = new List<InteractInfo>();
+    [InlineEditor]
     public HoldableData ItemData;
     public event Action<InteractionContext> OnHeld;
     public event Action<InteractionContext> OnSecondaryInteract;
@@ -140,17 +141,9 @@ public class Holdable : InteractableBase
     }
 
 
-    public override List<InteractInfo> GetInteractInfos()
-
+    public virtual List<InteractInfo> GetHeldInteractInfos(PlayerItemHolder holder)
     {
-        if (beingHeld)
-        {
-            return HeldInfos;
-        }
-        else
-        {
-            return base.GetInteractInfos();
-        }
+        return HeldInfos;
     }
     /// <summary>
     /// Called by the item holder after this is held

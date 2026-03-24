@@ -3,6 +3,7 @@ using UnityEngine;
 public class InteractionInfosUI : MonoBehaviour
 {
     public PlayerInteraction PlayerInteraction;
+    public PlayerItemHolder Holder;
     public InteractionInfoUI InfoPrefab;
     private List<InteractionInfoUI> activeInfos = new List<InteractionInfoUI>();
 
@@ -16,20 +17,38 @@ public class InteractionInfosUI : MonoBehaviour
         PlayerInteraction.OnInteractableChanged -= OnInteractableChanged;
     }
 
+    // void OnInteractableChanged(IInteractable _)
+    // {
+    //     var currentInteractable = PlayerInteraction.GetCurrentInteractable();
+    //     if (currentInteractable != null)
+    //     {
+    //         ClearInfos();
+    //         ShowInteractInfos(currentInteractable.GetInteractInfos());
+    //     }
+    //     else
+    //     {
+    //         ClearInfos();
+    //     }
+
+
+    // }
     void OnInteractableChanged(IInteractable _)
     {
+        ClearInfos();
+
+        if (Holder != null && Holder.isHolding)
+        {
+            var infos = Holder.ItemInHand.GetHeldInteractInfos(Holder);
+            ShowInteractInfos(infos);
+            return;
+        }
+
+        // fallback: hovered object
         var currentInteractable = PlayerInteraction.GetCurrentInteractable();
         if (currentInteractable != null)
         {
-            ClearInfos();
             ShowInteractInfos(currentInteractable.GetInteractInfos());
         }
-        else
-        {
-            ClearInfos();
-        }
-
-
     }
     void ShowInteractInfos(List<InteractInfo> infos)
     {

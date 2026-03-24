@@ -29,7 +29,7 @@ namespace Assets.Scripts.Vehicle
     public class FoodTruck : MonoBehaviour, IVelocityProvider
     {
         [Header("Orderstuff")]
-        public List<TruckMenuItem> MenuItems = new List<TruckMenuItem>();
+        public List<OrderMenuItem> MenuItems = new List<OrderMenuItem>();
         public SingleOrderSubmissionArea OrderSubmissionArea;
         public Transform OrderSpot;
         [Header("Truck stuff")]
@@ -171,7 +171,7 @@ namespace Assets.Scripts.Vehicle
         /// Gets a random menu item from the trucks menu
         /// </summary>
         /// <returns></returns>
-        public TruckMenuItem GetRandomMenuItem()
+        public OrderMenuItem GetRandomMenuItem()
         {
             if (MenuItems.Count == 0)
             {

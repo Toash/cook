@@ -16,7 +16,7 @@ public class HoldableContainer : MonoBehaviour
 
     private int currentAmount;
     private Holdable thisHoldable;
-    private Holdable containedHoldable;
+    // private Holdable containedHoldable;
     private bool initialized = false;
 
     void Awake()
@@ -25,7 +25,7 @@ public class HoldableContainer : MonoBehaviour
     }
     void Start()
     {
-        if (containedHoldable == null)
+        if (ContainedItem.Prefab == null)
         {
             Debug.Log("[HoldableContainer]: contained holdable prefab is null!");
         }
@@ -35,9 +35,9 @@ public class HoldableContainer : MonoBehaviour
     transform,
     () =>
     {
-        if (containedHoldable != null && containedHoldable.TryGetComponent<Ingredient>(out var ingredient))
+        if (ContainedItem != null && ContainedItem.Prefab != null)
         {
-            return $"{ingredient.Data.Name}s {currentAmount}/{MaxAmount}";
+            return $"{ContainedItem.Name}s {currentAmount}/{MaxAmount}";
         }
 
         if (ContainedItem != null)
@@ -66,11 +66,18 @@ public class HoldableContainer : MonoBehaviour
         if (itemData == null) return;
 
         ContainedItem = itemData;
-        containedHoldable = itemData.HoldablePrefab;
+        // containedHoldable = itemData.Prefab;
 
         MaxAmount = startingAmount;
         currentAmount = startingAmount;
 
+        initialized = true;
+    }
+    public void Init(HoldableData itemData, int currentAmount, int maxAmount)
+    {
+        ContainedItem = itemData;
+        this.currentAmount = currentAmount;
+        MaxAmount = maxAmount;
         initialized = true;
     }
 
@@ -90,7 +97,7 @@ public class HoldableContainer : MonoBehaviour
     {
         if (currentAmount <= 0) return;
 
-        Holdable holdable = Instantiate(containedHoldable);
+        Holdable holdable = Instantiate(ContainedItem.Prefab);
         context.Player.ItemHolder.TryHold(holdable);
 
         currentAmount--;

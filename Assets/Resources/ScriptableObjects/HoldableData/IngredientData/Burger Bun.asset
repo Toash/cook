@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Burger Bun
   m_EditorClassIdentifier: Assembly-CSharp::IngredientData
   Name: Bun
-  HoldablePrefab: {fileID: 1393483071371575836, guid: 0f74bb44e07d8014c8da18eb4a981f59, type: 3}
+  Prefab: {fileID: 1393483071371575836, guid: 0f74bb44e07d8014c8da18eb4a981f59, type: 3}
   PlaceSound: {fileID: 11400000, guid: 9910fb30e7218fd438f3e078db7e9ba1, type: 2}
   PickUpSound: {fileID: 11400000, guid: 431fb7333f6e0a94bac436ebdb410c23, type: 2}
   Type: 0

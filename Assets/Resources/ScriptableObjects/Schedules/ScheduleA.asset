@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.World.Schedule
   Activities:
   - {fileID: 11400000, guid: 7783643afbdaf6444958229803f43d3f, type: 2}
+  - {fileID: 11400000, guid: fc4fdd3d76efc544e9ddef321b1521a9, type: 2}

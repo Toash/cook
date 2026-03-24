@@ -135,6 +135,13 @@ public class PlayerInteraction : MonoBehaviour
 
         return null;
     }
+    public T GetHoveredComponent<T>() where T : Component
+    {
+        if (HoveredInteractable == null)
+            return null;
+
+        return HoveredInteractable.GetComponentInParent<T>();
+    }
 
     public void InteractablePoll(IInteractable newInteractable)
     {

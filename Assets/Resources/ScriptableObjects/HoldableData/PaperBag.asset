@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PaperBag
   m_EditorClassIdentifier: Assembly-CSharp::HoldableData
   Name: PaperBag
-  HoldablePrefab: {fileID: 1831075881435196347, guid: 45b52d6b47ed508439213cf95ae112b0, type: 3}
+  Prefab: {fileID: 1831075881435196347, guid: 45b52d6b47ed508439213cf95ae112b0, type: 3}
   PlaceSound: {fileID: 11400000, guid: 9910fb30e7218fd438f3e078db7e9ba1, type: 2}
   PickUpSound: {fileID: 11400000, guid: 431fb7333f6e0a94bac436ebdb410c23, type: 2}

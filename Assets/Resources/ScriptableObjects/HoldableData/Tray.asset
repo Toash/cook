@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: Tray
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   Name: Tray
-  HoldablePrefab: {fileID: 1012223261652574990, guid: 1714a326524567543808c6df3272727e, type: 3}
+  Prefab: {fileID: 1012223261652574990, guid: 1714a326524567543808c6df3272727e, type: 3}
+  PlaceSound: {fileID: 11400000, guid: 9910fb30e7218fd438f3e078db7e9ba1, type: 2}
+  PickUpSound: {fileID: 11400000, guid: 431fb7333f6e0a94bac436ebdb410c23, type: 2}

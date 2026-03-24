@@ -12,9 +12,10 @@ public class GenerateOrderCommand : ConsoleCommand
             return false;
         }
 
-        FoodTruck truck = FindFirstObjectByType<FoodTruck>();
+        OrderStation station = FindFirstObjectByType<OrderStation>();
         NPC npc = null;
-        var prop = OrderManager.I.GenerateRandomOrderProposition(truck, npc);
+
+        var prop = OrderManager.I.GenerateRandomOrderProposition(station, npc);
         OrderManager.I.ProposeOrder(prop);
 
         Debug.Log("[Console]: Generated random order proposition (NPC = null)");

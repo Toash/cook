@@ -9,7 +9,7 @@ public class ContainerDispensor : InteractableBase
     Holdable containedHoldable;
     void Start()
     {
-        containedHoldable = ContainedItem.HoldablePrefab;
+        containedHoldable = ContainedItem.Prefab;
         UpdateTooltip();
 
     }

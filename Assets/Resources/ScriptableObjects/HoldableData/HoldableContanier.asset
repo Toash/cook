@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: HoldableContanier
   m_EditorClassIdentifier: Assembly-CSharp::HoldableData
   Name: Container
-  HoldablePrefab: {fileID: 7714901732994385239, guid: 4d5cd7ab9325d55459a8cef6b9354587, type: 3}
+  Prefab: {fileID: 7714901732994385239, guid: 4d5cd7ab9325d55459a8cef6b9354587, type: 3}
   PlaceSound: {fileID: 11400000, guid: 9910fb30e7218fd438f3e078db7e9ba1, type: 2}
   PickUpSound: {fileID: 11400000, guid: 431fb7333f6e0a94bac436ebdb410c23, type: 2}

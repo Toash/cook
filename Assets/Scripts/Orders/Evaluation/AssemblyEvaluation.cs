@@ -23,7 +23,7 @@ public class AssemblyEvaluation
         int expectedPartCount = 0;
         foreach (var menuItem in order.MenuItems)
         {
-            foreach (var (_, count) in TruckMenuItem.Consolidate(menuItem))
+            foreach (var (_, count) in OrderMenuItem.Consolidate(menuItem))
             {
                 expectedPartCount += count;
             }

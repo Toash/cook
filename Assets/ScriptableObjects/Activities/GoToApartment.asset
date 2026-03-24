@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GoToApartment
   m_EditorClassIdentifier: Assembly-CSharp::Activity
   LocationData: {fileID: 11400000, guid: 3f4372ff4d2ac1040b4a4f3c9836d476, type: 2}
-  StartHour: 7
+  StartHour: 16
   StartMinute: 0
   EndHour: 8
   EndMinute: 0

@@ -1,11 +1,9 @@
-
 using Assets.Scripts.World;
 using UnityEngine;
 
 /// <summary>
-/// Represents an activity that the npcs does at specific times.
+/// Represents an activity that the npc does at specific times.
 /// </summary>
-// [System.Serializable]
 [CreateAssetMenu(fileName = "Activity", menuName = "NPC/Activity")]
 public class Activity : ScriptableObject
 {
@@ -18,7 +16,6 @@ public class Activity : ScriptableObject
     [Range(0, 23)] public int EndHour;
     [Range(0, 59)] public int EndMinute;
 
-
     public override string ToString()
     {
         if (LocationData == null) return "No location data";
@@ -30,10 +27,8 @@ public class Activity : ScriptableObject
 
     public bool InTime(int hour, int minute)
     {
-        bool inHour = hour >= StartHour && hour <= EndHour;
-        bool inMinute = minute >= StartMinute && minute <= EndMinute;
-        return inHour && inMinute;
+        int currentTotalMinutes = hour * 60 + minute;
+        return currentTotalMinutes >= StartTotalMinutes &&
+               currentTotalMinutes < EndTotalMinutes;
     }
-
-
 }

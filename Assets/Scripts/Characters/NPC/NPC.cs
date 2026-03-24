@@ -10,7 +10,6 @@ public class NPC : MonoBehaviour
 {
 
     public NPCBrain Brain;
-    public NPCScheduleController Schedule;
 
     public NPCMovement Movement;
     public NPCHand Hand;
@@ -22,10 +21,6 @@ public class NPC : MonoBehaviour
         if (Brain == null)
         {
             Debug.LogError("[NPC]: Brain is null!");
-        }
-        if (Schedule == null)
-        {
-            Debug.LogError("[NPC]: Schedule is null!");
         }
         if (Movement == null)
         {

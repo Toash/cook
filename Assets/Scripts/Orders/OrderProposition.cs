@@ -9,11 +9,11 @@ using Assets.Scripts.Ingredient.MenuItem;
 public class OrderProposition
 {
     public NPC Proposer;
-    public List<TruckMenuItem> MenuItems;
+    public List<OrderMenuItem> MenuItems;
     public int Payout;
 
     // orders should be created through order manager.
-    public OrderProposition(NPC proposer, List<TruckMenuItem> items, int payout)
+    public OrderProposition(NPC proposer, List<OrderMenuItem> items, int payout)
     {
         this.Proposer = proposer;
         this.MenuItems = items;
