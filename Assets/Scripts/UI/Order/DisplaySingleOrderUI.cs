@@ -24,7 +24,7 @@ public class DisplaySingleOrderUI : MonoBehaviour
         Payout.text = "$" + order.Payout.ToString();
 
 
-        foreach (var item in order.MenuItems)
+        foreach (var item in order.Items)
         {
 
             var itemUI = Instantiate(DisplaySingleMenuItemUI, MenuItemsFlexContainer);

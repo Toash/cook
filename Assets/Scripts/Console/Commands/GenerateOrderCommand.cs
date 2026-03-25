@@ -1,4 +1,3 @@
-using Assets.Scripts.Vehicle;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Console Commands/GenerateOrder")]

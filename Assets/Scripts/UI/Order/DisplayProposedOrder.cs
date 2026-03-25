@@ -51,10 +51,10 @@ public class DisplayProposedOrder : MonoBehaviour
     public void Populate(OrderProposition proposition)
     {
         Payout.text = "$" + proposition.Payout.ToString();
-        foreach (var item in proposition.MenuItems)
+        foreach (OrderedMenuItem item in proposition.Items)
         {
 
-            var itemUI = Instantiate(DisplaySingleMenuItemUI, MenuItemsFlexContainer);
+            DisplaySingleMenuItemUI itemUI = Instantiate(DisplaySingleMenuItemUI, MenuItemsFlexContainer);
             itemUI.Populate(item);
 
         }

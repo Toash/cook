@@ -7,8 +7,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "IngredientData", menuName = "Items/IngredientData")]
 public class IngredientData : HoldableData
 {
-    [Header("Ingredient Specific")]
-    public Texture2D Image;
+
+    // [Header("Ingredient Specific")]
 
 
 

@@ -1,28 +1,25 @@
-
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Assets.Scripts.Ingredient.MenuItem;
 
 /// <summary>
 /// Evaluation of a single prepared item
 /// </summary>
 public class PreparedItemAssemblyDiscrepancies
 {
-    public OrderMenuItem ClosestMenuItem;
+    public OrderedMenuItem ClosestMenuItem;
 
     public int Discrepancies;
 
-    public PreparedItemAssemblyDiscrepancies(OrderMenuItem ClosestMenuItem, int Discrepancies)
+    public PreparedItemAssemblyDiscrepancies(OrderedMenuItem closestMenuItem, int discrepancies)
     {
-        this.ClosestMenuItem = ClosestMenuItem;
-        this.Discrepancies = Discrepancies;
+        ClosestMenuItem = closestMenuItem;
+        Discrepancies = discrepancies;
     }
 
-
     public static PreparedItemAssemblyDiscrepancies EvaluateByMatchingClosestMenuItem(
-    List<OrderMenuItem> menuItems,
-    PreparedItemData preparedItem)
+        List<OrderedMenuItem> menuItems,
+        PreparedItemData preparedItem)
     {
         Debug.Log("[PreparedItemAssemblyDiscrepancies]: Finding best match");
 
@@ -31,14 +28,18 @@ public class PreparedItemAssemblyDiscrepancies
             return new PreparedItemAssemblyDiscrepancies(null, 0);
         }
 
-        OrderMenuItem closestMenuItem = null;
+        OrderedMenuItem closestMenuItem = null;
         int lowestDiscrepancies = int.MaxValue;
 
-        foreach (OrderMenuItem menuItem in menuItems)
+        foreach (OrderedMenuItem orderedItem in menuItems)
         {
-            Dictionary<IngredientData, int> consolidatedMenuItem = OrderMenuItem.Consolidate(menuItem);
-            int discrepancies = 0;
+            if (orderedItem == null || orderedItem.BaseItem == null)
+                continue;
 
+            Dictionary<IngredientData, int> consolidatedMenuItem =
+                BaseMenuItem.Consolidate(orderedItem.BaseItem);
+
+            int discrepancies = 0;
             HashSet<IngredientData> allIngredients = new HashSet<IngredientData>();
 
             foreach (var kv in consolidatedMenuItem)
@@ -56,12 +57,16 @@ public class PreparedItemAssemblyDiscrepancies
                 discrepancies += Math.Abs(menuCount - preparedCount);
             }
 
-            // menu item with lowest discrepancies 
             if (discrepancies < lowestDiscrepancies)
             {
                 lowestDiscrepancies = discrepancies;
-                closestMenuItem = menuItem;
+                closestMenuItem = orderedItem;
             }
+        }
+
+        if (closestMenuItem == null)
+        {
+            return new PreparedItemAssemblyDiscrepancies(null, 0);
         }
 
         return new PreparedItemAssemblyDiscrepancies(closestMenuItem, lowestDiscrepancies);

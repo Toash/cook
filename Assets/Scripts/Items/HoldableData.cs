@@ -9,6 +9,7 @@ using UnityEngine;
 public class HoldableData : ScriptableObject
 {
     public string Name;
+    public Texture2D Image;
     public Holdable Prefab;
 
     [Header("Audio")]

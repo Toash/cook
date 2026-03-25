@@ -1,29 +1,33 @@
 using System.Collections.Generic;
-using System.Reflection;
-using Assets.Scripts.Ingredient.MenuItem;
 using UnityEngine;
 
 /// <summary>
 /// Evaluates based off of how ingredients are actually laid out.
+/// Only evaluates the base menu item assembly.
 /// </summary>
 public class AssemblyEvaluation
 {
     public float Score01;
     public int Discrepancies;
+
     public AssemblyEvaluation(float score01, int discrepancies)
     {
-        this.Score01 = score01;
-        this.Discrepancies = discrepancies;
+        Score01 = score01;
+        Discrepancies = discrepancies;
     }
-
 
     public static AssemblyEvaluation Evaluate(Order order, List<PreparedItemData> preparedItems)
     {
         Debug.Log("[AssemblyEvaluation]: Evaluating assembly...");
+
         int expectedPartCount = 0;
-        foreach (var menuItem in order.MenuItems)
+
+        foreach (OrderedMenuItem orderedItem in order.Items)
         {
-            foreach (var (_, count) in OrderMenuItem.Consolidate(menuItem))
+            if (orderedItem == null || orderedItem.BaseItem == null)
+                continue;
+
+            foreach (var (_, count) in BaseMenuItem.Consolidate(orderedItem.BaseItem))
             {
                 expectedPartCount += count;
             }
@@ -35,16 +39,18 @@ public class AssemblyEvaluation
         }
 
         int totalDiscrepancies = 0;
+
         foreach (PreparedItemData preparedItem in preparedItems)
         {
             PreparedItemAssemblyDiscrepancies discrepancies =
-                PreparedItemAssemblyDiscrepancies.EvaluateByMatchingClosestMenuItem(order.MenuItems, preparedItem);
+                PreparedItemAssemblyDiscrepancies.EvaluateByMatchingClosestMenuItem(order.Items, preparedItem);
 
             totalDiscrepancies += discrepancies.Discrepancies;
         }
 
         float assemblyScore = 1f - ((float)totalDiscrepancies / expectedPartCount);
         assemblyScore = Mathf.Clamp01(assemblyScore);
+
         Debug.Log("[AssemblyEvaluation]: Total discrepancies: " + totalDiscrepancies);
         Debug.Log("[AssemblyEvaluation]: Assembly score: " + assemblyScore);
 

@@ -57,9 +57,17 @@ public class OrderReceipt : MonoBehaviour
         // Replace these fields with whatever your Order actually has.
         // This is just an example shape.
         string text = $"Receipt #{OrderID}";
-        foreach (var item in order.MenuItems)
+        foreach (var item in order.Items)
         {
-            text += $"\n- {item.Name}";
+            text += $"\n- {item.BaseItem.Name}";
+
+            // display condiments
+            foreach (var extra in item.AddedCondiments)
+            {
+                text += $"\n\t- {extra.Name}";
+
+            }
+
         }
 
 

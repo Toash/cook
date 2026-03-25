@@ -225,6 +225,10 @@ public class Holdable : InteractableBase
             }
 
 
+            // copy condiment visuals as well
+
+
+
 
             if (holdableVisualRoot.TryGetComponent<Outline>(out var outline))
             {

@@ -12,8 +12,8 @@ public class Ingredient : MonoBehaviour
 {
     public IngredientData Data;
 
-    [SerializeField] private List<CondimentData> appliedCondiments = new();
-    public IReadOnlyList<CondimentData> AppliedCondiments => appliedCondiments;
+    // public List<CondimentData> appliedCondiments = new();
+    // public IReadOnlyList<CondimentData> AppliedCondiments => appliedCondiments;
 
     // what food this ingredient belongs to, if any.
     public PreparedItem PreparedItem { get; set; }
@@ -60,52 +60,54 @@ public class Ingredient : MonoBehaviour
             baseName = $"{cookable.CookState} {baseName}";
         }
 
-        if (appliedCondiments.Count == 0)
-            return baseName;
+        return baseName;
+        // if (appliedCondiments.Count == 0)
+        //     return baseName;
 
-        return $"{baseName} [{string.Join(", ", GetCondimentNames())}]";
+        // return $"{baseName} [{string.Join(", ", GetCondimentNames())}]";
     }
 
-    IEnumerable<string> GetCondimentNames()
-    {
-        foreach (CondimentData condiment in appliedCondiments)
-        {
-            if (condiment != null)
-                yield return condiment.Name;
-        }
-    }
+    // IEnumerable<string> GetCondimentNames()
+    // {
+    //     foreach (CondimentData condiment in appliedCondiments)
+    //     {
+    //         if (condiment != null)
+    //             yield return condiment.Name;
+    //     }
+    // }
 
-    public bool HasCondiment(CondimentData condiment)
-    {
-        return condiment != null && appliedCondiments.Contains(condiment);
-    }
+    // public bool HasCondiment(CondimentData condiment)
+    // {
+    //     return condiment != null && appliedCondiments.Contains(condiment);
+    // }
 
-    public bool CanApplyCondiment(CondimentData condiment)
-    {
-        if (condiment == null) return false;
+    // public bool CanApplyCondiment(CondimentData condiment)
+    // {
+    //     if (condiment == null) return false;
+    //     if (!Data.AcceptsCondiments) return false;
 
-        if (HasCondiment(condiment))
-            return false;
+    //     if (HasCondiment(condiment))
+    //         return false;
 
-        return true;
-    }
-    public bool TryApplyCondiment(CondimentData condiment)
-    {
-        if (!CanApplyCondiment(condiment))
-            return false;
+    //     return true;
+    // }
+    // public bool TryApplyCondiment(CondimentData condiment)
+    // {
+    //     if (!CanApplyCondiment(condiment))
+    //         return false;
 
-        appliedCondiments.Add(condiment);
+    //     appliedCondiments.Add(condiment);
 
-        return true;
-    }
+    //     return true;
+    // }
 
-    public bool RemoveCondiment(CondimentData condiment)
-    {
-        if (condiment == null)
-            return false;
+    // public bool RemoveCondiment(CondimentData condiment)
+    // {
+    //     if (condiment == null)
+    //         return false;
 
-        return appliedCondiments.Remove(condiment);
-    }
+    //     return appliedCondiments.Remove(condiment);
+    // }
 
     public Cookable TryGetCookable(out Cookable cookable)
     {
@@ -128,10 +130,10 @@ public class Ingredient : MonoBehaviour
         {
             string label = $"Ingredient: {Data.Name}";
 
-            if (appliedCondiments.Count > 0)
-            {
-                label += $"\nCondiments: {string.Join(", ", GetCondimentNames())}";
-            }
+            // if (appliedCondiments.Count > 0)
+            // {
+            //     label += $"\nCondiments: {string.Join(", ", GetCondimentNames())}";
+            // }
 
             Handles.Label(transform.position + transform.forward * 0.5f, label, style);
         }

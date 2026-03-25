@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Assets.Scripts.Ingredient.MenuItem;
-using Assets.Scripts.Vehicle;
 using Sirenix.OdinInspector;
 using UnityEngine;
 public class OrderManager : MonoBehaviour
 {
     public static OrderManager I;
+    public CondimentDatabase CondimentDatabase;
 
 
     public AudioDefinition OrderCompleteSound;
@@ -97,10 +96,22 @@ public class OrderManager : MonoBehaviour
         }
 
         // pick from station.AvailableMenuItems
-        OrderMenuItem menuItem = station.AvailableMenuItems[UnityEngine.Random.Range(0, station.AvailableMenuItems.Count)];
+        BaseMenuItem menuItem = station.AvailableMenuItems[UnityEngine.Random.Range(0, station.AvailableMenuItems.Count)];
         int payout = 100;
-        List<OrderMenuItem> items = new List<OrderMenuItem>() { menuItem };
-        OrderProposition order = new OrderProposition(owner, items, payout);
+        List<OrderedMenuItem> orderedItems = new List<OrderedMenuItem>();
+
+        var orderedItem = new OrderedMenuItem(menuItem);
+        int condimentCount = UnityEngine.Random.Range(1, 1);
+        for (int i = 0; i < condimentCount; i++)
+        {
+            CondimentData condiment = CondimentDatabase.GetRandom();
+            orderedItem.AddedCondiments.Add(condiment);
+        }
+
+        orderedItems.Add(orderedItem);
+        // TODO: add condiments, etc./..
+
+        OrderProposition order = new OrderProposition(owner, orderedItems, payout);
         return order;
     }
     public bool HasProposedOrder()

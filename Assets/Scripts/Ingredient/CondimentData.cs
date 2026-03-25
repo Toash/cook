@@ -4,4 +4,5 @@ using UnityEngine;
 public class CondimentData : ScriptableObject
 {
     public string Name;
+    public GameObject VisualPrefab;
 }

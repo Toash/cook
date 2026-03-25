@@ -18,20 +18,20 @@ public class CondimentApplicatorHoldable : Holdable
             return false;
 
 
-        Ingredient ingredient = context.Player.Interaction.GetHoveredComponent<Ingredient>();
-        if (ingredient == null)
+        var condiment = context.Player.Interaction.GetHoveredComponent<CondimentReceiver>();
+        if (condiment == null)
             return false;
 
-        ingredient.TryApplyCondiment(condiment);
+        condiment.TryApplyCondiment(this.condiment);
         return true;
     }
     public override List<InteractInfo> GetHeldInteractInfos(PlayerItemHolder holder)
     {
-        Ingredient ingredient = holder.Player.Interaction.GetHoveredComponent<Ingredient>();
-        if (ingredient == null)
+        var condiment = holder.Player.Interaction.GetHoveredComponent<CondimentReceiver>();
+        if (condiment == null)
             return HeldInfos;
 
-        if (ingredient.CanApplyCondiment(condiment))
+        if (condiment.CanApplyCondiment(this.condiment))
             return CanApplyInfos;
 
         return HeldInfos;

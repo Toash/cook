@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Assets.Scripts.Ingredient.MenuItem;
 using UnityEngine;
 
 public class OrderStation : MonoBehaviour
@@ -20,7 +19,7 @@ public class OrderStation : MonoBehaviour
     [Tooltip("Where customers go before exiting the restaurant.")]
     public Transform ExitSpot;
 
-    public List<OrderMenuItem> AvailableMenuItems;
+    public List<BaseMenuItem> AvailableMenuItems;
 
     private void Awake()
     {

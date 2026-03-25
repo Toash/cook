@@ -1,6 +1,5 @@
 
 using System.Collections.Generic;
-using Assets.Scripts.Ingredient.MenuItem;
 
 /// <summary>
 /// Represents an order that an npc is proposing.
@@ -9,14 +8,14 @@ using Assets.Scripts.Ingredient.MenuItem;
 public class OrderProposition
 {
     public NPC Proposer;
-    public List<OrderMenuItem> MenuItems;
+    public List<OrderedMenuItem> Items;
     public int Payout;
 
     // orders should be created through order manager.
-    public OrderProposition(NPC proposer, List<OrderMenuItem> items, int payout)
+    public OrderProposition(NPC proposer, List<OrderedMenuItem> items, int payout)
     {
         this.Proposer = proposer;
-        this.MenuItems = items;
+        this.Items = items;
         this.Payout = payout;
     }
 }

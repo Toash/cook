@@ -82,8 +82,6 @@ public class PlayerController : MonoBehaviour
 
     ConstrainedInfo constraintInfo;
     bool sprinting;
-    [ReadOnly]
-    public IVelocityProvider CurrentVelocityProvider;
 
     public IInteractable CurrentConstrainerInteractable { get; private set; }// the constrainer that the player is currently in
 
@@ -146,10 +144,6 @@ public class PlayerController : MonoBehaviour
         {
 
             Vector3 totalVelocity = moveVelocity + gravityVelocity;
-            if (CurrentVelocityProvider != null)
-            {
-                totalVelocity += CurrentVelocityProvider.GetVelocity();
-            }
             CharController.Move(totalVelocity * Time.deltaTime);
         }
 
@@ -376,17 +370,6 @@ public class PlayerController : MonoBehaviour
     public void SetSpeedMultiplier(float mult)
     {
         speedMultiplier = mult;
-
-    }
-    public void SetVelocityProvider(IVelocityProvider provider)
-    {
-        CurrentVelocityProvider = provider;
-
-    }
-    public void ClearVelocityProvider()
-    {
-        Debug.Log("[PlayerController]: Cleared velocity provider");
-        CurrentVelocityProvider = null;
 
     }
 
