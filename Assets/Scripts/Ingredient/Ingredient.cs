@@ -67,47 +67,6 @@ public class Ingredient : MonoBehaviour
         // return $"{baseName} [{string.Join(", ", GetCondimentNames())}]";
     }
 
-    // IEnumerable<string> GetCondimentNames()
-    // {
-    //     foreach (CondimentData condiment in appliedCondiments)
-    //     {
-    //         if (condiment != null)
-    //             yield return condiment.Name;
-    //     }
-    // }
-
-    // public bool HasCondiment(CondimentData condiment)
-    // {
-    //     return condiment != null && appliedCondiments.Contains(condiment);
-    // }
-
-    // public bool CanApplyCondiment(CondimentData condiment)
-    // {
-    //     if (condiment == null) return false;
-    //     if (!Data.AcceptsCondiments) return false;
-
-    //     if (HasCondiment(condiment))
-    //         return false;
-
-    //     return true;
-    // }
-    // public bool TryApplyCondiment(CondimentData condiment)
-    // {
-    //     if (!CanApplyCondiment(condiment))
-    //         return false;
-
-    //     appliedCondiments.Add(condiment);
-
-    //     return true;
-    // }
-
-    // public bool RemoveCondiment(CondimentData condiment)
-    // {
-    //     if (condiment == null)
-    //         return false;
-
-    //     return appliedCondiments.Remove(condiment);
-    // }
 
     public Cookable TryGetCookable(out Cookable cookable)
     {

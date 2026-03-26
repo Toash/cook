@@ -33,7 +33,7 @@ public class Spatula : Holdable
         }
         return false;
     }
-    public override List<InteractInfo> GetInteractInfos()
+    public override List<InteractInfo> GetHoverInteractInfos()
     {
         if (beingHeld)
         {
@@ -45,7 +45,7 @@ public class Spatula : Holdable
         }
         else
         {
-            return base.GetInteractInfos();
+            return base.GetHoverInteractInfos();
         }
     }
 

@@ -47,7 +47,7 @@ public class InteractionInfosUI : MonoBehaviour
         var currentInteractable = PlayerInteraction.GetCurrentInteractable();
         if (currentInteractable != null)
         {
-            ShowInteractInfos(currentInteractable.GetInteractInfos());
+            ShowInteractInfos(currentInteractable.GetHoverInteractInfos());
         }
     }
     void ShowInteractInfos(List<InteractInfo> infos)

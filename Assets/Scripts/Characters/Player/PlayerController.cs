@@ -82,6 +82,7 @@ public class PlayerController : MonoBehaviour
 
     ConstrainedInfo constraintInfo;
     bool sprinting;
+    private bool popupAllowsMovement;
 
     public IInteractable CurrentConstrainerInteractable { get; private set; }// the constrainer that the player is currently in
 
@@ -117,26 +118,23 @@ public class PlayerController : MonoBehaviour
                 HandleLooking();
                 break;
             case PlayerMode.InPopup:
-                moveVelocity = Vector3.zero;
-                // Cursor.lockState = CursorLockMode.None;
+                if (!popupAllowsMovement)
+                {
+                    moveVelocity = Vector3.zero;
+                }
+
                 HandleGravity();
-                HandleJumping();
-                HandleWishVelocity();
-                HandleAcceleratingVelocity();
+
+                if (popupAllowsMovement)
+                {
+                    HandleJumping();
+                    HandleWishVelocity();
+                    HandleAcceleratingVelocity();
+                }
+
                 break;
         }
 
-        // HandleGravity();
-        // if (!IsCameraContrained && !IsBodyContrained)
-        // {
-        //     HandleJumping();
-        //     HandleWishVelocity();
-        //     HandleAcceleratingVelocity();
-        // }
-        // if (!IsCameraContrained)
-        // {
-        //     HandleLooking();
-        // }
 
 
 
@@ -153,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-    public void SetPlayerMode(PlayerMode mode)
+    void SetPlayerMode(PlayerMode mode)
     {
         Debug.Log("[PlayerController]: Setting player mode to " + mode.ToString());
         var from = CurrentControlMode;
@@ -181,14 +179,15 @@ public class PlayerController : MonoBehaviour
     /// Only allows one popup at a time
     /// </summary>
     /// <param name="type"></param>
-    public void ShowPopup(PopupType type)
+    public void ShowPopup(PopupType type, bool allowMovement = false)
     {
         if (CurrentControlMode == PlayerMode.InPopup) return;
-
         if (CurrentControlMode != PlayerMode.FullGameplay) return;
 
         if (type == PopupType.None) return;
         if (currentPopupType != PopupType.None) CloseCurrentPopup();
+
+        popupAllowsMovement = allowMovement;
 
         PopupShow?.Invoke(type);
         currentPopupType = type;

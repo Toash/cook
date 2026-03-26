@@ -6,19 +6,24 @@ namespace Assets.Scripts.Characters.NPC
     /// <summary>
     /// NPC has placed an order and waits at the station's wait spot
     /// until their submitted order is ready for pickup.
+    /// If they wait too long, they cancel and leave.
     /// </summary>
     public class NPCWaitForOrder : NPCState
     {
         public override string Name => "NPCWaitForOrder";
 
+        private float maxWaitSeconds = 6f;
+
         private Coroutine moveRoutine;
         private bool orderReady;
+        private float waitTimer;
 
         private OrderStation Station => Brain.CurrentOrderStation;
 
         public override void OnEnter(NPCBrain brain)
         {
             orderReady = false;
+            waitTimer = 0f;
 
             if (Station == null)
             {
@@ -66,6 +71,22 @@ namespace Assets.Scripts.Characters.NPC
 
         public override void OnUpdate(NPCBrain brain)
         {
+            if (orderReady)
+                return;
+
+            waitTimer += Time.deltaTime;
+
+            if (waitTimer < maxWaitSeconds)
+                return;
+
+            string message = NPCDialoguePresets.RandomImpatientSaying();
+            NPC.Dialogue.Say(message, 3f);
+
+            OrderManager.I.CancelOrderIfExists(Brain.CurrentOrderID);
+
+            Brain.CurrentOrderID = 0;
+
+            Brain.ChangeState("NPCLeaveRestaurant");
         }
 
         public override void OnFixedUpdate(NPCBrain brain)

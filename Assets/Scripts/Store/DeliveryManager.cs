@@ -8,6 +8,7 @@ public class DeliveryManager : MonoBehaviour
     [SerializeField] private Transform dropoffPoint;
     [SerializeField] private float spawnRadius = 1f;
     [SerializeField] private float verticalSpawnOffset = 0.25f;
+    public int DeliveryDelaySeconds = 3;
 
     private readonly List<PendingDelivery> pendingDeliveries = new();
 
@@ -32,7 +33,7 @@ public class DeliveryManager : MonoBehaviour
         TimeManager.I.MinuteChanged -= OnMinuteChanged;
     }
 
-    public void OrderSupplies(SupplyOrder order, int deliveryDelaySeconds)
+    public void OrderSupplies(SupplyOrder order)
     {
         if (order == null)
         {
@@ -47,14 +48,14 @@ public class DeliveryManager : MonoBehaviour
         }
 
         int currentTime = TimeManager.I.CurrentTimeSeconds;
-        int arrivalTime = currentTime + deliveryDelaySeconds;
+        int arrivalTime = currentTime + DeliveryDelaySeconds;
 
         pendingDeliveries.Add(new PendingDelivery
         {
             Order = order,
             ArrivalTimeSeconds = arrivalTime
         });
-        Debug.Log($"[DeliveryManager]: Order placed. Will arrive in {deliveryDelaySeconds} seconds");
+        Debug.Log($"[DeliveryManager]: Order placed. Will arrive in {DeliveryDelaySeconds} seconds");
 
     }
 

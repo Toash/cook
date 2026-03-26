@@ -27,6 +27,7 @@ public class OrderManager : MonoBehaviour
     /// <summary>
     /// Orders that the player has to currently make.
     /// </summary>
+    [ShowInInspector, ReadOnly]
     public List<Order> ActiveOrders = new List<Order>();
     public event Action<OrderSubmissionResult> PlayerSubmittedOrder; // player has submitted the order
     public event Action<OrderSubmissionResult> NPCEvaluatedOrder; // npc has evaluted order
@@ -218,6 +219,20 @@ public class OrderManager : MonoBehaviour
         NPCEvaluatedOrder?.Invoke(result);
         AudioManager.I.PlayOneShot(OrderCompleteSound);
 
+    }
+
+    public bool CancelOrderIfExists(int orderId)
+    {
+        if (orderId == 0)
+            return false;
+
+        Order order = ActiveOrders.Find(o => o.ID == orderId);
+
+        if (order == null)
+            return false;
+
+        RemoveActiveOrder(order);
+        return true;
     }
 
 

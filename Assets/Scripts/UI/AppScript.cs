@@ -6,7 +6,7 @@ using UnityEngine;
 /// 
 /// Apps are referred to by their child indices based off of some parent object
 /// </summary>
-public class PhoneAppScript : MonoBehaviour
+public class AppScript : MonoBehaviour
 {
 
     [Tooltip("Object for the homepage")]

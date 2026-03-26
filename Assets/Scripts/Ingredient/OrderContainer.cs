@@ -66,24 +66,6 @@ public class OrderContainer : MonoBehaviour
     }
 
 
-    // public bool CanSubmit()
-    // {
-    //     bool hasPreparedItems = PreparedItems.Count > 0;
-    //     bool hasReceipt = Receipt != null;
-
-    //     if (!hasReceipt)
-    //     {
-    //         Debug.Log("[OrderContainer]: Cannot submit, does not have receipt");
-    //     }
-
-    //     if (!hasPreparedItems)
-    //     {
-    //         Debug.Log("[OrderContainer]: Cannot submit, does not have atleast 1 prepared item.");
-    //     }
-
-
-    //     return hasReceipt && hasPreparedItems;
-    // }
 
     public bool TryGetPreparedItems(out List<PreparedItem> items)
     {

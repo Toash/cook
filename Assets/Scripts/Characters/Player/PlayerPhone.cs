@@ -39,7 +39,7 @@ public class PlayerPhone : MonoBehaviour
     void _OnOpen()
     {
         // PhoneUIRoot.SetActive(true);
-        Player.Controller.ShowPopup(PopupType.Phone);
+        Player.Controller.ShowPopup(PopupType.Phone, true);
 
 
     }

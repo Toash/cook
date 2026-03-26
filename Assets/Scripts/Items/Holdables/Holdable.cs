@@ -130,6 +130,8 @@ public class Holdable : InteractableBase
     }
     public override void Interact(InteractionContext context)
     {
+        if (!isActiveAndEnabled) return;
+
         OnHeld?.Invoke(context);
         // context.Player.ItemHolder.TryHold(GetHoldableRoot());
         if (context.Type == InteractType.Primary)

@@ -44,7 +44,7 @@ public class PreparedItem
         {
             if (snapper.TryGetComponent<Ingredient>(out var ingredient))
             {
-                if (Ingredients.Contains(ingredient))
+                if (!Ingredients.Contains(ingredient))
                 {
                     AddIngredient(ingredient);
                 }

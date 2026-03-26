@@ -31,6 +31,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7092826566749458655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1977081637344677442
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6145258325607336831}
+  - component: {fileID: 3665803768325370166}
+  m_Layer: 0
+  m_Name: NPCEatAtTable
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6145258325607336831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977081637344677442}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1348562496413235146}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3665803768325370166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977081637344677442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 644c6576bd1a4bc4e981822acff30929, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCEatAtTable
+  NPC: {fileID: 0}
+  Brain: {fileID: 0}
 --- !u!1 &2435990840348460411
 GameObject:
   m_ObjectHideFlags: 0
@@ -767,7 +813,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Characters.NPC.NPCLeaveRestaurant
   NPC: {fileID: 0}
   Brain: {fileID: 0}
-  returnToSidewalk: 1
 --- !u!1 &7874687342891767388
 GameObject:
   m_ObjectHideFlags: 0
@@ -863,6 +908,7 @@ Transform:
   - {fileID: 7947440019282179571}
   - {fileID: 3085675758329167781}
   - {fileID: 6631574210917283581}
+  - {fileID: 6145258325607336831}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6343099179267865205
@@ -879,6 +925,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCBrain
   InitialStateString: NPCSidewalkWander
   DefaultStateString: NPCSidewalkWander
+  HasEatenToday: 0
   CurrentState: {fileID: 0}
   CurrentOrderID: 0
   TimeSinceLastAte: 0

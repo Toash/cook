@@ -50,7 +50,7 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
 
 
     public abstract void Interact(InteractionContext context);
-    public virtual List<InteractInfo> GetInteractInfos()
+    public virtual List<InteractInfo> GetHoverInteractInfos()
     {
         return HoverInteractInfo;
     }

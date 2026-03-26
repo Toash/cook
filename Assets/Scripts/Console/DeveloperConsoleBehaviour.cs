@@ -1,41 +1,46 @@
+using System;
 using Sirenix.OdinInspector;
 using TMPro;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEngine.InputSystem.InputAction;
 
-/// <summary>
-/// Root object for the developer console. handles ui and input and passes commands to the DeveloperConsole class.
-/// </summary>
+[Serializable]
+public class StartupConsoleCommand
+{
+    [InlineEditor]
+    public ConsoleCommand Command;
+
+    public string Arguments;
+
+    public string BuildInput(string prefix)
+    {
+        return string.IsNullOrWhiteSpace(Arguments)
+            ? $"{prefix}{Command.CommandWord}"
+            : $"{prefix}{Command.CommandWord} {Arguments}";
+    }
+}
+
 public class DeveloperConsoleBehaviour : MonoBehaviour
 {
     [SerializeField] private string prefix = string.Empty;
-    [SerializeField, InlineEditor] private ConsoleCommand[] commands = new ConsoleCommand[0];
-    [SerializeField, InlineEditor] private ConsoleCommand[] startCommands = new ConsoleCommand[0];
+    [SerializeField, InlineEditor] private ConsoleCommand[] commands = Array.Empty<ConsoleCommand>();
+    [SerializeField] private StartupConsoleCommand[] startCommands = Array.Empty<StartupConsoleCommand>();
 
     [Header("UI")]
-    [SerializeField] private GameObject uiCanvas = null;
-    [SerializeField] private TMP_InputField inputField = null;
+    [SerializeField] private GameObject uiCanvas;
+    [SerializeField] private TMP_InputField inputField;
+
     [Header("Input")]
     [SerializeField] private InputActionAsset inputActionAsset;
     [SerializeField] private InputActionReference toggleConsole;
-    [SerializeField, Tooltip("The name of the action map for player mode.")] private string playerModeActionMapName = "Player";
-
-
+    [SerializeField] private string playerModeActionMapName = "Player";
 
     private float pausedTimeScale;
+    private static DeveloperConsoleBehaviour instance;
 
     private DeveloperConsole developerConsole;
-    private DeveloperConsole DeveloperConsole
-    {
-        get
-        {
-            if (developerConsole != null) { return developerConsole; }
-            return developerConsole = new DeveloperConsole(prefix, commands);
-        }
-    }
-    private static DeveloperConsoleBehaviour instance;
+    private DeveloperConsole DeveloperConsole =>
+        developerConsole ??= new DeveloperConsole(prefix, commands);
 
     private void Awake()
     {
@@ -46,64 +51,52 @@ public class DeveloperConsoleBehaviour : MonoBehaviour
         }
 
         instance = this;
-
         DontDestroyOnLoad(gameObject);
     }
-    void Start()
+
+    private void Start()
     {
-        foreach (var command in startCommands)
+        foreach (var cmd in startCommands)
         {
-            DeveloperConsole.ProcessCommand(prefix + command.CommandWord);
+            DeveloperConsole.ProcessCommand(cmd.BuildInput(prefix));
         }
     }
-    void Update()
-    {
-        if (toggleConsole.action.WasPressedThisFrame()) { ToggleConsole(); }
-    }
 
+    private void Update()
+    {
+        if (toggleConsole.action.WasPressedThisFrame())
+            ToggleConsole();
+    }
 
     public void ToggleConsole()
     {
-
         if (uiCanvas.activeSelf)
-        {
             HideConsole();
-        }
         else
-        {
             ShowConsole();
-        }
     }
 
     private void HideConsole()
     {
         Time.timeScale = pausedTimeScale;
-
         inputActionAsset.FindActionMap(playerModeActionMapName).Enable();
-
         uiCanvas.SetActive(false);
     }
 
     private void ShowConsole()
     {
-        // pause
         pausedTimeScale = Time.timeScale;
         Time.timeScale = 0;
+
         uiCanvas.SetActive(true);
-
         inputActionAsset.FindActionMap(playerModeActionMapName).Disable();
-
-        // focus input field
         inputField.ActivateInputField();
     }
 
     public void ProcessCommand(string inputValue)
     {
         DeveloperConsole.ProcessCommand(inputValue);
-
         inputField.text = string.Empty;
-
         HideConsole();
     }
-
 }

@@ -63,8 +63,10 @@ namespace Assets.Scripts.Characters.NPC
 
                 NPC.Dialogue.Say(message);
 
-                Brain.HasEatenToday = true;
-                Brain.ChangeState("NPCLeaveRestaurant");
+                // Brain.HasEatenToday = true;
+                // Brain.ChangeState("NPCLeaveRestaurant");
+
+                Brain.ChangeState("NPCEatAtTable");
             }
         }
     }

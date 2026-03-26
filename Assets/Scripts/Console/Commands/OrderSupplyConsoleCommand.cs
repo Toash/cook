@@ -5,8 +5,6 @@ using UnityEngine;
 public class OrderSupplyConsoleCommand : ConsoleCommand
 {
 
-    [Tooltip("Delay, in in-game seconds, before delivery arrives.")]
-    [SerializeField] private int defaultDeliveryDelaySeconds = 2;
 
     public override bool Process(string[] args)
     {
@@ -55,7 +53,7 @@ public class OrderSupplyConsoleCommand : ConsoleCommand
             });
         }
 
-        DeliveryManager.I.OrderSupplies(order, defaultDeliveryDelaySeconds);
+        DeliveryManager.I.OrderSupplies(order);
 
         Debug.Log($"[OrderSupplyConsoleCommand]: Ordered {order.Items.Count} item type(s).");
         return true;

@@ -74,7 +74,7 @@ MonoBehaviour:
   HoverTooltipData:
     Parent: {fileID: 0}
     Offset: {x: 0, y: 0, z: 0}
-  ContainedItem: {fileID: 11400000, guid: b255552a45f5a374a9b082ac146acfc8, type: 2}
+  ContainedItem: {fileID: 11400000, guid: d4815c66d15075e4281a57e1a23060e4, type: 2}
 --- !u!1 &2889990844393685624
 GameObject:
   m_ObjectHideFlags: 0

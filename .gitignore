@@ -23,6 +23,7 @@ ithappy/
 DemiGiant/
 Sirenix/
 JC_LP_MegaCity/
+RootMotion/
 
 # Ignore the auto-generated AOT compatibility dll.
 /Assets/Plugins/Sirenix/Assemblies/AOT/*

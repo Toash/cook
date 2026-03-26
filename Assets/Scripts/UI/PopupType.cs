@@ -7,5 +7,6 @@ public enum PopupType
 {
     None,
     Phone,
+    Computer,
     GroceryStore,
 }
