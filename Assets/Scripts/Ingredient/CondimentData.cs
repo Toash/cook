@@ -1,8 +1,10 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Ingredient/Condiment Data")]
-public class CondimentData : ScriptableObject
+public class CondimentData : HoldableData
 {
-    public string Name;
+    /// <summary>
+    /// Prefab used when applying the condiment.
+    /// </summary>
     public GameObject VisualPrefab;
 }

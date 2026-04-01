@@ -123,11 +123,6 @@ public class Snapper : MonoBehaviour
         transform.SetParent(parentSnapper.transform, worldPositionStays: true);
 
 
-        if (parentSnapArea.DisappearSnappedObject)
-        {
-            //todo change this to just disable the visual root.
-            gameObject.SetActive(false);
-        }
 
         return true;
     }

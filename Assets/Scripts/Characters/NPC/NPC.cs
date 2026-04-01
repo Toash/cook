@@ -14,7 +14,6 @@ public class NPC : MonoBehaviour
     public NPCMovement Movement;
     public NPCHand Hand;
     public NPCWorldDialogue Dialogue;
-    public CharacterVisual Visuals;
 
     void Awake()
     {
@@ -29,10 +28,6 @@ public class NPC : MonoBehaviour
         if (Hand == null)
         {
             Debug.LogError("[NPC]: Hand is null!");
-        }
-        if (Visuals == null)
-        {
-            Debug.LogError("[NPC]: Visuals is null!");
         }
     }
 

@@ -26,17 +26,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5335258728758679687}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: -0.0103}
   m_LocalScale: {x: 0.005, y: 0.005, z: 0.005}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6521753100113432671}
   m_Father: {fileID: 7049840208266003952}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.313}
+  m_AnchoredPosition: {x: 0, y: 0.027}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &2165417815629831649
@@ -128,13 +128,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6331946127571587523}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.23300004, z: 0}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0.019, z: 0}
   m_LocalScale: {x: 0.31139413, y: 0.45489752, z: 0.014663103}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7049840208266003952}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!33 &7253964055508388415
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -242,6 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Snapper
   ParentSnapConnections: []
+  ChildSnapConnections: []
 --- !u!114 &4364911229386095459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,8 +275,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.34438562, y: 0.47287244, z: 0.028108597}
-  m_Center: {x: 0.001647234, y: 0.24050197, z: -0.008236408}
+  m_Size: {x: 0.34438562, y: 0.04622042, z: 0.49380577}
+  m_Center: {x: 0.001647234, y: 0.027175963, z: 0.011861265}
 --- !u!114 &1339551314847062171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,13 +289,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb56e004d3e89c043915a302ea89428f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Holdable
+  HoverInteractInfo:
+  - Type: 1
+    Description: Pick up
   VisualRoot: {fileID: 8331544024246473326}
   HoverTooltipData:
     Parent: {fileID: 0}
-    Text: 
-    Offset: {x: 0, y: 0}
-  ItemData: {fileID: 0}
-  GizmoSize: 0.3
+    Offset: {x: 0, y: 0, z: 0}
+  ItemData: {fileID: 11400000, guid: ffbef908b1205dd41b459f7b9627ebcf, type: 2}
+  DefaultHeldInfos:
+  - Type: 1
+    Description: Place
 --- !u!114 &-1731720021882725483
 MonoBehaviour:
   m_ObjectHideFlags: 0

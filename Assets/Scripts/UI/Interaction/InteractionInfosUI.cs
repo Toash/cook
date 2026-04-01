@@ -17,21 +17,6 @@ public class InteractionInfosUI : MonoBehaviour
         PlayerInteraction.OnInteractableChanged -= OnInteractableChanged;
     }
 
-    // void OnInteractableChanged(IInteractable _)
-    // {
-    //     var currentInteractable = PlayerInteraction.GetCurrentInteractable();
-    //     if (currentInteractable != null)
-    //     {
-    //         ClearInfos();
-    //         ShowInteractInfos(currentInteractable.GetInteractInfos());
-    //     }
-    //     else
-    //     {
-    //         ClearInfos();
-    //     }
-
-
-    // }
     void OnInteractableChanged(IInteractable _)
     {
         ClearInfos();
@@ -47,7 +32,7 @@ public class InteractionInfosUI : MonoBehaviour
         var currentInteractable = PlayerInteraction.GetCurrentInteractable();
         if (currentInteractable != null)
         {
-            ShowInteractInfos(currentInteractable.GetHoverInteractInfos());
+            ShowInteractInfos(currentInteractable.GetHoverInteractInfos(PlayerInteraction.BuildContext(InteractType.None)));
         }
     }
     void ShowInteractInfos(List<InteractInfo> infos)

@@ -5,7 +5,7 @@ public class Spatula : Holdable
 
     public List<InteractInfo> FlipInfos = new List<InteractInfo>();
     private Flippable currentFlippable = null;
-    public override bool TryGetPlacementPreview(PlayerItemHolder holder, PlacementInfo info, out Vector3 pos, out Quaternion rot, out bool show)
+    public override bool TryGetCustomPlacementPreview(PlayerItemHolder holder, PlacementInfo info, out Vector3 pos, out Quaternion rot, out bool show)
     {
         // return base.TryGetPlacementPreviewPosAndRot(holder, info, out pos, out rot);
         if (currentFlippable)
@@ -20,7 +20,7 @@ public class Spatula : Holdable
         show = false;
         return false;
     }
-    public override bool OnPressedInteract(PlayerItemHolder holder, InteractionContext context)
+    public override bool OnHeldPressedInteract(PlayerItemHolder holder, InteractionContext context)
     {
         if (context.Type == InteractType.Primary)
         {
@@ -33,7 +33,7 @@ public class Spatula : Holdable
         }
         return false;
     }
-    public override List<InteractInfo> GetHoverInteractInfos()
+    public override List<InteractInfo> GetHoverInteractInfos(InteractionContext context)
     {
         if (beingHeld)
         {
@@ -41,11 +41,11 @@ public class Spatula : Holdable
             {
                 return FlipInfos;
             }
-            return HeldInfos;
+            return DefaultHeldInfos;
         }
         else
         {
-            return base.GetHoverInteractInfos();
+            return base.GetHoverInteractInfos(context);
         }
     }
 

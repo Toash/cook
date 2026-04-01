@@ -48,8 +48,10 @@ public class Ingredient : MonoBehaviour
         if (TryGetComponent<InteractableBase>(out var interactable))
         {
             interactable.HoverTooltipData = new HoverTooltipData(transform, GetTooltipText);
+
         }
     }
+
 
     string GetTooltipText()
     {

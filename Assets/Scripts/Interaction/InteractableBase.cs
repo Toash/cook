@@ -1,79 +1,119 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+
 /// <summary>
-/// Represents an object that the player can interact with
+/// Represents an object that the player can interact with.
+/// Invariant: every InteractableBase root object must be on the "Interact" layer.
 /// </summary>
 [RequireComponent(typeof(Collider))]
-// [RequireComponent(typeof(Highlightable))]
+[DisallowMultipleComponent]
 public abstract class InteractableBase : MonoBehaviour, IInteractable
 {
+    private const string INTERACT_LAYER_NAME = "Interact";
 
-    public List<InteractInfo> HoverInteractInfo = new List<InteractInfo>();
+    public List<InteractInfo> HoverInteractInfo = new();
+
     [Tooltip("Root object for whatever visually represents this item.")]
     public GameObject VisualRoot;
-    // public string HoverTooltip = "";
+
     [HideInInspector]
     public HoverTooltipData HoverTooltipData;
 
-    Outline outline = null;
+    private Outline outline;
 
     public event Action<InteractionContext> OnInteract;
 
-    public bool IsHovered { get; private set; } = false;
-    void Awake()
+    public bool IsHovered { get; private set; }
+
+    protected virtual void Reset()
     {
-        SetLayer();
+        EnforceInteractLayer();
     }
-    void Start()
+
+    protected virtual void Awake()
     {
-        SetLayer();
+        EnforceInteractLayer();
+    }
+
+    protected virtual void Start()
+    {
+        EnforceInteractLayer();
+
+        if (VisualRoot == null)
+        {
+            Debug.LogError("[InteractableBase]: No VisualRoot assigned!");
+
+        }
+
+
         if (VisualRoot != null)
         {
-            outline = VisualRoot.AddComponent<Outline>();
+            outline = VisualRoot.GetComponent<Outline>();
+            if (outline == null)
+                outline = VisualRoot.AddComponent<Outline>();
+
             outline.OutlineWidth = 5f;
             SetOutline(false);
         }
     }
 
-    void OnValidate()
+    protected virtual void OnValidate()
     {
-        SetLayer();
+        EnforceInteractLayer();
     }
-    public virtual void OnHoverEnter() { IsHovered = true; }
-    public virtual void OnHoverExit() { IsHovered = false; }
+
+    public virtual void OnHoverEnter()
+    {
+        IsHovered = true;
+    }
+
+    public virtual void OnHoverExit()
+    {
+        IsHovered = false;
+    }
+
     public void BaseInteract(InteractionContext context)
     {
         OnInteract?.Invoke(context);
         Interact(context);
     }
 
-
     public abstract void Interact(InteractionContext context);
-    public virtual List<InteractInfo> GetHoverInteractInfos()
+
+    public virtual List<InteractInfo> GetHoverInteractInfos(InteractionContext context)
     {
         return HoverInteractInfo;
     }
 
-    void SetLayer()
+    // public void SetHoverTooltipData(HoverTooltipData data)
+    // {
+    //     HoverTooltipData = data;
+    // }
+
+    public virtual HoverTooltipData GetHoverTooltipData()
     {
-        int interactLayer = LayerMask.NameToLayer("Interact");
+        return HoverTooltipData;
+    }
+
+    public void SetOutline(bool enabled)
+    {
+        if (outline == null) return;
+        outline.enabled = enabled;
+    }
+
+    private void EnforceInteractLayer()
+    {
+        int interactLayer = LayerMask.NameToLayer(INTERACT_LAYER_NAME);
         if (interactLayer == -1)
         {
-            Debug.LogError("Could not find interact mask.");
+            Debug.LogError($"Could not find required layer '{INTERACT_LAYER_NAME}'.", this);
             return;
         }
 
-        gameObject.layer = interactLayer;
-
+        if (gameObject.layer != interactLayer)
+        {
+            gameObject.layer = interactLayer;
+        }
     }
-
-
-    public void SetOutline(bool boolean)
-    {
-        if (outline == null) return;
-
-        outline.enabled = boolean;
-    }
-
 }

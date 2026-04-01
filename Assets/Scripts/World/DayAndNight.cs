@@ -26,17 +26,36 @@ public class DayAndNight : MonoBehaviour
     float startingZRotation;
     float startingSunIntensity;
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
+    // void Awake()
+    // {
+    //     DontDestroyOnLoad(gameObject);
+    // }
+    // void OnEnable()
+    // {
+    //     DayManager.I.DayStarted += OnDayStarted;
+    // }
+
+    // void OnDisable()
+    // {
+    //     if (DayManager.I != null)
+    //         DayManager.I.DayStarted -= OnDayStarted;
+    // }
     void Start()
     {
         // cache daytime values for lerping
         startingYRotation = DirectionalLight.transform.rotation.eulerAngles.y;
         startingZRotation = DirectionalLight.transform.rotation.eulerAngles.z;
         startingSunIntensity = DirectionalLight.intensity;
+
     }
+    // void OnDayStarted(int dayNumber)
+    // {
+    //     DirectionalLight =
+    // }
+
+
+
+
 
     void Update()
     {

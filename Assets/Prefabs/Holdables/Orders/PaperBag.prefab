@@ -190,7 +190,7 @@ GameObject:
   - component: {fileID: 1831075881435196347}
   - component: {fileID: 5354236529962631232}
   - component: {fileID: 6350989321261998255}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PaperBag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -249,6 +249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Snapper
   ParentSnapConnections: []
+  ChildSnapConnections: []
 --- !u!114 &1831075881435196347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,12 +262,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb56e004d3e89c043915a302ea89428f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Holdable
+  HoverInteractInfo:
+  - Type: 1
+    Description: Pick up
   VisualRoot: {fileID: 4063418067336838072}
   HoverTooltipData:
     Parent: {fileID: 0}
-    Text: 
-    Offset: {x: 0, y: 0}
+    Offset: {x: 0, y: 0, z: 0}
   ItemData: {fileID: 11400000, guid: b255552a45f5a374a9b082ac146acfc8, type: 2}
+  HoldLocalPosition: {x: 0, y: 0, z: 0}
+  HoldLocalEuler: {x: 0, y: 0, z: 0}
+  DefaultHeldInfos:
+  - Type: 1
+    Description: Place
   GizmoSize: 0.3
 --- !u!114 &5354236529962631232
 MonoBehaviour:
@@ -293,6 +301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db76e1c97d08793498c811504c0c9cf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OrderContainer
+  ContainedPreparedItems: []
   AttachedReceipt: {fileID: 0}
 --- !u!1001 &5381380862959307523
 PrefabInstance:

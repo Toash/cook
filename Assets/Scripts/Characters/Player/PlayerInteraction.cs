@@ -142,6 +142,10 @@ public class PlayerInteraction : MonoBehaviour
 
         return HoveredInteractable.GetComponentInParent<T>();
     }
+    public InteractionContext BuildContext(InteractType type)
+    {
+        return new InteractionContext(type, GetComponent<Player>());
+    }
 
     public void InteractablePoll(IInteractable newInteractable)
     {

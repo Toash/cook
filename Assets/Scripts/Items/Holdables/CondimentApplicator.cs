@@ -12,7 +12,7 @@ public class CondimentApplicatorHoldable : Holdable
 
     [SerializeField] private CondimentData condiment;
 
-    public override bool OnPressedInteract(PlayerItemHolder holder, InteractionContext context)
+    public override bool OnHeldPressedInteract(PlayerItemHolder holder, InteractionContext context)
     {
         if (context.Type != InteractType.Primary)
             return false;
@@ -29,11 +29,11 @@ public class CondimentApplicatorHoldable : Holdable
     {
         var condiment = holder.Player.Interaction.GetHoveredComponent<CondimentReceiver>();
         if (condiment == null)
-            return HeldInfos;
+            return DefaultHeldInfos;
 
         if (condiment.CanApplyCondiment(this.condiment))
             return CanApplyInfos;
 
-        return HeldInfos;
+        return DefaultHeldInfos;
     }
 }

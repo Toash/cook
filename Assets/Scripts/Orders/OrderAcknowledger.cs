@@ -2,8 +2,9 @@ using UnityEngine;
 public class OrderAcknowledger : InteractableBase
 {
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         HoverTooltipData = new HoverTooltipData(transform, "No Order");
         OrderManager.I.ProposedOrderAdded += OnProposedOrderAdded;
         OrderManager.I.ProposedOrderRemoved += OnProposedOrderRemoved;

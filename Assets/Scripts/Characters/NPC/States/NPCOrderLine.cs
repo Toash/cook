@@ -33,10 +33,10 @@ public class NPCOrderLine : NPCState
 
         Line.AddNPCToLine(brain);
 
-        if (Line.NPCLookAt != null)
-        {
-            NPC.Visuals.SetLookAtTarget(Line.NPCLookAt);
-        }
+        // if (Line.NPCLookAt != null)
+        // {
+        //     NPC.Visuals.SetLookAtTarget(Line.NPCLookAt);
+        // }
 
         brain.LineChanged += MoveToCurrentLinePos;
         MoveToCurrentLinePos();
@@ -58,7 +58,7 @@ public class NPCOrderLine : NPCState
             Line.RemoveNPCFromLine(brain);
         }
 
-        NPC.Visuals.SetLookAtTarget(null);
+        // NPC.Visuals.SetLookAtTarget(null);
         hasProposedOrder = false;
     }
 

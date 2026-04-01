@@ -12,7 +12,7 @@ namespace Assets.Scripts.Characters.NPC
     {
         public override string Name => "NPCWaitForOrder";
 
-        private float maxWaitSeconds = 6f;
+        private float maxWaitSeconds = 1000f;
 
         private Coroutine moveRoutine;
         private bool orderReady;

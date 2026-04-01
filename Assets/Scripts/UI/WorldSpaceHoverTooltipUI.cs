@@ -68,7 +68,8 @@ public class WorldSpaceHoverTooltipUI : MonoBehaviour
             return;
         }
 
-        var data = interactable.HoverTooltipData;
+        HoverTooltipData data = interactable.GetHoverTooltipData();
+
         if (data == null || data.Parent == null)
         {
             Clear();

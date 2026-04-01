@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-public class OrderManager : MonoBehaviour
+public class OrderManager : MonoBehaviour, IDaySummaryContributor
 {
     public static OrderManager I;
     public CondimentDatabase CondimentDatabase;
@@ -37,6 +37,16 @@ public class OrderManager : MonoBehaviour
 
 
 
+    public int TodayCompletedCount { get; private set; }
+    // public int TodayFailedCount { get; private set; }
+    // public int TodayCancelledCount { get; private set; }
+
+    public int LifetimeCompletedCount { get; private set; }
+    // public int LifetimeFailedCount { get; private set; }
+    // public int LifetimeCancelledCount { get; private set; }
+
+
+
     void Awake()
     {
         if (I != null && I != this)
@@ -49,6 +59,16 @@ public class OrderManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             I = this;
         }
+    }
+
+    void Start()
+    {
+        DayManager.I.DayStarted += OnDayStarted;
+    }
+    void OnDestroy()
+    {
+        DayManager.I.DayStarted -= OnDayStarted;
+
     }
 
 
@@ -301,5 +321,21 @@ public class OrderManager : MonoBehaviour
         return PlayerTrySubmit(order, preparedItems);
     }
 
+    void RegisterCompletedOrder()
+    {
+        TodayCompletedCount++;
+        LifetimeCompletedCount++;
+    }
 
+    private void OnDayStarted(int dayNumber)
+    {
+        TodayCompletedCount = 0;
+        // TodayFailedCount = 0;
+        // TodayCancelledCount = 0;
+    }
+
+    public void Contribute(DaySummary summary)
+    {
+        summary.Add("Orders Completed", TodayCompletedCount);
+    }
 }

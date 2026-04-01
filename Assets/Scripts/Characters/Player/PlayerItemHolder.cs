@@ -7,6 +7,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
+/// data about where an item should be placed 
+/// </summary>
+[Serializable]
+public struct PlacementPose
+{
+    public bool IsValid;
+    public Transform Parent;
+    public Vector3 Position;
+    public Quaternion Rotation;
+}
+/// <summary>
 /// System for holding items.  that can be used.
 /// </summary>
 [RequireComponent(typeof(Player))]
@@ -56,6 +67,7 @@ public class PlayerItemHolder : MonoBehaviour
     private GameObject handVisual = null;
 
     public Player Player;
+    private float playerCamYawOffset = 0f;
     void Awake()
     {
         Player = GetComponent<Player>();
@@ -90,29 +102,21 @@ public class PlayerItemHolder : MonoBehaviour
     {
         if (!isHolding) return;
 
-        // customer behaviour
-        if (ItemInHand.OnPressedInteract(this, context))
+        if (ItemInHand.OnHeldPressedInteract(this, context))
         {
             return;
         }
 
+        //place 
         if (context.Type == InteractType.Primary)
         {
-
-            if (ItemInHand.TryPlace(this, placementInfo))
+            if (TryGetPlacementPose(ItemInHand, placementInfo, out PlacementPose pose))
             {
-                FinishPlace();
-                return;
-            }
-
-            // generic placement fallback
-            if (placementInfo.TryGetWorldPlacementInfo(out Transform trans, out Vector3 pos, out Quaternion rot))
-            {
-                TryPlaceOnSurface(trans, pos, rot);
+                TryPlaceFromPose(pose, placementInfo);
             }
         }
-
     }
+
     void FinishHold()
     {
         ItemInHand.OnAfterHeld(this);
@@ -152,6 +156,10 @@ public class PlayerItemHolder : MonoBehaviour
             snapper.DetachFromParent();
         }
 
+        //   compute angle offset of the holdable
+        float playerYaw = CamRoot.eulerAngles.y;
+        float itemYaw = target.transform.eulerAngles.y;
+        playerCamYawOffset = Mathf.DeltaAngle(playerYaw, itemYaw);
 
 
 
@@ -172,8 +180,12 @@ public class PlayerItemHolder : MonoBehaviour
         handVisual.transform.SetParent(HoldSpot, worldPositionStays: true);
 
         // handVisual.transform.localRotation = Quaternion.identity;
-        handVisual.transform.localPosition = target.HoldLocalPosition;
-        handVisual.transform.localRotation = Quaternion.Euler(target.HoldLocalEuler);
+        // handVisual.transform.localPosition = target.HoldLocalPosition;
+        // handVisual.transform.localRotation = Quaternion.Euler(target.HoldLocalEuler);
+
+        handVisual.transform.localPosition = Vector3.zero;
+        handVisual.transform.localRotation = Quaternion.identity;
+
 
 
         ItemInHand = target;
@@ -184,24 +196,24 @@ public class PlayerItemHolder : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Tries to place the held item if it can.
-    /// </summary>
-    /// <param name="pos"></param>
-    public bool TryPlaceOnSurface(Transform surface, Vector3 pos, Quaternion rot)
-    {
-        if (!isHolding) return false;
-        Debug.Log("[PlayerItemHolder]: Trying to place on surface.");
+    // /// <summary>
+    // /// Tries to place the held item if it can.
+    // /// </summary>
+    // /// <param name="pos"></param>
+    // public bool TryPlaceOnSurface(Transform surface, Vector3 pos, Quaternion rot)
+    // {
+    //     if (!isHolding) return false;
+    //     Debug.Log("[PlayerItemHolder]: Trying to place on surface.");
 
 
-        //place
-        ItemInHand.transform.SetParent(surface, worldPositionStays: true);
-        ItemInHand.transform.position = pos;
-        ItemInHand.transform.rotation = rot;
+    //     //place
+    //     ItemInHand.transform.SetParent(surface, worldPositionStays: true);
+    //     ItemInHand.transform.position = pos;
+    //     ItemInHand.transform.rotation = rot;
 
-        FinishPlace();
-        return true;
-    }
+    //     FinishPlace();
+    //     return true;
+    // }
 
 
     /// <summary>
@@ -239,52 +251,104 @@ public class PlayerItemHolder : MonoBehaviour
 
         return true;
     }
-    /// <summary>
-    /// Handle the preview shown before placing items
-    /// </summary>
-    /// <param name="preview"></param>
-    /// <param name="placementInfo"></param>
-    /// <param name="heldHoldable"></param>
+
+
+    bool TryGetPlacementPose(Holdable heldHoldable, PlacementInfo info, out PlacementPose pose)
+    {
+        pose = default;
+
+        if (heldHoldable == null)
+            return false;
+
+        // Custom placement has highest priority
+        if (heldHoldable.TryGetCustomPlacementPreview(this, info, out Vector3 customPos, out Quaternion customRot, out bool show))
+        {
+            if (!show)
+                return false;
+
+            pose.IsValid = true;
+            pose.Parent = null;
+            pose.Position = customPos;
+            pose.Rotation = customRot;
+            return true;
+        }
+
+        // Snap placement
+        if (heldHoldable.TryGetComponent<Snapper>(out var snapper) &&
+            snapper.TryGetPreviewPose(info, out Vector3 snapPos, out Quaternion snapRot))
+        {
+            pose.IsValid = true;
+            pose.Parent = null;
+            pose.Position = snapPos;
+            pose.Rotation = snapRot;
+            return true;
+        }
+
+        // World placement
+        if (info.TryGetWorldPlacementInfo(out Transform surface, out Vector3 worldPos, out Quaternion _))
+        {
+            float playerYaw = CamRoot.eulerAngles.y;
+            float totalYaw = playerYaw + playerCamYawOffset + info.WorldPlacementYaw;
+
+            pose.IsValid = true;
+            pose.Parent = surface;
+            pose.Position = worldPos;
+            pose.Rotation = Quaternion.Euler(0f, totalYaw, 0f);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    bool TryPlaceFromPose(PlacementPose pose, PlacementInfo placementInfo)
+    {
+        if (!isHolding || !pose.IsValid)
+            return false;
+
+        ItemInHand.transform.SetParent(pose.Parent, worldPositionStays: true);
+        ItemInHand.transform.position = pose.Position;
+        ItemInHand.transform.rotation = pose.Rotation;
+
+        // handle snapper
+        if (ItemInHand.TryGetComponent<Snapper>(out var snapper))
+        {
+            if (snapper.TryPlaceFromPlacementInfo(placementInfo))
+            {
+                FinishPlace();
+                return true;
+            }
+        }
+
+
+
+
+        FinishPlace();
+        return true;
+    }
+
+
+
+
     void UpdatePlacementPreview(PlacementPreview preview, PlacementInfo placementInfo, Holdable heldHoldable)
     {
-        //custom preview
-        if (heldHoldable.TryGetPlacementPreview(this, placementInfo, out Vector3 customPos, out Quaternion customRot, out bool show))
-        {
-            preview.IsShowing = show;
-            preview.Position = customPos;
-            preview.Rotation = customRot;
-        }
-
-
-        // preview for snapping
-        else if (heldHoldable.TryGetComponent<Snapper>(out var snapper) && snapper.TryGetPreviewPose(placementInfo, out Vector3 snapPos, out Quaternion snapRot))
+        if (TryGetPlacementPose(heldHoldable, placementInfo, out PlacementPose pose))
         {
             preview.IsShowing = true;
-
-            preview.Position = snapPos;
-            preview.Rotation = snapRot;
-        }
-        // preview for place on world.
-        else if (placementInfo.TryGetWorldPlacementInfo(out var _, out Vector3 worldPos, out Quaternion worldRot))
-        {
-            preview.IsShowing = true;
-            preview.Position = worldPos;
-            preview.Rotation = worldRot;
+            preview.Position = pose.Position;
+            preview.Rotation = pose.Rotation;
         }
         else
         {
-            // disable preview 
             preview.IsShowing = false;
         }
 
-
-        // show / hide preview
         if (preview.IsShowing)
         {
             if (preview.PreviewObject == null)
             {
                 preview.PreviewObject = heldHoldable.GetParentChildLinkedVisualRootClone();
-                // set layer to ignore raycast
+
                 preview.PreviewObject.layer = LayerMask.NameToLayer("Ignore Raycast");
                 foreach (Transform t in preview.PreviewObject.GetComponentsInChildren<Transform>())
                 {
@@ -292,18 +356,14 @@ public class PlayerItemHolder : MonoBehaviour
                 }
             }
 
-            if (preview.PreviewObject != null)
-            {
-                preview.PreviewObject.transform.position = preview.Position;
-                preview.PreviewObject.transform.rotation = preview.Rotation;
-            }
+            preview.PreviewObject.transform.position = preview.Position;
+            preview.PreviewObject.transform.rotation = preview.Rotation;
         }
         else
         {
             TryDeletePreview(preview);
         }
     }
-
 
 
     bool TryDeletePreview(PlacementPreview preview)

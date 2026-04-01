@@ -1,5 +1,3 @@
-
-
 using UnityEngine;
 
 /// <summary>
@@ -16,20 +14,25 @@ public class HoldableData : ScriptableObject
     public AudioDefinition PlaceSound;
     public AudioDefinition PickUpSound;
 
+    [Header("Containers")]
+    [Tooltip("Prefab used when this item is spawned inside a container.")]
+    public HoldableContainer ContainerPrefab;
+
     void OnValidate()
     {
         if (PlaceSound == null)
         {
             PlaceSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/DefaultPlace");
         }
+
         if (PickUpSound == null)
         {
             PickUpSound = Resources.Load<AudioDefinition>("ScriptableObjects/AudioDefinition/DefaultPickup");
         }
+
+        if (ContainerPrefab == null)
+        {
+            ContainerPrefab = Resources.Load<HoldableContainer>("Prefabs/Holdables/Containers/GenericHoldableContainer");
+        }
     }
-
-
-
-
-
 }

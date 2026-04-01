@@ -9,14 +9,17 @@ using UnityEngine;
 /// </summary>
 public class Holdable : InteractableBase
 {
-    [Header("Hold Pose")]
-    public Vector3 HoldLocalPosition = Vector3.zero;
-    public Vector3 HoldLocalEuler = Vector3.zero;
+    [Tooltip("The item that this holdable represents.")]
+    [InlineEditor]
+    [AssetsOnly]
+    public HoldableData ItemData;
+    // [Header("Hold Pose")]
+    // public Vector3 HoldLocalPosition = Vector3.zero;
+    // public Vector3 HoldLocalEuler = Vector3.zero;
 
     [Tooltip("Information that is shown when the item is actually held.")]
-    public List<InteractInfo> HeldInfos = new List<InteractInfo>();
+    public List<InteractInfo> DefaultHeldInfos = new List<InteractInfo>();
     [InlineEditor]
-    public HoldableData ItemData;
     public event Action<InteractionContext> OnHeld;
     public event Action<InteractionContext> OnSecondaryInteract;
 
@@ -38,21 +41,41 @@ public class Holdable : InteractableBase
             HoverInteractInfo.Add(new InteractInfo(InteractType.Primary, "Pick up"));
         }
 
-        if (HeldInfos.Count == 0)
+        if (DefaultHeldInfos.Count == 0)
         {
-            HeldInfos.Add(new InteractInfo(InteractType.Primary, "Place"));
+            DefaultHeldInfos.Add(new InteractInfo(InteractType.Primary, "Place"));
+        }
+
+
+
+    }
+    protected override void OnValidate()
+    {
+        base.OnValidate();
+        InitRefs();
+
+    }
+    protected override void Awake()
+    {
+        base.Awake();
+        InitRefs();
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        if (ItemData == null)
+        {
+            throw new Exception($"{name}: ItemData is null!");
         }
 
     }
-    void OnValidate()
-    {
-        InitRefs();
 
-    }
-    void Awake()
-    {
-        InitRefs();
-    }
+    // public virtual void Start()
+    // {
+    //     SetHoverTooltipData(new HoverTooltipData
+    //     (transform, () => ItemData != null ? ItemData.Name : "Holdable"));
+    // }
 
     // public virtual void OnStartHolding(PlayerItemHolder holder) { }
 
@@ -67,20 +90,21 @@ public class Holdable : InteractableBase
     /// <param name="holder"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    public virtual bool OnPressedInteract(PlayerItemHolder holder, InteractionContext context)
+    public virtual bool OnHeldPressedInteract(PlayerItemHolder holder, InteractionContext context)
     {
         return false;
     }
 
     /// <summary>
     /// Get the placement preview of this holdable.
+    /// Return true to override placement preview.
     /// </summary>
     /// <param name="holder"></param>
     /// <param name="info"></param>
     /// <param name="pos"></param>
     /// <param name="rot"></param>
     /// <returns></returns>
-    public virtual bool TryGetPlacementPreview(PlayerItemHolder holder, PlacementInfo info, out Vector3 pos, out Quaternion rot, out bool show)
+    public virtual bool TryGetCustomPlacementPreview(PlayerItemHolder holder, PlacementInfo info, out Vector3 pos, out Quaternion rot, out bool show)
     {
 
         pos = default;
@@ -89,15 +113,15 @@ public class Holdable : InteractableBase
         return false;
     }
 
-    public virtual bool TryPlace(PlayerItemHolder holder, PlacementInfo info)
-    {
-        if (TryGetComponent<Snapper>(out var snapper))
-        {
-            return snapper.TryPlaceFromPlacementInfo(info);
-        }
+    // public virtual bool TryPlace(PlayerItemHolder holder, PlacementInfo info)
+    // {
+    //     if (TryGetComponent<Snapper>(out var snapper))
+    //     {
+    //         return snapper.TryPlaceFromPlacementInfo(info);
+    //     }
 
-        return false;
-    }
+    //     return false;
+    // }
 
 
 
@@ -124,15 +148,23 @@ public class Holdable : InteractableBase
         return t.GetComponentInChildren<Holdable>();
     }
 
+    // public override HoverTooltipData GetHoverTooltipData()
+    // {
+    //     return base.GetHoverTooltipData();
+    // }
+
     public bool IsBeingHeld()
     {
         return beingHeld;
     }
     public override void Interact(InteractionContext context)
     {
+
+        Debug.Log("[Holdable] Interact: " + context.Type);
         if (!isActiveAndEnabled) return;
 
         OnHeld?.Invoke(context);
+
         // context.Player.ItemHolder.TryHold(GetHoldableRoot());
         if (context.Type == InteractType.Primary)
         {
@@ -145,7 +177,7 @@ public class Holdable : InteractableBase
 
     public virtual List<InteractInfo> GetHeldInteractInfos(PlayerItemHolder holder)
     {
-        return HeldInfos;
+        return DefaultHeldInfos;
     }
     /// <summary>
     /// Called by the item holder after this is held
@@ -261,7 +293,7 @@ public class Holdable : InteractableBase
 
 
 #if UNITY_EDITOR
-    public float GizmoSize = .3f;
+    // public float GizmoSize = .3f;
     void OnDrawGizmos()
     {
         if (beingHeld)
@@ -280,7 +312,7 @@ public class Holdable : InteractableBase
             Handles.Label(transform.position, "VisualRoot not set!", style);
         }
 
-        Gizmos.DrawWireCube(transform.position, Vector3.one * GizmoSize);
+        Gizmos.DrawWireCube(transform.position, Vector3.one * .3f);
 
     }
 

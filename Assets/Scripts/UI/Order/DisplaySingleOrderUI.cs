@@ -10,10 +10,25 @@ public class DisplaySingleOrderUI : MonoBehaviour
     public DisplaySingleMenuItemUI DisplaySingleMenuItemUI;
 
     public TMP_Text Payout;
+    public TMP_Text TimeSinceOrdered;
+
 
 
     private Order displayedOrder;
 
+    void Update()
+    {
+        if (displayedOrder != null)
+        {
+            TimeSinceOrdered.text = "Time: " + displayedOrder.TimeSinceOrdered.ToString("F1");
+        }
+        else
+        {
+            TimeSinceOrdered.text = "";
+        }
+
+
+    }
 
 
     public void Populate(Order order)
@@ -24,9 +39,8 @@ public class DisplaySingleOrderUI : MonoBehaviour
         Payout.text = "$" + order.Payout.ToString();
 
 
-        foreach (var item in order.Items)
+        foreach (OrderedMenuItem item in order.Items)
         {
-
             var itemUI = Instantiate(DisplaySingleMenuItemUI, MenuItemsFlexContainer);
             itemUI.Populate(item);
 
